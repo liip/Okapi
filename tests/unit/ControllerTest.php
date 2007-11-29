@@ -71,6 +71,15 @@ class ControllerTest extends UnitTestCase {
         $c = $this->getController(array('path' => '/command/mymethod'));
         $this->assertEqual($c['params']['method'], 'mymethod');
     }
+
+    /**
+     * Test if the method is correctly parsed from the path also when
+     * additional parameters come after the method.
+     */
+    function testMethodWithParams() {
+        $c = $this->getController(array('path' => '/command/ls/def'));
+        $this->assertEqual($c['params']['method'], 'ls');
+    }
     
     /**
      * Test if the method is correctly parsed from the path.
