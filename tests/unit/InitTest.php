@@ -196,7 +196,8 @@ class InitTest extends UnitTestCase {
                 'themesdir'            => API_THEMES_DIR,
                 'webroot'              => API_WEBROOT,
                 'webrootStatic'        => API_WEBROOT_STATIC,
-                'commandMapAllowRegex' => true
+                'commandMapAllowRegex' => true,
+                'host'                 => 'demo',
             ));
     }
     

@@ -63,6 +63,26 @@ class ControllerTest extends UnitTestCase {
     }
     
     /**
+     * Test if the method is correctly parsed from the path.
+     * In case of an existing command, the method is expected
+     * to be the first component after the command.
+     */
+    function testMethod() {
+        $c = $this->getController(array('path' => '/command/mymethod'));
+        $this->assertEqual($c['params']['method'], 'mymethod');
+    }
+    
+    /**
+     * Test if the method is correctly parsed from the path.
+     * In case of an non-existing command, the method is expected
+     * to be empty-
+     */
+    function testMethodInvalidCommand() {
+        $c = $this->getController(array('path' => '/the/command'));
+        $this->assertEqual($c['params']['method'], '');
+    }
+    
+    /**
      * Helper method to initialize a new controller with some
      * overwritten parameters. Uses api_init::getControllerConfig()
      * and overwrites the keys which are given.

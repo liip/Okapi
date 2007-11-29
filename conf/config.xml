@@ -13,4 +13,8 @@
         <!-- Must be around. -->
         <host name="localhost" />
     </hosts>
+    
+    <exceptionhandler>
+         <handler exception="*">ignore</handler>
+    </exceptionhandler>
 </config>
