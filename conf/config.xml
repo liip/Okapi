@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<config>
+    <configCache>false</configCache>
+    <tmpdir>{API_PROJECT_DIR}tmp/</tmpdir>
+    
+    <lang dir="{API_PROJECT_DIR}/lang" fileprefix="lang" i18ntransform="true">
+        <output default="en">en,de</output>
+    </lang>
+    
+    <hosts>
+        <host sld="demo" tld="okapi.org" />
+        
+        <!-- Must be around. -->
+        <host name="localhost" />
+    </hosts>
+</config>
