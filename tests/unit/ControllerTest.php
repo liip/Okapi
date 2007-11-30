@@ -71,7 +71,7 @@ class ControllerTest extends UnitTestCase {
         $c = $this->getController(array('path' => '/command/mymethod'));
         $this->assertEqual($c['params']['method'], 'mymethod');
     }
-
+    
     /**
      * Test if the method is correctly parsed from the path also when
      * additional parameters come after the method.
@@ -84,11 +84,75 @@ class ControllerTest extends UnitTestCase {
     /**
      * Test if the method is correctly parsed from the path.
      * In case of an non-existing command, the method is expected
-     * to be empty-
+     * to be empty.
      */
     function testMethodInvalidCommand() {
         $c = $this->getController(array('path' => '/the/command'));
         $this->assertEqual($c['params']['method'], '');
+    }
+    
+    /**
+     * Test if the filename is correctly parsed from the path.
+     */
+    function testFilename() {
+        $c = $this->getController(array('path' => '/document.pdf'));
+        $this->assertEqual($c['params']['filename'], 'document.pdf');
+    }
+    
+    /**
+     * Test if the filename is correctly parsed from the path.
+     * The last component of the path is taken.
+     */
+    function testFilenameHierarchy() {
+        $c = $this->getController(array('path' => '/subfolder/document.pdf'));
+        $this->assertEqual($c['params']['filename'], 'document.pdf');
+    }
+    
+    /**
+     * Test if the filename is correctly parsed from the path.
+     * An extension is required, so in this case an empty filename is
+     * returned.
+     */
+    function testFilenameExtension() {
+        $c = $this->getController(array('path' => '/document'));
+        $this->assertEqual($c['params']['filename'], '');
+    }
+    
+    /**
+     * Test if the filename is correctly parsed from the path.
+     * An extension is required, so in this case an empty filename is
+     * returned.
+     */
+    function testFilenameExtensionDot() {
+        $c = $this->getController(array('path' => '/document.'));
+        $this->assertEqual($c['params']['filename'], '');
+    }
+    
+    /**
+     * Test if the directiveHost and directivePath is correctly returned
+     * from the commandmap.
+     */
+    function testDirective() {
+        $c = $this->getController(array('path' => '/command/'));
+        $this->assertEqual($c['params']['directiveHost'], '*');
+        $this->assertEqual($c['params']['directivePath'], '/command/');
+    }
+    
+    /**
+     * Test if the command attributes are correctly returned from the
+     * commandmap.
+     */
+    function testCommandAttributes() {
+        $c = $this->getController(array('path' => '/command/'));
+        $this->assertEqual($c['params']['attrib'], array(
+            'host'    => '*',
+            'path'    => '/command/',
+            'view'    => 'default',
+            'xsl'     => 'command.xsl',
+            'theme'   => 'default',
+            'css'     => 'default',
+            'passdom' => 'no',
+        ));
     }
     
     /**
