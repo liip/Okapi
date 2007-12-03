@@ -16,7 +16,7 @@
         <host name="localhost" />
     </hosts>
     
-    <exceptionhandler>
+    <!-- <exceptionhandler>
          <handler exception="*">ignore</handler>
-    </exceptionhandler>
+    </exceptionhandler> -->
 </config>
