@@ -14,6 +14,19 @@ class ControllerTest extends UnitTestCase {
         $c = $this->getController();
         $this->assertIsA($c['ctrl'], 'api_controller');
     }
+    
+    /**
+     * Check that process method works.
+     */
+    function testProcess() {
+        $c = $this->getController();
+        ob_start();
+        $c['ctrl']->process();
+        $contents = ob_get_contents();
+        ob_end_clean();
+
+        $this->assertNotEqual($contents, '');
+    }
 
     /**
      * Helper method to initialize a new controller with some
