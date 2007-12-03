@@ -120,13 +120,6 @@ class InitTest extends UnitTestCase {
         $this->assertIsA($pool, 'api_pool');
         $this->assertIsA($pool->config, 'api_config');
     }
-    
-    /**
-     * Verify the config file set to api_init.
-     */
-    function testInitConfigFileName() {
-        $this->assertEqual(api_init::$apiCfgFile, API_PROJECT_DIR . 'conf/config.xml');
-    }
 
     /**
      * Verify that config can be used.
@@ -187,7 +180,6 @@ class InitTest extends UnitTestCase {
     function testControllerConfig() {
         $this->assertEqual(api_init::getControllerConfig(),
             array(
-                'configfile'           => api_init::$apiCfgFile,
                 'basedir'              => API_PROJECT_DIR,
                 'path'                 => api_init::$path,
                 'params'               => api_init::$apiParams,
