@@ -3,6 +3,8 @@
     <configCache>false</configCache>
     <tmpdir>{API_PROJECT_DIR}tmp/</tmpdir>
     
+    <commandmap regex="true" />
+    
     <lang dir="{API_PROJECT_DIR}/lang" fileprefix="lang" i18ntransform="true">
         <output default="en">en,de</output>
     </lang>
