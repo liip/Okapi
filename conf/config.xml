@@ -20,4 +20,6 @@
     <!-- <exceptionhandler>
          <handler exception="*">ignore</handler>
     </exceptionhandler> -->
+    
+    <config_test>main</config_test>
 </config>
