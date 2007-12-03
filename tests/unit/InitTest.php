@@ -164,16 +164,6 @@ class InitTest extends UnitTestCase {
     }
     
     /**
-     * Test if the $_GET array is put into api_init::$apiParams correctly.
-     *
-     * path should be ignored, everything else should be put in.
-     */
-    function testApiParams() {
-        $this->assertEqual(api_init::$apiParams,
-            array('question' => 'does it work?'));
-    }
-    
-    /**
      * Tests the controller configuration as returned by
      * api_init::getControllerConfig()
      */

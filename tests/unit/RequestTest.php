@@ -125,5 +125,16 @@ class RequestTest extends UnitTestCase {
         $r = new api_request();
         $this->assertEqual($r->getDefaultLanguage(), 'en');
     }
+    
+    /**
+     * Tests if the parameters are correctly set from GET array.
+     */
+    function testParametersGet() {
+        $_GET = array('path' => 'mypath', 'question' => 'does it work?');
+        $r = new api_request();
+        $this->assertEqual($r->getParameters(), array(
+            'path' => 'mypath',
+            'question' => 'does it work?'));
+    }
 }
 ?>
