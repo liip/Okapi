@@ -172,7 +172,6 @@ class InitTest extends UnitTestCase {
             array(
                 'basedir'              => API_PROJECT_DIR,
                 'path'                 => api_init::$path,
-                'params'               => api_init::$apiParams,
                 'commandconf'          => API_PROJECT_DIR."conf/commandmap.xml",
                 'cachedir'             => API_TEMP_DIR,
                 'themesdir'            => API_THEMES_DIR,
