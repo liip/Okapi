@@ -25,6 +25,17 @@ class RequestTest extends UnitTestCase {
     }
 
     /**
+     * Test if the path is correctly parsed from the URI for a
+     * host which defines a path prefix.
+     */
+    function testRequestPathWithPrefix() {
+        $_SERVER['HTTP_HOST'] = 'pathdemo.okapi.org';
+        $_SERVER["REQUEST_URI"] = '/xyz/command/foo/bar';
+        $r = new api_request();
+        $this->assertEqual('/command/foo/bar', $r->getPath());
+    }
+
+    /**
      * Test if the filename is correctly parsed from the path.
      */
     function testFilename() {

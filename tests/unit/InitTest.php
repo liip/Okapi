@@ -182,6 +182,14 @@ class InitTest extends UnitTestCase {
     }
     
     /**
+     * Test host parsing for a configured host with a prefix path.
+     */
+    function testParseHostWithPathPrefix() {
+        $this->assertEqual(api_init::getHostConfig('pathdemo.okapi.org'),
+            array('sld' => 'pathdemo', 'tld' => 'okapi.org', 'path' => '/xyz'));
+    }
+
+    /**
      * Helper to test if a constant is defined.
      */
     private function assertDefined($constant) {

@@ -11,6 +11,7 @@
     
     <hosts>
         <host sld="demo" tld="okapi.org" />
+        <host sld="pathdemo" tld="okapi.org" path="/xyz" />
         
         <!-- Must be around. -->
         <host name="localhost" />
