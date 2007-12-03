@@ -21,9 +21,7 @@ class ControllerTest extends UnitTestCase {
      * and overwrites the keys which are given.
      */
     private function getController($opts = array()) {
-        $cfg = api_init::getControllerConfig();
-        $cfg = array_merge($cfg, $opts);
-        $controller = new api_controller($cfg);
+        $controller = new api_controller();
         
         return array('ctrl' => $controller,
                      'params' => $controller->getRequestParams());
