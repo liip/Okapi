@@ -24,45 +24,6 @@ class ControllerTest extends UnitTestCase {
     }
     
     /**
-     * Test that language parsing works correctly for a path which does
-     * not contain any language (the default language must be used).
-     */
-    function testLangDefault() {
-        $c = $this->getController();
-        $this->assertEqual($c['params']['lang'], 'en');
-    }
-    
-    /**
-     * Read the language from the path. This case tests reading the
-     * language when it's the default language.
-     */
-    function testLangPath() {
-        $c = $this->getController(array('path' => '/en/the/command'));
-        $this->assertEqual($c['params']['lang'], 'en');
-        $this->assertEqual($c['ctrl']->path, '/the/command');
-    }
-    
-    /**
-     * Read the language from the path. This case tests reading the
-     * language when it's not the default language.
-     */
-    function testLangPathGerman() {
-        $c = $this->getController(array('path' => '/de/the/command'));
-        $this->assertEqual($c['params']['lang'], 'de');
-        $this->assertEqual($c['ctrl']->path, '/the/command');
-    }
-    
-    /**
-     * Read the language from the path. This case verifies
-     * only known languages are used.
-     */
-    function testLangPathSpanish() {
-        $c = $this->getController(array('path' => '/es/the/command'));
-        $this->assertEqual($c['params']['lang'], 'en');
-        $this->assertEqual($c['ctrl']->path, '/es/the/command');
-    }
-    
-    /**
      * Test if the method is correctly parsed from the path.
      * In case of an existing command, the method is expected
      * to be the first component after the command.
@@ -89,43 +50,6 @@ class ControllerTest extends UnitTestCase {
     function testMethodInvalidCommand() {
         $c = $this->getController(array('path' => '/the/command'));
         $this->assertEqual($c['params']['method'], '');
-    }
-    
-    /**
-     * Test if the filename is correctly parsed from the path.
-     */
-    function testFilename() {
-        $c = $this->getController(array('path' => '/document.pdf'));
-        $this->assertEqual($c['params']['filename'], 'document.pdf');
-    }
-    
-    /**
-     * Test if the filename is correctly parsed from the path.
-     * The last component of the path is taken.
-     */
-    function testFilenameHierarchy() {
-        $c = $this->getController(array('path' => '/subfolder/document.pdf'));
-        $this->assertEqual($c['params']['filename'], 'document.pdf');
-    }
-    
-    /**
-     * Test if the filename is correctly parsed from the path.
-     * An extension is required, so in this case an empty filename is
-     * returned.
-     */
-    function testFilenameExtension() {
-        $c = $this->getController(array('path' => '/document'));
-        $this->assertEqual($c['params']['filename'], '');
-    }
-    
-    /**
-     * Test if the filename is correctly parsed from the path.
-     * An extension is required, so in this case an empty filename is
-     * returned.
-     */
-    function testFilenameExtensionDot() {
-        $c = $this->getController(array('path' => '/document.'));
-        $this->assertEqual($c['params']['filename'], '');
     }
     
     /**
