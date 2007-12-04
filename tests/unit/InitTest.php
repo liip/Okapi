@@ -140,19 +140,13 @@ class InitTest extends UnitTestCase {
     }
     
     /**
-     * Test that sld and tld are set correctly.
-     */
-    function testInitHost() {
-        $this->assertEqual(api_init::$sld, 'demo');
-        $this->assertEqual(api_init::$tld, 'okapi.org');
-    }
-    
-    /**
      * Test host parsing for a configured host.
      */
     function testParseKnownHost() {
         $this->assertEqual(api_init::getHostConfig('demo.okapi.org'),
-            array('sld' => 'demo', 'tld' => 'okapi.org', 'path' => '/'));
+            array('host' => 'demo',
+                  'sld' => 'demo', 'tld' => 'okapi.org',
+                  'path' => '/'));
     }
     
     /**
@@ -171,13 +165,11 @@ class InitTest extends UnitTestCase {
         $this->assertEqual(api_init::getControllerConfig(),
             array(
                 'basedir'              => API_PROJECT_DIR,
-                'path'                 => api_init::$path,
                 'commandconf'          => API_PROJECT_DIR."conf/commandmap.xml",
                 'cachedir'             => API_TEMP_DIR,
                 'themesdir'            => API_THEMES_DIR,
                 'webroot'              => API_WEBROOT,
                 'webrootStatic'        => API_WEBROOT_STATIC,
-                'host'                 => 'demo',
             ));
     }
     
@@ -186,7 +178,9 @@ class InitTest extends UnitTestCase {
      */
     function testParseHostWithPathPrefix() {
         $this->assertEqual(api_init::getHostConfig('pathdemo.okapi.org'),
-            array('sld' => 'pathdemo', 'tld' => 'okapi.org', 'path' => '/xyz'));
+            array('host' => 'pathdemo.okapi',
+                  'sld' => 'pathdemo', 'tld' => 'okapi.org',
+                  'path' => '/xyz'));
     }
 
     /**

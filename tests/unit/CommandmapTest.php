@@ -22,7 +22,7 @@ class CommandmapTest extends UnitTestCase {
     
     function testDirectiveHost() {
         $commands = new api_commandmap($this->request);
-        $this->assertEqual($commands->getDirectiveHost(), 'demo.okapi.org');
+        $this->assertEqual($commands->getDirectiveHost(), 'demo');
     }
     
     function testDirectivePath() {
@@ -62,7 +62,7 @@ class CommandmapTest extends UnitTestCase {
     function testCommandAttributes() {
         $commands = new api_commandmap($this->request);
         $this->assertEqual($commands->getCommandAttributes(), array(
-            'host'    => "demo.okapi.org",
+            'host'    => "demo",
             'path'    => '/command/',
             'view'    => 'default',
             'xsl'     => 'command.xsl',

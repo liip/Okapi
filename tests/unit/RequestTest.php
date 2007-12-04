@@ -14,6 +14,37 @@ class RequestTest extends UnitTestCase {
         $r = new api_request();
         $this->assertEqual('demo.okapi.org', $r->getHost());
     }
+    
+    /**
+     * Test if the lookup host name is correctly set from the HTTP
+     * host header. The lookup host name is used for commandmap
+     * lookups.
+     */
+    function testRequestLookupHost() {
+        $_SERVER['HTTP_HOST'] = 'demo.okapi.org';
+        $r = new api_request();
+        $this->assertEqual('demo', $r->getLookupHost());
+    }
+
+    /**
+     * Test if the subdomain is correctly parsed from the
+     * HTTP host header.
+     */
+    function testSubdomain() {
+        $_SERVER['HTTP_HOST'] = 'demo.okapi.org';
+        $r = new api_request();
+        $this->assertEqual('demo', $r->getSld());
+    }
+
+    /**
+     * Test if the "top-level" domain is correctly parsed from the
+     * HTTP host header.
+     */
+    function testTopdomain() {
+        $_SERVER['HTTP_HOST'] = 'demo.okapi.org';
+        $r = new api_request();
+        $this->assertEqual('okapi.org', $r->getTld());
+    }
 
     /**
      * Test if the path is correctly parsed from the URI.

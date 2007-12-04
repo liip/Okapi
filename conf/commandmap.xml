@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <commandmap>
-    <directive host="demo.okapi.org" path="/command/" view="default" xsl="command.xsl" theme="default" css="default" passdom="no">
+    <directive host="demo" path="/command/" view="default" xsl="command.xsl" theme="default" css="default" passdom="no">
         <command name="nocommand"/>
     </directive>
 </commandmap>

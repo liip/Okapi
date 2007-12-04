@@ -19,7 +19,7 @@ class ModelQueryinfoTest extends OkapiTestCase {
         $this->assertXPath($dom, '/queryinfo/lang', 'en');
         $this->assertXPath($dom, '/queryinfo/method', 'foo');
         $this->assertXPath($dom, '/queryinfo/directivePath', '/command/');
-        $this->assertXPath($dom, '/queryinfo/directiveHost', 'demo.okapi.org');
+        $this->assertXPath($dom, '/queryinfo/directiveHost', 'demo');
     }
 }
 ?>
