@@ -22,4 +22,15 @@
     </exceptionhandler> -->
     
     <config_test>main</config_test>
+    
+    <backend>
+        <server id="extapi">
+            <host>extapi.local.ch</host>
+            <path>/0</path>
+            
+            <command id="cities">
+                <path>/cities.xml</path>
+            </command>
+        </server>
+    </backend>
 </config>
