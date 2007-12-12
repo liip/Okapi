@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<catalogue xmlns:xi="http://www.w3.org/2001/XInclude">
+    <message key="associate">Link</message>
+    <message key="autocompletionremaining">Other {remain} results omitted. Limit search further.</message>
+    <message key="classifieddeactivate">Deactivate listing</message>
+    <message key="chf">CHF</message>
+</catalogue>
