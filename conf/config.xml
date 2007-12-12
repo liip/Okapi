@@ -7,6 +7,7 @@
     
     <lang dir="{API_PROJECT_DIR}lang" fileprefix="lang" i18ntransform="true">
         <output default="en">en,de</output>
+        <retriever>lowercase</retriever>
     </lang>
     
     <hosts>
