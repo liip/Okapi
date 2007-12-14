@@ -4,10 +4,10 @@
  */
 class ModelFileTest extends OkapiTestCase {
     function testModel() {
-        $model = new api_model_file(dirname(__FILE__).'/../../conf/config.xml');
+        $model = new api_model_file(dirname(__FILE__).'/../../lang/lang_en.xml');
         
         $dom = $model->getDOM();
-        $this->assertXPath($dom, '/config/config_test', 'main');
+        $this->assertXPath($dom, '/catalogue/message[@key="chf"]', 'CHF');
     }
 
     /**

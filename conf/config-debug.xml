@@ -1,6 +1,0 @@
-<?xml version="1.0"?>
-<config xmlns:xi="http://www.w3.org/2001/XInclude">
-    <xi:include href="config.xml#xpointer(/config/*[name()!='config_test'])" /> 
-    
-    <config_test>debug</config_test>
-</config>

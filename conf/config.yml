@@ -1,0 +1,45 @@
+# =======================
+# = Live configuration =
+# =======================
+default: &default
+    configCache: false
+    tmpdir: {API_PROJECT_DIR}tmp/
+    commandmap:
+        regex: true
+    
+    lang:
+        dir: {API_PROJECT_DIR}lang/
+        fileprefix: lang
+        i18ntransform: true
+        default: en
+        languages: [en, de]
+        retriever: lowercase
+    
+    hosts:
+        demo.okapi.org:
+            sld: demo
+            tld: okapi.org
+        pathdemo.okapi.org:
+            path: /xyz
+            sld: pathdemo
+            tld: okapi.org
+            host: pathdemo.okapi
+    
+    exceptionhandler:
+        "*": ignore
+    
+    config_test: main
+    
+    backend:
+        extapi:
+            host: extapi.local.ch
+            path: /0
+            cities:
+                path: /cities.xml
+
+
+# =======================
+# = Debug configuration =
+# =======================
+debug: *default
+    config_test: debug
