@@ -29,6 +29,25 @@ class RoutingTest extends UnitTestCase {
         $this->assertEqual($route, array('controller' => 'test',
             'method' => 'process', 'param1' => 'abc'));
     }
+    
+    /**
+     * Generic mapping plus a specific one.
+     */
+    function testGenericMapping() {
+        $m = new api_routing();
+        $m->add('/user/:method/:id', array('controller' => 'user'));
+        $m->add('/:controller/:method/:id');
+        
+        $request = new mock_request(array('path' => '/user/save/3'));
+        $route = $m->getRoute($request);
+        $this->assertEqual($route, array('controller' => 'user',
+            'method' => 'save', 'id' => '3'));
+        
+        $request = new mock_request(array('path' => '/list/get/7'));
+        $route = $m->getRoute($request);
+        $this->assertEqual($route, array('controller' => 'list',
+            'method' => 'get', 'id' => '7'));
+    }
 
     /**
      * Mapping with one request param but wrong URI.
