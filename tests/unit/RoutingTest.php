@@ -9,9 +9,10 @@ class RoutingTest extends UnitTestCase {
      */
     function testEmpty() {
         $m = new api_routing();
-        $m->add('', array('controller' => 'index'));
+        $m->add('/', array('controller' => 'index'));
         
-        $route = $m->getRoute('/');
+        $request = new mock_request(array('path' => '/'));
+        $route = $m->getRoute($request);
         $this->assertEqual($route, array('controller' => 'index',
             'method' => 'process'));
     }
@@ -21,9 +22,10 @@ class RoutingTest extends UnitTestCase {
      */
     function testWithOneRequestParam() {
         $m = new api_routing();
-        $m->add('test/:param1', array('controller' => 'test'));
+        $m->add('/test/:param1', array('controller' => 'test'));
         
-        $route = $m->getRoute('/test/abc');
+        $request = new mock_request(array('path' => '/test/abc'));
+        $route = $m->getRoute($request);
         $this->assertEqual($route, array('controller' => 'test',
             'method' => 'process', 'param1' => 'abc'));
     }
@@ -33,12 +35,14 @@ class RoutingTest extends UnitTestCase {
      */
     function testWithOneRequestParamNoMatch() {
         $m = new api_routing();
-        $m->add('test/:param1', array('controller' => 'test'));
+        $m->add('/test/:param1', array('controller' => 'test'));
         
-        $route = $m->getRoute('/test/');
+        $request = new mock_request(array('path' => '/test/'));
+        $route = $m->getRoute($request);
         $this->assertNull($route);
 
-        $route = $m->getRoute('/mytest/abc');
+        $request = new mock_request(array('path' => '/mytest/abc'));
+        $route = $m->getRoute($request);
         $this->assertNull($route);
     }
     
@@ -47,9 +51,10 @@ class RoutingTest extends UnitTestCase {
      */
     function testWithMultipleRequestParam() {
         $m = new api_routing();
-        $m->add(':user/:controller/test/def/:foo/:bar/superuser', array('controller' => 'test'));
+        $m->add('/:user/:controller/test/def/:foo/:bar/superuser', array('controller' => 'test'));
         
-        $route = $m->getRoute('/pneff/index/test/def/myfoo/something/superuser');
+        $request = new mock_request(array('path' => '/pneff/index/test/def/myfoo/something/superuser'));
+        $route = $m->getRoute($request);
         $this->assertEqual($route, array('controller' => 'index',
             'method' => 'process', 'user' => 'pneff', 'foo' => 'myfoo',
             'bar' => 'something'));
@@ -60,12 +65,14 @@ class RoutingTest extends UnitTestCase {
      */
     function testWithMultipleRequestParamNoMatch() {
         $m = new api_routing();
-        $m->add(':user/:controller/test/def/:foo/:bar/superuser', array('controller' => 'test'));
+        $m->add('/:user/:controller/test/def/:foo/:bar/superuser', array('controller' => 'test'));
         
-        $route = $m->getRoute('/pneff/index/test/def/myfoo/something');
+        $request = new mock_request(array('path' => '/pneff/index/test/def/myfoo/something'));
+        $route = $m->getRoute($request);
         $this->assertNull($route);
         
-        $route = $m->getRoute('index/test/def/myfoo/something/superuser');
+        $request = new mock_request(array('path' => '/index/test/def/myfoo/something/superuser'));
+        $route = $m->getRoute($request);
         $this->assertNull($route);
     }
 
@@ -75,16 +82,58 @@ class RoutingTest extends UnitTestCase {
      */
     function testPreserveRoutes() {
         $m = new api_routing();
-        $m->add('test/:param1', array('controller' => 'test'));
+        $m->add('/test/:param1', array('controller' => 'test'));
         
-        $route = $m->getRoute('/test/abc');
+        $request = new mock_request(array('path' => '/test/abc'));
+        $route = $m->getRoute($request);
         $this->assertEqual($route, array('controller' => 'test',
             'method' => 'process', 'param1' => 'abc'));
         
         $m = new api_routing();
-        $route = $m->getRoute('/test/abc');
+        $route = $m->getRoute($request);
         $this->assertEqual($route, array('controller' => 'test',
             'method' => 'process', 'param1' => 'abc'));
+    }
+    
+    /**
+     * Add the HTTP verb as a requisite to the route.
+     */
+    function testVerbDefaultGET() {
+        $m = new api_routing();
+        $m->add('/test/:param1', array('controller' => 'test',
+                                       '#conditions' => array('verb' => 'GET')));
+        
+        $request = new mock_request(array('path' => '/test/abc'));
+        $route = $m->getRoute($request);
+        $this->assertEqual($route, array('controller' => 'test',
+            'method' => 'process', 'param1' => 'abc'));
+    }
+    
+    /**
+     * Add the HTTP verb as a requisite to the route.
+     */
+    function testVerbExplicitGET() {
+        $m = new api_routing();
+        $m->add('/test/:param1', array('controller' => 'test',
+                                       '#conditions' => array('verb' => 'GET')));
+        
+        $request = new mock_request(array('path' => '/test/abc', 'verb' => 'GET'));
+        $route = $m->getRoute($request);
+        $this->assertEqual($route, array('controller' => 'test',
+            'method' => 'process', 'param1' => 'abc'));
+    }
+    
+    /**
+     * Asserts that the route does not match if the verb is different.
+     */
+    function testVerbExplicitGETNoMatch() {
+        $m = new api_routing();
+        $m->add('/test/:param1', array('controller' => 'test',
+                                       '#conditions' => array('verb' => 'GET')));
+        
+        $request = new mock_request(array('path' => '/test/abc', 'verb' => 'POST'));
+        $route = $m->getRoute($request);
+        $this->assertNull($route);
     }
 }
 ?>
