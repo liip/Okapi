@@ -135,5 +135,34 @@ class RoutingTest extends UnitTestCase {
         $route = $m->getRoute($request);
         $this->assertNull($route);
     }
+    
+    /**
+     * Groups of routes allow for common conditions for all the given
+     * routes.
+     */
+    function testGrouping() {
+        $m = new api_routing();
+        $g = $m->createGroup(array('controller' => 'test', '#conditions' => array('verb' => 'GET')));
+        $g->add('/test/:param1');       // Uses defaults
+        $g->add('/users/:uid', array('controller' => 'user'));
+        
+        $request = new mock_request(array('path' => '/test/abc', 'verb' => 'POST'));
+        $route = $m->getRoute($request);
+        $this->assertNull($route);
+        
+        $request = new mock_request(array('path' => '/test/abc', 'verb' => 'GET'));
+        $route = $m->getRoute($request);
+        $this->assertEqual($route, array('controller' => 'test',
+            'method' => 'process', 'param1' => 'abc'));
+        
+        $request = new mock_request(array('path' => '/users/userid', 'verb' => 'POST'));
+        $route = $m->getRoute($request);
+        $this->assertNull($route);
+        
+        $request = new mock_request(array('path' => '/users/userid', 'verb' => 'GET'));
+        $route = $m->getRoute($request);
+        $this->assertEqual($route, array('controller' => 'user',
+            'method' => 'process', 'uid' => 'userid'));
+    }
 }
 ?>
