@@ -21,6 +21,7 @@ class ControllerTest extends UnitTestCase {
     function testProcess() {
         $c = new api_controller();
         ob_start();
+        $this->expectError(new PatternExpectation('/Cannot modify header information/i'));
         $c->process();
         $contents = ob_get_contents();
         ob_end_clean();
