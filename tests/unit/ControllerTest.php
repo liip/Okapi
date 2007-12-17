@@ -11,33 +11,21 @@ class ControllerTest extends UnitTestCase {
      * Check that controller can be correctly instantiated.
      */
     function testInit() {
-        $c = $this->getController();
-        $this->assertIsA($c['ctrl'], 'api_controller');
+        $c = new api_controller();
+        $this->assertIsA($c, 'api_controller');
     }
     
     /**
      * Check that process method works.
      */
     function testProcess() {
-        $c = $this->getController();
+        $c = new api_controller();
         ob_start();
-        $c['ctrl']->process();
+        $c->process();
         $contents = ob_get_contents();
         ob_end_clean();
 
         $this->assertNotEqual($contents, '');
-    }
-
-    /**
-     * Helper method to initialize a new controller with some
-     * overwritten parameters. Uses api_init::getControllerConfig()
-     * and overwrites the keys which are given.
-     */
-    private function getController($opts = array()) {
-        $controller = new api_controller();
-        
-        return array('ctrl' => $controller,
-                     'params' => $controller->getRequestParams());
     }
 }
 ?>

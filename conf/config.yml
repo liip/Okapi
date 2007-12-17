@@ -4,8 +4,6 @@
 default: &default
     configCache: false
     tmpdir: {API_PROJECT_DIR}tmp/
-    commandmap:
-        regex: true
     
     lang:
         dir: {API_PROJECT_DIR}lang/

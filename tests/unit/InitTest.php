@@ -158,22 +158,6 @@ class InitTest extends UnitTestCase {
     }
     
     /**
-     * Tests the controller configuration as returned by
-     * api_init::getControllerConfig()
-     */
-    function testControllerConfig() {
-        $this->assertEqual(api_init::getControllerConfig(),
-            array(
-                'basedir'              => API_PROJECT_DIR,
-                'commandconf'          => API_PROJECT_DIR."conf/commandmap.xml",
-                'cachedir'             => API_TEMP_DIR,
-                'themesdir'            => API_THEMES_DIR,
-                'webroot'              => API_WEBROOT,
-                'webrootStatic'        => API_WEBROOT_STATIC,
-            ));
-    }
-    
-    /**
      * Test host parsing for a configured host with a prefix path.
      */
     function testParseHostWithPathPrefix() {

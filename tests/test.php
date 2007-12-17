@@ -13,6 +13,12 @@ foreach (glob('unit/*.php') as $file) {
     $test->addTestFile($file);
 }
 
+// Set up environment
+$_SERVER['HTTP_HOST'] = 'demo.okapi.org';
+$_SERVER["REQUEST_URI"] = '/the/command';
+$_GET = array('path' => 'mypath', 'question' => 'does it work?');
+api_init::start();
+
 // Run
 $test->run(new JunitXMLReporter());
 ?>

@@ -6,20 +6,19 @@
 class ModelQueryinfoTest extends OkapiTestCase {
     function testModel() {
         $_SERVER['HTTP_HOST'] = 'demo.okapi.org';
-        $_SERVER["REQUEST_URI"] = '/command/foo';
+        $_SERVER["REQUEST_URI"] = '/mycommand/foo';
         $_GET = array('param1' => 'value1');
         $request = new api_request();
-        $commands = new api_commandmap($request);
+        $route = array('command' => 'mycommand', 'method' => 'foo');
 
-        $model = new api_model_queryinfo($request, $commands);
+        $model = new api_model_queryinfo($request, $route);
         $dom = $model->getDOM();
         
         $this->assertXPath($dom, '/queryinfo/query/param1', 'value1');
-        $this->assertXPath($dom, '/queryinfo/requestURI', 'command/foo?param1=value1');
+        $this->assertXPath($dom, '/queryinfo/requestURI', 'mycommand/foo?param1=value1');
         $this->assertXPath($dom, '/queryinfo/lang', 'en');
+        $this->assertXPath($dom, '/queryinfo/command', 'mycommand');
         $this->assertXPath($dom, '/queryinfo/method', 'foo');
-        $this->assertXPath($dom, '/queryinfo/directivePath', '/command/');
-        $this->assertXPath($dom, '/queryinfo/directiveHost', 'demo');
     }
 }
 ?>

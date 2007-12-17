@@ -29,7 +29,7 @@ class ConfigTest extends UnitTestCase {
     function testEnvInclude() {
         $_SERVER['OKAPI_ENV'] = 'debug';
         $cfg = new api_config();
-        $this->assertEqual($cfg->commandmap['regex'], true);
+        $this->assertEqual($cfg->configCache, false);
     }
 }
 ?>

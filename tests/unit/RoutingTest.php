@@ -9,12 +9,12 @@ class RoutingTest extends UnitTestCase {
      */
     function testEmpty() {
         $m = new api_routing();
-        $m->add('/', array('controller' => 'index'));
+        $m->add('/', array('command' => 'index'));
         
         $request = new mock_request(array('path' => '/'));
         $route = $m->getRoute($request);
-        $this->assertEqual($route, array('controller' => 'index',
-            'method' => 'process'));
+        $this->assertEqual($route, array('command' => 'index',
+            'method' => 'process', 'view' => array()));
     }
 
     /**
@@ -22,12 +22,13 @@ class RoutingTest extends UnitTestCase {
      */
     function testWithOneRequestParam() {
         $m = new api_routing();
-        $m->add('/test/:param1', array('controller' => 'test'));
+        $m->add('/test/:param1', array('command' => 'test'));
         
         $request = new mock_request(array('path' => '/test/abc'));
         $route = $m->getRoute($request);
-        $this->assertEqual($route, array('controller' => 'test',
-            'method' => 'process', 'param1' => 'abc'));
+        $this->assertEqual($route, array('command' => 'test',
+            'method' => 'process', 'param1' => 'abc',
+            'view' => array()));
     }
     
     /**
@@ -35,18 +36,18 @@ class RoutingTest extends UnitTestCase {
      */
     function testGenericMapping() {
         $m = new api_routing();
-        $m->add('/user/:method/:id', array('controller' => 'user'));
-        $m->add('/:controller/:method/:id');
+        $m->add('/user/:method/:id', array('command' => 'user'));
+        $m->add('/:command/:method/:id');
         
         $request = new mock_request(array('path' => '/user/save/3'));
         $route = $m->getRoute($request);
-        $this->assertEqual($route, array('controller' => 'user',
-            'method' => 'save', 'id' => '3'));
+        $this->assertEqual($route, array('command' => 'user',
+            'method' => 'save', 'id' => '3', 'view' => array()));
         
         $request = new mock_request(array('path' => '/list/get/7'));
         $route = $m->getRoute($request);
-        $this->assertEqual($route, array('controller' => 'list',
-            'method' => 'get', 'id' => '7'));
+        $this->assertEqual($route, array('command' => 'list',
+            'method' => 'get', 'id' => '7', 'view' => array()));
     }
 
     /**
@@ -54,7 +55,7 @@ class RoutingTest extends UnitTestCase {
      */
     function testWithOneRequestParamNoMatch() {
         $m = new api_routing();
-        $m->add('/test/:param1', array('controller' => 'test'));
+        $m->add('/test/:param1', array('command' => 'test'));
         
         $request = new mock_request(array('path' => '/test/'));
         $route = $m->getRoute($request);
@@ -70,13 +71,13 @@ class RoutingTest extends UnitTestCase {
      */
     function testWithMultipleRequestParam() {
         $m = new api_routing();
-        $m->add('/:user/:controller/test/def/:foo/:bar/superuser', array('controller' => 'test'));
+        $m->add('/:user/:command/test/def/:foo/:bar/superuser', array('command' => 'test'));
         
         $request = new mock_request(array('path' => '/pneff/index/test/def/myfoo/something/superuser'));
         $route = $m->getRoute($request);
-        $this->assertEqual($route, array('controller' => 'index',
+        $this->assertEqual($route, array('command' => 'index',
             'method' => 'process', 'user' => 'pneff', 'foo' => 'myfoo',
-            'bar' => 'something'));
+            'bar' => 'something', 'view' => array()));
     }
     
     /**
@@ -84,7 +85,7 @@ class RoutingTest extends UnitTestCase {
      */
     function testWithMultipleRequestParamNoMatch() {
         $m = new api_routing();
-        $m->add('/:user/:controller/test/def/:foo/:bar/superuser', array('controller' => 'test'));
+        $m->add('/:user/:command/test/def/:foo/:bar/superuser', array('command' => 'test'));
         
         $request = new mock_request(array('path' => '/pneff/index/test/def/myfoo/something'));
         $route = $m->getRoute($request);
@@ -101,17 +102,19 @@ class RoutingTest extends UnitTestCase {
      */
     function testPreserveRoutes() {
         $m = new api_routing();
-        $m->add('/test/:param1', array('controller' => 'test'));
+        $m->add('/test/:param1', array('command' => 'test'));
         
         $request = new mock_request(array('path' => '/test/abc'));
         $route = $m->getRoute($request);
-        $this->assertEqual($route, array('controller' => 'test',
-            'method' => 'process', 'param1' => 'abc'));
+        $this->assertEqual($route, array('command' => 'test',
+            'method' => 'process', 'param1' => 'abc',
+            'view' => array()));
         
         $m = new api_routing();
         $route = $m->getRoute($request);
-        $this->assertEqual($route, array('controller' => 'test',
-            'method' => 'process', 'param1' => 'abc'));
+        $this->assertEqual($route, array('command' => 'test',
+            'method' => 'process', 'param1' => 'abc',
+            'view' => array()));
     }
     
     /**
@@ -119,13 +122,14 @@ class RoutingTest extends UnitTestCase {
      */
     function testVerbDefaultGET() {
         $m = new api_routing();
-        $m->add('/test/:param1', array('controller' => 'test',
+        $m->add('/test/:param1', array('command' => 'test',
                                        '#conditions' => array('verb' => 'GET')));
         
         $request = new mock_request(array('path' => '/test/abc'));
         $route = $m->getRoute($request);
-        $this->assertEqual($route, array('controller' => 'test',
-            'method' => 'process', 'param1' => 'abc'));
+        $this->assertEqual($route, array('command' => 'test',
+            'method' => 'process', 'param1' => 'abc',
+            'view' => array()));
     }
     
     /**
@@ -133,13 +137,14 @@ class RoutingTest extends UnitTestCase {
      */
     function testVerbExplicitGET() {
         $m = new api_routing();
-        $m->add('/test/:param1', array('controller' => 'test',
+        $m->add('/test/:param1', array('command' => 'test',
                                        '#conditions' => array('verb' => 'GET')));
         
         $request = new mock_request(array('path' => '/test/abc', 'verb' => 'GET'));
         $route = $m->getRoute($request);
-        $this->assertEqual($route, array('controller' => 'test',
-            'method' => 'process', 'param1' => 'abc'));
+        $this->assertEqual($route, array('command' => 'test',
+            'method' => 'process', 'param1' => 'abc',
+            'view' => array()));
     }
     
     /**
@@ -147,7 +152,7 @@ class RoutingTest extends UnitTestCase {
      */
     function testVerbExplicitGETNoMatch() {
         $m = new api_routing();
-        $m->add('/test/:param1', array('controller' => 'test',
+        $m->add('/test/:param1', array('command' => 'test',
                                        '#conditions' => array('verb' => 'GET')));
         
         $request = new mock_request(array('path' => '/test/abc', 'verb' => 'POST'));
@@ -161,9 +166,11 @@ class RoutingTest extends UnitTestCase {
      */
     function testGrouping() {
         $m = new api_routing();
-        $g = $m->createGroup(array('controller' => 'test', '#conditions' => array('verb' => 'GET')));
+        $g = $m->createGroup(array('command' => 'test',
+            'view' => array('xsl' => 'test.xsl'),
+            '#conditions' => array('verb' => 'GET')));
         $g->add('/test/:param1');       // Uses defaults
-        $g->add('/users/:uid', array('controller' => 'user'));
+        $g->add('/users/:uid', array('command' => 'user'));
         
         $request = new mock_request(array('path' => '/test/abc', 'verb' => 'POST'));
         $route = $m->getRoute($request);
@@ -171,8 +178,9 @@ class RoutingTest extends UnitTestCase {
         
         $request = new mock_request(array('path' => '/test/abc', 'verb' => 'GET'));
         $route = $m->getRoute($request);
-        $this->assertEqual($route, array('controller' => 'test',
-            'method' => 'process', 'param1' => 'abc'));
+        $this->assertEqual($route, array('command' => 'test',
+            'method' => 'process', 'param1' => 'abc',
+            'view' => array('xsl' => 'test.xsl')));
         
         $request = new mock_request(array('path' => '/users/userid', 'verb' => 'POST'));
         $route = $m->getRoute($request);
@@ -180,8 +188,9 @@ class RoutingTest extends UnitTestCase {
         
         $request = new mock_request(array('path' => '/users/userid', 'verb' => 'GET'));
         $route = $m->getRoute($request);
-        $this->assertEqual($route, array('controller' => 'user',
-            'method' => 'process', 'uid' => 'userid'));
+        $this->assertEqual($route, array('command' => 'user',
+            'method' => 'process', 'uid' => 'userid',
+            'view' => array('xsl' => 'test.xsl')));
     }
 }
 ?>
