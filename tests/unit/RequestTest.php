@@ -56,6 +56,15 @@ class RequestTest extends UnitTestCase {
     }
 
     /**
+     * Path must not include any URL parameters.
+     */
+    function testRequestPathWithoutParams() {
+        $_SERVER["REQUEST_URI"] = '/the/command?XML=1';
+        $r = new api_request();
+        $this->assertEqual('/the/command', $r->getPath());
+    }
+
+    /**
      * Test if the path is correctly parsed from the URI for a
      * host which defines a path prefix.
      */
