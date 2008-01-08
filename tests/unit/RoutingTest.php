@@ -4,6 +4,12 @@
  * allows queries on the configured routes.
  */
 class RoutingTest extends UnitTestCase {
+    function setUp() {
+        // Remove all existing routes
+        $m = new api_routing();
+        $m->clear();
+    }
+    
     /**
      * Root URL goes to api_commands_index command.
      */
@@ -122,8 +128,8 @@ class RoutingTest extends UnitTestCase {
      */
     function testVerbDefaultGET() {
         $m = new api_routing();
-        $m->add('/test/:param1', array('command' => 'test',
-                                       '#conditions' => array('verb' => 'GET')));
+        $m->add('/test/:param1', array('command' => 'test'))
+          ->when(array('verb' => 'GET'));
         
         $request = new mock_request(array('path' => '/test/abc'));
         $route = $m->getRoute($request);
@@ -137,8 +143,8 @@ class RoutingTest extends UnitTestCase {
      */
     function testVerbExplicitGET() {
         $m = new api_routing();
-        $m->add('/test/:param1', array('command' => 'test',
-                                       '#conditions' => array('verb' => 'GET')));
+        $m->add('/test/:param1', array('command' => 'test'))
+          ->when(array('verb' => 'GET'));
         
         $request = new mock_request(array('path' => '/test/abc', 'verb' => 'GET'));
         $route = $m->getRoute($request);
@@ -152,8 +158,8 @@ class RoutingTest extends UnitTestCase {
      */
     function testVerbExplicitGETNoMatch() {
         $m = new api_routing();
-        $m->add('/test/:param1', array('command' => 'test',
-                                       '#conditions' => array('verb' => 'GET')));
+        $m->add('/test/:param1', array('command' => 'test'))
+          ->when(array('verb' => 'GET'));
         
         $request = new mock_request(array('path' => '/test/abc', 'verb' => 'POST'));
         $route = $m->getRoute($request);
@@ -166,11 +172,12 @@ class RoutingTest extends UnitTestCase {
      */
     function testGrouping() {
         $m = new api_routing();
-        $g = $m->createGroup(array('command' => 'test',
-            'view' => array('xsl' => 'test.xsl'),
-            '#conditions' => array('verb' => 'GET')));
-        $g->add('/test/:param1');       // Uses defaults
-        $g->add('/users/:uid', array('command' => 'user'));
+        $g = $m->create(array('command' => 'test',
+                              'view' => array('xsl' => 'test.xsl')))
+               ->when(array('verb' => 'GET'));
+        
+        $m->add('/test/:param1', $g->dup());       // Uses defaults
+        $m->add('/users/:uid', $g->dup()->add(null, array('command' => 'user')));
         
         $request = new mock_request(array('path' => '/test/abc', 'verb' => 'POST'));
         $route = $m->getRoute($request);
