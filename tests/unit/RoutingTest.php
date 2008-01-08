@@ -15,7 +15,7 @@ class RoutingTest extends UnitTestCase {
      */
     function testEmpty() {
         $m = new api_routing();
-        $m->add('/', array('command' => 'index'));
+        $m->route('/')->params(array('command' => 'index'));
         
         $request = new mock_request(array('path' => '/'));
         $route = $m->getRoute($request);
@@ -28,7 +28,7 @@ class RoutingTest extends UnitTestCase {
      */
     function testWithOneRequestParam() {
         $m = new api_routing();
-        $m->add('/test/:param1', array('command' => 'test'));
+        $m->route('/test/:param1')->params(array('command' => 'test'));
         
         $request = new mock_request(array('path' => '/test/abc'));
         $route = $m->getRoute($request);
@@ -42,8 +42,8 @@ class RoutingTest extends UnitTestCase {
      */
     function testGenericMapping() {
         $m = new api_routing();
-        $m->add('/user/:method/:id', array('command' => 'user'));
-        $m->add('/:command/:method/:id');
+        $m->route('/user/:method/:id')->params(array('command' => 'user'));
+        $m->route('/:command/:method/:id');
         
         $request = new mock_request(array('path' => '/user/save/3'));
         $route = $m->getRoute($request);
@@ -61,7 +61,7 @@ class RoutingTest extends UnitTestCase {
      */
     function testWithOneRequestParamNoMatch() {
         $m = new api_routing();
-        $m->add('/test/:param1', array('command' => 'test'));
+        $m->params(array('command' => 'test'))->route('/test/:param1');
         
         $request = new mock_request(array('path' => '/test/'));
         $route = $m->getRoute($request);
@@ -77,7 +77,8 @@ class RoutingTest extends UnitTestCase {
      */
     function testWithMultipleRequestParam() {
         $m = new api_routing();
-        $m->add('/:user/:command/test/def/:foo/:bar/superuser', array('command' => 'test'));
+        $m->route('/:user/:command/test/def/:foo/:bar/superuser')
+          ->params(array('command' => 'test'));
         
         $request = new mock_request(array('path' => '/pneff/index/test/def/myfoo/something/superuser'));
         $route = $m->getRoute($request);
@@ -91,7 +92,8 @@ class RoutingTest extends UnitTestCase {
      */
     function testWithMultipleRequestParamNoMatch() {
         $m = new api_routing();
-        $m->add('/:user/:command/test/def/:foo/:bar/superuser', array('command' => 'test'));
+        $m->route('/:user/:command/test/def/:foo/:bar/superuser')
+          ->params(array('command' => 'test'));
         
         $request = new mock_request(array('path' => '/pneff/index/test/def/myfoo/something'));
         $route = $m->getRoute($request);
@@ -108,7 +110,7 @@ class RoutingTest extends UnitTestCase {
      */
     function testPreserveRoutes() {
         $m = new api_routing();
-        $m->add('/test/:param1', array('command' => 'test'));
+        $m->route('/test/:param1')->params(array('command' => 'test'));
         
         $request = new mock_request(array('path' => '/test/abc'));
         $route = $m->getRoute($request);
@@ -128,7 +130,8 @@ class RoutingTest extends UnitTestCase {
      */
     function testVerbDefaultGET() {
         $m = new api_routing();
-        $m->add('/test/:param1', array('command' => 'test'))
+        $m->route('/test/:param1')
+          ->params(array('command' => 'test'))
           ->when(array('verb' => 'GET'));
         
         $request = new mock_request(array('path' => '/test/abc'));
@@ -143,7 +146,8 @@ class RoutingTest extends UnitTestCase {
      */
     function testVerbExplicitGET() {
         $m = new api_routing();
-        $m->add('/test/:param1', array('command' => 'test'))
+        $m->route('/test/:param1')
+          ->params(array('command' => 'test'))
           ->when(array('verb' => 'GET'));
         
         $request = new mock_request(array('path' => '/test/abc', 'verb' => 'GET'));
@@ -158,7 +162,8 @@ class RoutingTest extends UnitTestCase {
      */
     function testVerbExplicitGETNoMatch() {
         $m = new api_routing();
-        $m->add('/test/:param1', array('command' => 'test'))
+        $m->route('/test/:param1')
+          ->params(array('command' => 'test'))
           ->when(array('verb' => 'GET'));
         
         $request = new mock_request(array('path' => '/test/abc', 'verb' => 'POST'));
@@ -172,12 +177,15 @@ class RoutingTest extends UnitTestCase {
      */
     function testGrouping() {
         $m = new api_routing();
-        $g = $m->create(array('command' => 'test',
+        $g = new api_routing_route();
+        $g = $g->params(array('command' => 'test',
                               'view' => array('xsl' => 'test.xsl')))
                ->when(array('verb' => 'GET'));
         
-        $m->add('/test/:param1', $g->dup());       // Uses defaults
-        $m->add('/users/:uid', $g->dup()->add(null, array('command' => 'user')));
+        $m->add($g->dup()->route('/test/:param1'));       // Uses defaults
+        $m->add($g->dup()
+                  ->route('/users/:uid')
+                  ->params(array('command' => 'user')));
         
         $request = new mock_request(array('path' => '/test/abc', 'verb' => 'POST'));
         $route = $m->getRoute($request);
