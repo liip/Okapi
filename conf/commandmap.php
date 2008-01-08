@@ -1,7 +1,7 @@
 <?php
 $m = new api_routing();
 $m->route('/command/:method')
-  ->params(array(
+  ->config(array(
       'command' => 'nocommand',
       'view' => array('xsl' => 'command.xsl')));
 ?>
