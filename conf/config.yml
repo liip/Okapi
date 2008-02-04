@@ -1,7 +1,7 @@
 # =======================
 # = Live configuration =
 # =======================
-default: &default
+default: &demo-shared
     configCache: false
     tmpdir: {API_PROJECT_DIR}tmp/
     
@@ -29,7 +29,7 @@ default: &default
     config_test: main
     
     backend:
-        extapi:
+        extapi: &extapi
             host: extapi.local.ch
             path: /0
             cities:
@@ -39,5 +39,9 @@ default: &default
 # =======================
 # = Debug configuration =
 # =======================
-debug: *default
+debug: *demo-shared
     config_test: debug
+    backend:
+        extapi: *extapi
+            host: extapi.trunk.local.ch
+        blafasel: somethingelse
