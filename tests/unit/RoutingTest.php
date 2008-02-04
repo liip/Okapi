@@ -207,5 +207,26 @@ class RoutingTest extends UnitTestCase {
             'method' => 'process', 'uid' => 'userid',
             'view' => array('xsl' => 'test.xsl')));
     }
+    
+    /**
+     * Final slash at the end should be ignored.
+     */
+    function testAdditionalSlash() {
+        $m = new api_routing();
+        $m->route('/test/:param1')
+          ->config(array('command' => 'test'));
+        
+        // Empty param
+        $request = new mock_request(array('path' => '/test/'));
+        $route = $m->getRoute($request);
+        $this->assertNull($route);
+        
+        // extra slash
+        $request = new mock_request(array('path' => '/test/myparam/'));
+        $route = $m->getRoute($request);
+        $this->assertEqual($route, array('command' => 'test',
+            'method' => 'process', 'param1' => 'myparam',
+            'view' => array()));
+    }
 }
 ?>
