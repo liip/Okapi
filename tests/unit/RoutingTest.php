@@ -228,5 +228,20 @@ class RoutingTest extends UnitTestCase {
             'method' => 'process', 'param1' => 'myparam',
             'view' => array()));
     }
+    
+    /**
+     * Double slash leads to an empty param and is thus not allowed
+     * in the URL.
+     */
+    function testDoubleSlash() {
+        $m = new api_routing();
+        $m->route('/test/:param1/:param2')
+          ->config(array('command' => 'test'));
+        
+        // Empty param
+        $request = new mock_request(array('path' => '/test//b'));
+        $route = $m->getRoute($request);
+        $this->assertNull($route);
+    }
 }
 ?>
