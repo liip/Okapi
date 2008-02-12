@@ -1,7 +1,7 @@
 <?php
 class ResponseTest extends UnitTestCase {
     function tearDown() {
-        ob_end_clean();
+        @ob_end_clean();
     }
     
     function testInit() {
@@ -78,17 +78,6 @@ class ResponseTest extends UnitTestCase {
         $r->setCharset(null);
         $this->assertEqual(array('Content-Type' => 'binary/something'),
             $r->getHeaders());
-    }
-    
-    /**
-     * Send all content to the browser.
-     */
-    function send() {
-        foreach ($this->getHeaders() as $header => $value) {
-            header("$header: $value");
-        }
-        
-        ob_end_flush();
     }
 }
 ?>
