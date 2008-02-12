@@ -35,6 +35,10 @@ class RoutingTest extends UnitTestCase {
         $this->assertEqual($route, array('command' => 'test',
             'method' => 'process', 'param1' => 'abc',
             'view' => array()));
+        
+        $request = new mock_request(array('path' => '/test/abc/def'));
+        $route = $m->getRoute($request);
+        $this->assertNull($route);
     }
     
     /**
@@ -87,9 +91,6 @@ class RoutingTest extends UnitTestCase {
             'bar' => 'something', 'view' => array()));
     }
     
-    /**
-     * 
-     */
     function testWithMultipleRequestParamNoMatch() {
         $m = new api_routing();
         $m->route('/:user/:command/test/def/:foo/:bar/superuser')
@@ -242,6 +243,58 @@ class RoutingTest extends UnitTestCase {
         $request = new mock_request(array('path' => '/test//b'));
         $route = $m->getRoute($request);
         $this->assertNull($route);
+    }
+    
+    /**
+     * The last param can be a wildcard parameter which will
+     * eat up and return all remaining parameters.
+     *
+     * This test makes sure it only matches when it should.
+     */
+    function testWildcardNoMatch() {
+        $m = new api_routing();
+        $m->route('/test/:userid/*path')
+          ->config(array('command' => 'test'));
+        
+        $request = new mock_request(array('path' => '/test/123'));
+        $route = $m->getRoute($request);
+        $this->assertNull($route);
+    }
+    
+    /**
+     * The last param can be a wildcard parameter which will
+     * eat up and return all remaining parameters.
+     */
+    function testWildcardOneElement() {
+        $m = new api_routing();
+        $m->route('/test/:userid/*path')
+          ->config(array('command' => 'test'));
+        
+        $request = new mock_request(array('path' => '/test/123/something'));
+        $route = $m->getRoute($request);
+        $this->assertEqual($route, array('command' => 'test',
+            'method' => 'process',
+            'userid' => '123',
+            'path'   => 'something',
+            'view' => array()));
+    }
+    
+    /**
+     * The last param can be a wildcard parameter which will
+     * eat up and return all remaining parameters.
+     */
+    function testWildcardMultipleElements() {
+        $m = new api_routing();
+        $m->route('/test/:userid/*path')
+          ->config(array('command' => 'test'));
+        
+        $request = new mock_request(array('path' => '/test/123/foo/bar/go+on'));
+        $route = $m->getRoute($request);
+        $this->assertEqual($route, array('command' => 'test',
+            'method' => 'process',
+            'userid' => '123',
+            'path'   => 'foo/bar/go+on',
+            'view' => array()));
     }
 }
 ?>
