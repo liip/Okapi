@@ -10,9 +10,10 @@ class I18nTest extends OkapiTestCase {
         $_SERVER["REQUEST_URI"] = '/the/command';
         $_GET = array('path' => 'mypath', 'question' => 'does it work?');
         api_init::start();
+        api_request::getInstance(true);
         
         $_SERVER["REQUEST_URI"] = '/command/mymethod';
-        $this->request = new api_request();
+        $this->request = api_request::getInstance(true);
     }
 
     function testInit() {

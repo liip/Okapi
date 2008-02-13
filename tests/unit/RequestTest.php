@@ -1,7 +1,7 @@
 <?php
 class RequestTest extends UnitTestCase {
     function testInit() {
-        $r = new api_request();
+        $r = api_request::getInstance();
         $this->assertIsA($r, 'api_request');
     }
 
@@ -11,7 +11,7 @@ class RequestTest extends UnitTestCase {
      */
     function testRequestHost() {
         $_SERVER['HTTP_HOST'] = 'demo.okapi.org';
-        $r = new api_request();
+        $r = api_request::getInstance(true);
         $this->assertEqual('demo.okapi.org', $r->getHost());
     }
     
@@ -22,7 +22,7 @@ class RequestTest extends UnitTestCase {
      */
     function testRequestLookupHost() {
         $_SERVER['HTTP_HOST'] = 'demo.okapi.org';
-        $r = new api_request();
+        $r = api_request::getInstance(true);
         $this->assertEqual('demo', $r->getLookupHost());
     }
 
@@ -32,7 +32,7 @@ class RequestTest extends UnitTestCase {
      */
     function testSubdomain() {
         $_SERVER['HTTP_HOST'] = 'demo.okapi.org';
-        $r = new api_request();
+        $r = api_request::getInstance(true);
         $this->assertEqual('demo', $r->getSld());
     }
 
@@ -42,7 +42,7 @@ class RequestTest extends UnitTestCase {
      */
     function testTopdomain() {
         $_SERVER['HTTP_HOST'] = 'demo.okapi.org';
-        $r = new api_request();
+        $r = api_request::getInstance(true);
         $this->assertEqual('okapi.org', $r->getTld());
     }
 
@@ -51,7 +51,7 @@ class RequestTest extends UnitTestCase {
      */
     function testRequestPath() {
         $_SERVER["REQUEST_URI"] = '/the/command';
-        $r = new api_request();
+        $r = api_request::getInstance(true);
         $this->assertEqual('/the/command', $r->getPath());
     }
 
@@ -60,7 +60,7 @@ class RequestTest extends UnitTestCase {
      */
     function testRequestPathWithoutParams() {
         $_SERVER["REQUEST_URI"] = '/the/command?XML=1';
-        $r = new api_request();
+        $r = api_request::getInstance(true);
         $this->assertEqual('/the/command', $r->getPath());
     }
 
@@ -71,7 +71,7 @@ class RequestTest extends UnitTestCase {
     function testRequestPathWithPrefix() {
         $_SERVER['HTTP_HOST'] = 'pathdemo.okapi.org';
         $_SERVER["REQUEST_URI"] = '/xyz/command/foo/bar';
-        $r = new api_request();
+        $r = api_request::getInstance(true);
         $this->assertEqual('/command/foo/bar', $r->getPath());
     }
 
@@ -80,7 +80,7 @@ class RequestTest extends UnitTestCase {
      */
     function testFilename() {
         $_SERVER["REQUEST_URI"] = '/document.pdf';
-        $r = new api_request();
+        $r = api_request::getInstance(true);
         $this->assertEqual($r->getFilename(), 'document.pdf');
     }
     
@@ -90,7 +90,7 @@ class RequestTest extends UnitTestCase {
      */
     function testFilenameHierarchy() {
         $_SERVER["REQUEST_URI"] = '/subfolder/document.pdf';
-        $r = new api_request();
+        $r = api_request::getInstance(true);
         $this->assertEqual($r->getFilename(), 'document.pdf');
     }
     
@@ -101,7 +101,7 @@ class RequestTest extends UnitTestCase {
      */
     function testFilenameExtension() {
         $_SERVER["REQUEST_URI"] = '/document';
-        $r = new api_request();
+        $r = api_request::getInstance(true);
         $this->assertEqual($r->getFilename(), '');
     }
     
@@ -112,7 +112,7 @@ class RequestTest extends UnitTestCase {
      */
     function testFilenameExtensionDot() {
         $_SERVER["REQUEST_URI"] = 'document.';
-        $r = new api_request();
+        $r = api_request::getInstance(true);
         $this->assertEqual($r->getFilename(), '');
     }
 
@@ -121,7 +121,7 @@ class RequestTest extends UnitTestCase {
      * not contain any language (the default language must be used).
      */
     function testLangDefault() {
-        $r = new api_request();
+        $r = api_request::getInstance(true);
         $this->assertEqual($r->getLang(), 'en');
     }
     
@@ -131,7 +131,7 @@ class RequestTest extends UnitTestCase {
      */
     function testLangPath() {
         $_SERVER["REQUEST_URI"] = '/en/the/command';
-        $r = new api_request();
+        $r = api_request::getInstance(true);
         $this->assertEqual($r->getLang(), 'en');
         $this->assertEqual($r->getPath(), '/the/command');
     }
@@ -142,7 +142,7 @@ class RequestTest extends UnitTestCase {
      */
     function testLangPathGerman() {
         $_SERVER["REQUEST_URI"] = '/de/the/command';
-        $r = new api_request();
+        $r = api_request::getInstance(true);
         $this->assertEqual($r->getLang(), 'de');
         $this->assertEqual($r->getPath(), '/the/command');
     }
@@ -153,7 +153,7 @@ class RequestTest extends UnitTestCase {
      */
     function testLangPathSpanish() {
         $_SERVER["REQUEST_URI"] = '/es/the/command';
-        $r = new api_request();
+        $r = api_request::getInstance(true);
         $this->assertEqual($r->getLang(), 'en');
         $this->assertEqual($r->getPath(), '/es/the/command');
     }
@@ -163,7 +163,7 @@ class RequestTest extends UnitTestCase {
      * configuration file.
      */
     function testLanguages() {
-        $r = new api_request();
+        $r = api_request::getInstance(true);
         $this->assertEqual($r->getLanguages(),
             array('en', 'de'));
     }
@@ -173,7 +173,7 @@ class RequestTest extends UnitTestCase {
      * configuration file.
      */
     function testDefaultLanguage() {
-        $r = new api_request();
+        $r = api_request::getInstance(true);
         $this->assertEqual($r->getDefaultLanguage(), 'en');
     }
     
@@ -182,7 +182,7 @@ class RequestTest extends UnitTestCase {
      */
     function testParametersGet() {
         $_GET = array('path' => 'mypath', 'question' => 'does it work?');
-        $r = new api_request();
+        $r = api_request::getInstance(true);
         $this->assertEqual($r->getParameters(), array(
             'path' => 'mypath',
             'question' => 'does it work?'));

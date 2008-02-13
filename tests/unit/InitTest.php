@@ -9,6 +9,7 @@ class InitTest extends UnitTestCase {
         $_SERVER["REQUEST_URI"] = '/the/command';
         $_GET = array('path' => 'mypath', 'question' => 'does it work?');
         api_init::start();
+        api_request::getInstance(true);
     }
     
     /**

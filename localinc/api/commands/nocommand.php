@@ -1,7 +1,7 @@
 <?php
 class api_commands_nocommand extends api_command {
-    public function __construct($request, $attribs, $response) {
-        parent::__construct($request, $attribs, $response);
+    public function __construct($attribs) {
+        parent::__construct($attribs);
     }
 }
 ?>

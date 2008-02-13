@@ -8,7 +8,7 @@ class ModelQueryinfoTest extends OkapiTestCase {
         $_SERVER['HTTP_HOST'] = 'demo.okapi.org';
         $_SERVER["REQUEST_URI"] = '/mycommand/foo';
         $_GET = array('param1' => 'value1');
-        $request = new api_request();
+        $request = api_request::getInstance(true);
         $route = array('command' => 'mycommand', 'method' => 'foo');
 
         $model = new api_model_queryinfo($request, $route);

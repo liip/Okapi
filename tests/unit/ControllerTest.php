@@ -20,6 +20,7 @@ class ControllerTest extends UnitTestCase {
         $_SERVER["REQUEST_URI"] = '/command/the';
         $_GET = array('question' => 'does it work?');
         api_init::start();
+        api_request::getInstance(true);
         
         $this->controller = new api_controller();
         $this->response = new testResponse();
@@ -52,6 +53,7 @@ class ControllerTest extends UnitTestCase {
      */
     function testProcessWithoutRoute() {
         $_SERVER["REQUEST_URI"] = '/some/obscure/test';
+        api_request::getInstance(true);
         $this->controller = new api_controller();
         $this->response = new testResponse();
         $this->controller->setResponse($this->response);
