@@ -47,6 +47,20 @@ class ControllerTest extends UnitTestCase {
     }
     
     /**
+     * Check that process method throws a correct exception when no
+     * route matches.
+     */
+    function testProcessWithoutRoute() {
+        $_SERVER["REQUEST_URI"] = '/some/obscure/test';
+        $this->controller = new api_controller();
+        $this->response = new testResponse();
+        $this->controller->setResponse($this->response);
+        
+        $this->expectException(new api_exception_NoCommandFound());
+        $this->controller->process();
+    }
+    
+    /**
      * Check that the headers are set correctly.
      */
     function testResponseHeaders() {

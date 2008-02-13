@@ -24,7 +24,7 @@ default: &demo-shared
             host: pathdemo.okapi
     
     exceptionhandler:
-        "*": ignore
+        "*": rethrow
     
     config_test: main
     

@@ -296,5 +296,53 @@ class RoutingTest extends UnitTestCase {
             'path'   => 'foo/bar/go+on',
             'view' => array()));
     }
+
+    /**
+     * Optional parameter if a default value has been given.
+     */
+    function testOptionalParam() {
+        $m = new api_routing();
+        $m->route('/test/:param1')->config(array('command' => 'test', 'param1' => 'foo'));
+        
+        // Param given, should be in route
+        $request = new mock_request(array('path' => '/test/bar'));
+        $route = $m->getRoute($request);
+        $this->assertEqual($route, array('command' => 'test',
+            'method' => 'process', 'param1' => 'bar',
+            'view' => array()));
+
+        // Param not given, default should be used
+        $request = new mock_request(array('path' => '/test/'));
+        $route = $m->getRoute($request);
+        $this->assertEqual($route, array('command' => 'test',
+            'method' => 'process', 'param1' => 'foo',
+            'view' => array()));
+
+        // Param not given and slash missing, default should be used
+        $request = new mock_request(array('path' => '/test'));
+        $route = $m->getRoute($request);
+        $this->assertEqual($route, array('command' => 'test',
+            'method' => 'process', 'param1' => 'foo',
+            'view' => array()));
+    }
+
+    /**
+     * Optional parameter only work at the end of the URL - verify.
+     */
+    function testOptionalParamOnlyTrailing() {
+        $m = new api_routing();
+        $m->route('/test/:param1/abc/:param2')
+          ->config(array('command' => 'test', 'param1' => 'foo', 'param2' => 'bar'));
+        
+        // Two parts missing at the end
+        $request = new mock_request(array('path' => '/test/func'));
+        $route = $m->getRoute($request);
+        $this->assertNull($route);
+        
+        // param1 left out
+        $request = new mock_request(array('path' => '/test/abc/func'));
+        $route = $m->getRoute($request);
+        $this->assertNull($route);
+    }
 }
 ?>
