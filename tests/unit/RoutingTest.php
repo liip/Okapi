@@ -253,7 +253,7 @@ class RoutingTest extends UnitTestCase {
      */
     function testWildcardNoMatch() {
         $m = new api_routing();
-        $m->route('/test/:userid/*path')
+        $m->route('/test/:userid/+path')
           ->config(array('command' => 'test'));
         
         $request = new mock_request(array('path' => '/test/123'));

@@ -183,7 +183,7 @@ class RequestTest extends UnitTestCase {
     function testParametersGet() {
         $_GET = array('path' => 'mypath', 'question' => 'does it work?');
         $r = api_request::getInstance(true);
-        $this->assertEqual($r->getParameters(), array(
+        $this->assertEqual($r->getParameters()->get(), array(
             'path' => 'mypath',
             'question' => 'does it work?'));
     }
