@@ -4,7 +4,12 @@
  */
 class mock_request extends api_request {
     public function __construct($params) {
-        parent::__construct();
+    	// When we instanciate api_request, we do not have the right path
+        if (isset($params['path'])) {
+            $_SERVER['REQUEST_URI'] = $params['path'];
+    	}
+    	parent::__construct();
+        
         
         foreach ($params as $key => $value) {
             $this->$key = $value;
