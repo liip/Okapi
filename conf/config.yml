@@ -22,6 +22,9 @@ default: &demo-shared
             sld: pathdemo
             tld: okapi.org
             host: pathdemo.okapi
+        notld.okapi.org:
+            # Used for the tests. tld should automatically be "okapi.org"
+            sld: notld
     
     exceptionhandler:
         "*": rethrow

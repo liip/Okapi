@@ -151,6 +151,18 @@ class InitTest extends UnitTestCase {
     }
     
     /**
+     * Test host configuration without a tld but an sld. The TLD
+     * must be calculated automatically.
+     */
+    function testHostconfigWithoutTld() {
+        $this->assertEqual(api_init::getHostConfig('notld.okapi.org'),
+            array('host' => 'notld',
+                  'sld'  => 'notld',
+                  'tld'  => 'okapi.org',
+                  'path' => '/'));
+    }
+    
+    /**
      * Test host parsing for a configured host with a prefix path.
      */
     function testParseHostWithPathPrefix() {
