@@ -102,14 +102,6 @@ class InitTest extends UnitTestCase {
         $this->assertDefined('API_WEBROOT_STATIC');
         $this->assertEqual(API_WEBROOT_STATIC, 'http://demo.okapi.org/static/');
     }
-
-    /**
-      * Verify that api_init initializes api_init::$apiPath which points
-      * to the current URI inside the application.
-      */
-    function testInitPath() {
-        $this->assertEqual(api_init::$path, '/the/command');
-    }
     
     /**
      * Verify that POOL is initialized.
