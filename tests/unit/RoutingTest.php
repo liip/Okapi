@@ -453,7 +453,7 @@ class RoutingTest extends UnitTestCase {
       * Tests with default parameter and sub-"folder" in the routing table
       */
       
-      function testParamVsSlash() {
+    function testParamVsSlash() {
         $m = new api_routing();
         $m->route('/bar/baz/')->config(array('command' => 'barbaz'));
         $m->route('/bar/:param')->config(array('command' => 'barparam','param' => 'index'));
@@ -514,8 +514,23 @@ class RoutingTest extends UnitTestCase {
         $this->assertEqual($route, array('command' => 'bar',
             'method' => 'baz.xml', 'view' => array()));
         
-    } 
-  
+    }
+    
+    /**
+     * Dynamic view parsing test
+     */
+    
+    function testDynamicView() {
+        $m = new api_routing();
+        $m->route('/:foo/:command/:method', array("dynamicview"=>TRUE))
+            ->config(Array(
+            'view' => Array('xsl' => '{foo}.xsl')));
+        $request = new mock_request(array('path' => '/ba\'r/baz/blubb'));
+        
+        $route = $m->getRoute($request);
+        
+        $this->assertEqual($route, Array('command' => 'baz', 'foo'=>"ba'r", 'method'=>'blubb',
+        'view' => Array('xsl' => "bar.xsl")));
+	}
 
 }
-?>
