@@ -476,7 +476,45 @@ class RoutingTest extends UnitTestCase {
             'method' => 'process', 'view' => array()));
         
         
-     } 
+     }
+     
+     
+     /**
+      * Tests if extensions can be omitted and stripped so the variable 
+      * is without extension
+      */
+      
+    function testOptionalExtension() {
+    	// i don't want the extension
+        $m = new api_routing();
+        $m->route('/:command/:method', array("optionalextension"=>TRUE))->config(Array());
+        
+        $request = new mock_request(array('path' => '/bar/baz.xml'));
+        $route = $m->getRoute($request);
+        $this->assertEqual($route, array('command' => 'bar',
+            'method' => 'baz', 'view' => array()));
+        
+        $m->clear();
+        // i want the extension
+        $m = new api_routing();
+        $m->route('/:command/:method', array("optionalextension"=>FALSE))->config(Array());
+        
+        $request = new mock_request(array('path' => '/bar/baz.xml'));
+        $route = $m->getRoute($request);
+        $this->assertEqual($route, array('command' => 'bar',
+            'method' => 'baz.xml', 'view' => array()));
+       
+        $m->clear();
+        //default behaviour
+        $m = new api_routing();
+        $m->route('/:command/:method', array())->config(Array());
+        
+        $request = new mock_request(array('path' => '/bar/baz.xml'));
+        $route = $m->getRoute($request);
+        $this->assertEqual($route, array('command' => 'bar',
+            'method' => 'baz.xml', 'view' => array()));
+        
+    } 
   
 
 }
