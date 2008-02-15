@@ -344,5 +344,140 @@ class RoutingTest extends UnitTestCase {
         $route = $m->getRoute($request);
         $this->assertNull($route);
     }
+    
+    
+    /**
+     * An URL can have multiple Slashes at the beginning or end,
+     * they will be normalized to just one
+     */
+
+    function testMultipleSlashes() {
+        $m = new api_routing();
+        $m->route('/test/')->config(array('command' => 'test'));;
+        
+        // double slashes at start
+        $request = new mock_request(array('path' => '//test/'));
+        $route = $m->getRoute($request);
+        $this->assertEqual($route, array('command' => 'test',
+            'method' => 'process', 'view' => array()));
+        
+        //double slashes at end
+        $request = new mock_request(array('path' => '/test//'));
+        $route = $m->getRoute($request);
+        $this->assertEqual($route, array('command' => 'test',
+            'method' => 'process', 'view' => array()));
+        
+        // triple slashes at start
+        $request = new mock_request(array('path' => '///test/'));
+        $route = $m->getRoute($request);
+        $this->assertEqual($route, array('command' => 'test',
+            'method' => 'process', 'view' => array()));
+        
+        //triple slashes at end
+        $request = new mock_request(array('path' => '/test///'));
+        $route = $m->getRoute($request);
+        $this->assertEqual($route, array('command' => 'test',
+            'method' => 'process', 'view' => array()));
+        
+    }
+    
+     /**
+     * An URL can have multiple Slashes in the middle,
+     * they will be normalized to just one
+     */   
+    
+    function testMultipleSlashesBetween() {
+        $m = new api_routing();
+        $m->route('/test/foo/')->config(array('command' => 'test'));;
+        
+        // double slashes 
+        $request = new mock_request(array('path' => '/test//foo/'));
+        $route = $m->getRoute($request);
+        $this->assertEqual($route, array('command' => 'test',
+            'method' => 'process', 'view' => array()));
+
+        // triple slashes 
+        $request = new mock_request(array('path' => '/test///foo/'));
+        $route = $m->getRoute($request);
+        $this->assertEqual($route, array('command' => 'test',
+            'method' => 'process', 'view' => array()));
+        
+    }
+    
+     /**
+      * The trailing slash can be omitted, but a route with
+      * a trailing slash should still match
+      *
+      * Tests without default parameter
+      */
+     
+     function testNoTrailingSlashNoParam() {
+        $m = new api_routing();
+        $m->route('/bar/baz/')->config(array('command' => 'barbaz'));;
+        $m->route('/bar/')->config(array('command' => 'bar'));;
+        
+        $request = new mock_request(array('path' => '/bar/baz'));
+        $route = $m->getRoute($request);
+        $this->assertEqual($route, array('command' => 'barbaz',
+            'method' => 'process', 'view' => array()));
+        
+        $request = new mock_request(array('path' => '/bar'));
+        $route = $m->getRoute($request);
+        $this->assertEqual($route, array('command' => 'bar',
+            'method' => 'process', 'view' => array()));
+      }  
+
+     /**
+      * The trailing slash can be omitted, but a route with
+      * a trailing slash should still match
+      *
+      * Test with default parameter
+      */
+     
+    function testNoTrailingSlashWithParam() {
+        $m = new api_routing();
+        $m->route('/test/:param')->config(array('command' => 'test', 'param' => 'foo'));;
+        
+        $request = new mock_request(array('path' => '/test'));
+        $route = $m->getRoute($request);
+        $this->assertEqual($route, array('command' => 'test',
+            'param' => 'foo',
+            'method' => 'process', 'view' => array()));
+        
+     }
+     
+     /**
+      * The trailing slash can be omitted, but a route with
+      * a trailing slash should still match
+      *
+      * Tests with default parameter and sub-"folder" in the routing table
+      */
+      
+      function testParamVsSlash() {
+        $m = new api_routing();
+        $m->route('/bar/baz/')->config(array('command' => 'barbaz'));
+        $m->route('/bar/:param')->config(array('command' => 'barparam','param' => 'index'));
+        
+        $request = new mock_request(array('path' => '/bar/baz'));
+        $route = $m->getRoute($request);
+        $this->assertEqual($route, array('command' => 'barbaz',
+            'method' => 'process', 'view' => array()));
+
+        $request = new mock_request(array('path' => '/bar/baz.xml'));
+        $route = $m->getRoute($request);
+        $this->assertEqual($route, array('command' => 'barparam',
+            'param' => 'baz.xml',
+            'method' => 'process', 'view' => array()));
+        
+        $request = new mock_request(array('path' => '/bar'));
+        $route = $m->getRoute($request);
+        $this->assertEqual($route, array('command' => 'barparam',
+            'param' => 'index',
+            'method' => 'process', 'view' => array()));
+        
+        
+     } 
+  
+
 }
 ?>
