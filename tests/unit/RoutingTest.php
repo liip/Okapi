@@ -525,12 +525,12 @@ class RoutingTest extends UnitTestCase {
         $m->route('/:foo/:command/:method', array("dynamicview"=>TRUE))
             ->config(Array(
             'view' => Array('xsl' => '{foo}.xsl')));
-        $request = new mock_request(array('path' => '/ba\'r/baz/blubb'));
+        $request = new mock_request(array('path' => '/ba\'_r/baz/blubb'));
         
         $route = $m->getRoute($request);
         
-        $this->assertEqual($route, Array('command' => 'baz', 'foo'=>"ba'r", 'method'=>'blubb',
-        'view' => Array('xsl' => "bar.xsl")));
+        $this->assertEqual($route, Array('command' => 'baz', 'foo'=>"ba'_r", 'method'=>'blubb',
+        'view' => Array('xsl' => "ba_r.xsl")));
 	}
 
 }
