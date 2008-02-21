@@ -225,5 +225,18 @@ class I18nTest extends OkapiTestCase {
         $this->assertEqual('CHF: Deactivate listing', $doc->documentElement->nodeValue);
         $this->assertEqual("<?xml version=\"1.0\"?>\n<root>CHF: Deactivate listing</root>\n", $doc->saveXML());
     }
+    
+    /**
+     * <i18n:text> can return XML fragments if asXML="yes" is used in the
+     * language file.
+     */
+    function testGetXMLFragment() {
+        $i18n = api_i18n::getInstance('en');
+        $doc = DOMDocument::loadXML('<div><i18n:text xmlns:i18n="http://apache.org/cocoon/i18n/2.1">asxmltest</i18n:text></div>');
+        $i18n->i18n($doc);
+        
+        $this->assertEqual('div', $doc->documentElement->tagName);
+        $this->assertEqual("<?xml version=\"1.0\"?>\n<div>Some <strong>XML</strong> here.</div>\n", $doc->saveXML());
+    }
 }
 ?>
