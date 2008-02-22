@@ -13,24 +13,6 @@ class InitTest extends UnitTestCase {
     }
     
     /**
-     * Verify that api_init initializes the API_DIRECTORY_SEPARATOR
-     * constant.
-     */
-    function testInitConstantsDirectorySeparator() {
-        $this->assertDefined('API_DIRECTORY_SEPARATOR');
-        $this->assertEqual(API_DIRECTORY_SEPARATOR, '/');
-    }
-    
-    /**
-     * Verify that api_init initializes the API_PATH_SEPARATOR
-     * constant.
-     */
-    function testInitConstantsPathSeparator() {
-        $this->assertDefined('API_PATH_SEPARATOR');
-        $this->assertEqual(API_PATH_SEPARATOR, ':');
-    }
-    
-    /**
      * Verify that api_init initializes the API_PROJECT_DIR
      * constant which points to the root of the current project.
      */
