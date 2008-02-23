@@ -3,6 +3,11 @@ ini_set("include_path", dirname(__FILE__)."/../inc/" . ':' .
                         dirname(__FILE__)."/" . ':' . 
                         ini_get("include_path"));
 
+$coverage = (getenv('coverage') ? true : false);
+if ($coverage) {
+    require(dirname(__FILE__).'/coverage_top.php');
+}
+
 require_once('simpletest/reporter.php');
 require_once('simpletest/unit_tester.php');
 require_once('api/autoload.php');
@@ -21,4 +26,8 @@ api_init::start();
 
 // Run
 $test->run(new JunitXMLReporter());
-?>
+ob_end_flush();
+
+if ($coverage) {
+    require(dirname(__FILE__).'/coverage_bottom.php');
+}
