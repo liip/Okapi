@@ -1,2 +1,23 @@
-default:
+#Preserve "white" spaces on empty lines.
+default: &default
+    configCache: false
+    tmpdir: {API_PROJECT_DIR}tmp/
     
+    hosts:
+        example.org:
+    
+    exceptionhandler:
+        "*": default
+    
+    lang:
+        dir: {API_PROJECT_DIR}inc/lang
+        fileprefix: lang
+        i18ntransform: true
+        default: de
+        languages: [de]
+        retriever: lowercase
+    
+    db:
+        default:
+            driver: mdb2
+            dsn: mysql://dbuser@localhost/example
