@@ -485,7 +485,7 @@ class RoutingTest extends UnitTestCase {
       */
       
     function testOptionalExtension() {
-    	// i don't want the extension
+        // i don't want the extension
         $m = new api_routing();
         $m->route('/:command/:method', array("optionalextension"=>TRUE))->config(Array());
         
@@ -513,13 +513,11 @@ class RoutingTest extends UnitTestCase {
         $route = $m->getRoute($request);
         $this->assertEqual($route, array('command' => 'bar',
             'method' => 'baz.xml', 'view' => array()));
-        
     }
     
     /**
      * Dynamic view parsing test
      */
-    
     function testDynamicView() {
         $m = new api_routing();
         $m->route('/:foo/:command/:method', array("dynamicview"=>TRUE))
@@ -531,6 +529,24 @@ class RoutingTest extends UnitTestCase {
         
         $this->assertEqual($route, Array('command' => 'baz', 'foo'=>"ba'_r", 'method'=>'blubb',
         'view' => Array('xsl' => "ba_r.xsl")));
-	}
+    }
+    
+    /**
+     * Tests a wildcard route.
+     */
+    function testWildcardRoute() {
+        $m = new api_routing();
+        $m->route('*')->config(array('command' => 'catchall'));
+        
+        $request = new mock_request(array('path' => '/test'));
+        $route = $m->getRoute($request);
+        $this->assertEqual($route, array('command' => 'catchall',
+            'method' => 'process', 'view' => array(), 'test'));
+        
+        $request = new mock_request(array('path' => '/test/another'));
+        $route = $m->getRoute($request);
+        $this->assertEqual($route, array('command' => 'catchall',
+            'method' => 'process', 'view' => array(), 'test/another'));
+    }
 
 }
