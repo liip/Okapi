@@ -10,11 +10,11 @@ default: &default
         "*": default
     
     lang:
-        dir: {API_PROJECT_DIR}inc/lang
+        dir: {API_PROJECT_DIR}lang
         fileprefix: lang
         i18ntransform: true
-        default: de
-        languages: [de]
+        default: en
+        languages: [en]
         retriever: lowercase
     
     db:
