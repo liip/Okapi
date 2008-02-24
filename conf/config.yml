@@ -15,7 +15,6 @@ default: &default
         i18ntransform: true
         default: en
         languages: [en]
-        retriever: lowercase
     
     db:
         default:
