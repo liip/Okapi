@@ -23,7 +23,8 @@ class ModelBackendGetTest extends OkapiTestCase {
     function testModelInvalidCommand() {
         $this->expectException(new api_exception_Backend(api_exception::THROW_FATAL,
             array('server' => 'extapi', 'command' => 'nonexisting'),
-            "Command not found in backend configuration."));
+            0,
+            "Command extapi/nonexisting not found in backend configuration."));
 
         $model = new api_model_backend_get('extapi', 'nonexisting');
     }
