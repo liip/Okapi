@@ -10,10 +10,10 @@
     <xsl:template match="/">
         <html lang="{$lang}" xml:lang="{$lang}">
 	        <head>
-	            <title>Okapi</title>
+	            <title><i18n:text>PageTitle</i18n:text></title>
 	        </head>
 	        <body>
-	            <h1>It works!</h1>
+	            <h1><i18n:text>WelcomeText</i18n:text></h1>
 	        </body>
         </html>
     </xsl:template>
