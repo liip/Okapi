@@ -86,21 +86,10 @@ class InitTest extends UnitTestCase {
     }
     
     /**
-     * Verify that POOL is initialized.
-     */
-    function testInitPool() {
-        $this->assertTrue(isset($GLOBALS['POOL']), "POOL is not defined.");
-        
-        $pool = $GLOBALS['POOL'];
-        $this->assertIsA($pool, 'api_pool');
-        $this->assertIsA($pool->config, 'api_config');
-    }
-
-    /**
      * Verify that config can be used.
      */
     function testInitConfig() {
-        $tmpdir = $GLOBALS['POOL']->config->tmpdir;
+        $tmpdir = api_config::getInstance()->tmpdir;
         $this->assertEqual($tmpdir, API_PROJECT_DIR . 'tmp/');
     }
     
@@ -108,7 +97,7 @@ class InitTest extends UnitTestCase {
      * Verify that the temp directory is created.
      */
     function testTempDir() {
-        $tmpdir = $GLOBALS['POOL']->config->tmpdir;
+        $tmpdir = api_config::getInstance()->tmpdir;
         $this->assertEqual(API_TEMP_DIR, $tmpdir);
         $this->assertTrue(file_exists($tmpdir));
         $this->assertTrue(is_dir($tmpdir));

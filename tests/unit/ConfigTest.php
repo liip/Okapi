@@ -13,13 +13,13 @@ class ConfigTest extends UnitTestCase {
     }
     
     function testDefault() {
-        $cfg = new api_config();
+        $cfg = api_config::getInstance(TRUE);
         $this->assertEqual($cfg->config_test, 'main');
     }
 
     function testEnvDev() {
         $_SERVER['OKAPI_ENV'] = 'debug';
-        $cfg = new api_config();
+        $cfg = api_config::getInstance(TRUE);
         $this->assertEqual($cfg->config_test, 'debug');
     }
 
@@ -28,7 +28,7 @@ class ConfigTest extends UnitTestCase {
      */
     function testEnvInclude() {
         $_SERVER['OKAPI_ENV'] = 'debug';
-        $cfg = new api_config();
+        $cfg = api_config::getInstance(TRUE);
         $this->assertEqual($cfg->configCache, false);
     }
 }
