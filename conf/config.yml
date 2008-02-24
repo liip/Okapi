@@ -4,7 +4,7 @@ default: &default
     tmpdir: {API_PROJECT_DIR}tmp/
     
     hosts:
-        modmon2.lo:
+        example.org:
     
     exceptionhandler:
         "*": default
@@ -18,7 +18,6 @@ default: &default
         retriever: lowercase
     
     db:
-        default,write:
-            driver: doctrine
-            dsn: mysql://modmon2:20modmon08@localhost/mo
-            modeldir: localinc/api/model/data            
+        default:
+            driver: mdb2
+            dsn: mysql://dbuser@localhost/example
