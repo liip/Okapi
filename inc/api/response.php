@@ -6,13 +6,11 @@ class api_response {
     protected $headers = array();
     protected $contenttype = null;
     protected $charset = 'utf-8';
-    
-    
+    protected $code = null;
     
     public static function getInstance($forcenew = false) {
         static $instance;
-        if ((!isset($instance) || !($instance instanceof api_response)) 
-        	|| $forcenew) {
+        if ((!isset($instance) || !($instance instanceof api_response)) || $forcenew) {
             $instance = new api_response();
         }
         return $instance;
@@ -67,15 +65,63 @@ class api_response {
     public function setCharset($charset) {
         $this->charset = $charset;
     }
+    
+    /**
+     * Sets the response code of the current request.
+     * @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html HTTP status codes
+     */
+    public function setCode($code) {
+        $this->code = $code;
+    }
+    
+    /**
+     * Redirects the user to another location. The location can be
+     * relative or absolute, but this methods always converts it into
+     * an absolute location before sending it to the client.
+     *
+     * Calls the api_response::send() method to force output of all
+     * headers set so far.
+     *
+     * @param $to string: Location to redirect to.
+     * @param $status int: HTTP status code to set. Use one of the following: 301, 302, 303.
+     * @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3.2 HTTP status codes
+     */
+    public function redirect($to, $status=301) {
+        if (strpos($to, 'http://') === 0 || strpos($to, 'https://') === 0) {
+            $url = $to;
+        } else {
+            $schema = $_SERVER['SERVER_PORT'] == '443' ? 'https' : 'http'; 
+            $host = (isset($_SERVER['HTTP_HOST']) && strlen($_SERVER['HTTP_HOST'])) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'];
+            $to = strpos($to,'/')===0 ? $to : '/'.$to;
+            $url = "$schema://$host$to";
+        }
+        
+        $this->setCode($status);
+        $this->setHeader('Location', $url);
+        $this->send();
+        exit();
+    }
 
     /**
      * Send all content to the browser.
      */
-    function send() {
+    public unction send() {
+        if (!is_null($this->code)) {
+            $this->sendStatus($this->code);
+        }
+        
         foreach ($this->getHeaders() as $header => $value) {
             header("$header: $value");
         }
         
         ob_end_flush();
+    }
+    
+    /**
+     * Send the status header line.
+     * @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html HTTP status codes
+     */
+    protected function sendStatus($code) {
+        header(' ', true, $code);
     }
 }
