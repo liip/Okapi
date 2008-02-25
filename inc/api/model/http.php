@@ -61,7 +61,7 @@ class api_model_http extends api_model {
         }
         
         $dom = DOMDocument::loadXML($xmls);
-        if ($this->dom === false) {
+        if ($dom === false) {
             throw new api_exception_XmlParseError(api_exception::THROW_FATAL, $this->url);
         }
         
