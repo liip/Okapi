@@ -31,4 +31,3 @@ class api_model_array extends api_model {
         return $dom;
     }
 }
-?>

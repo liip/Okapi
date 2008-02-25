@@ -25,5 +25,4 @@ final class api_views_plain extends api_views_default {
         $this->response->setContentType('text/plain');
     }
 }
-?>
 

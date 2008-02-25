@@ -5,5 +5,3 @@ class api_views_exceptionhandler extends api_views_default {
         parent::__construct($request, $route, $response);
     }
 }
-
-?>

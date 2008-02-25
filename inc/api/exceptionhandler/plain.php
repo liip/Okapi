@@ -9,4 +9,3 @@ class api_exceptionhandler_plain extends api_exceptionhandler_base {
         return true;
     }
 }
-?>

@@ -287,4 +287,3 @@ class api_request {
                      'lang' => $this->defaultLang);
     }
 }
-?>

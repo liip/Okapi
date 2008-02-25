@@ -238,4 +238,3 @@ class api_model_backend_get extends api_model_http {
         }
     }
 }
-?>

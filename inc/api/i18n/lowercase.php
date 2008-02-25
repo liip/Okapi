@@ -9,4 +9,3 @@ class api_i18n_lowercase extends api_i18n_default {
         return parent::get($key);
     }
 }
-?>

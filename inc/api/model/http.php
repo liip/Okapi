@@ -101,4 +101,3 @@ class api_model_http extends api_model {
         return $curl;
     }
 }
-?>

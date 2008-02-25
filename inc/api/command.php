@@ -134,4 +134,3 @@ abstract class api_command {
         return $dom;
     }
 }
-?>

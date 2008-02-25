@@ -56,4 +56,3 @@ class api_exceptionhandler_default extends api_exceptionhandler_base {
         return true;
     }
 }
-?>

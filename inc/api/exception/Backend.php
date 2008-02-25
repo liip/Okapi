@@ -5,4 +5,3 @@
  */
 class api_exception_Backend extends api_exception {
 }
-?>

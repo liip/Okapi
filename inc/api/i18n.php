@@ -344,4 +344,3 @@ class api_i18n {
         $this->retriever = new $classname($lang, $cfg);
     }
 }
-?>

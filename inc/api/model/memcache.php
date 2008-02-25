@@ -68,4 +68,3 @@ class api_model_memcache extends api_model {
         return $dom;
     }
 }
-?>

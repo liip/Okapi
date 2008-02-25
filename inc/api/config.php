@@ -241,4 +241,3 @@ class api_config {
         return $value;   
     }
 }
-?>

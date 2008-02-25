@@ -91,4 +91,3 @@ class api_model_queryinfo extends api_model {
         return $dom;
     }
 }
-?>

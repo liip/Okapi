@@ -33,4 +33,3 @@ class api_model_file extends api_model {
         return $this->dom;
     }
 }
-?>

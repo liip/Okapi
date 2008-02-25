@@ -132,4 +132,3 @@ abstract class api_views_common {
         $i->i18n($xmlDoc);
     }
 }
-?>

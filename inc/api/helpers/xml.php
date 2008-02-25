@@ -88,4 +88,3 @@ class api_helpers_xml {
         }
     }
 }
-?>
