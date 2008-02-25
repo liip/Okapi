@@ -105,7 +105,7 @@ class api_response {
     /**
      * Send all content to the browser.
      */
-    public unction send() {
+    public function send() {
         if (!is_null($this->code)) {
             $this->sendStatus($this->code);
         }
