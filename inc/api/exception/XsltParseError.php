@@ -13,6 +13,6 @@ class api_exception_XsltParseError extends api_exception_LibxmlError {
      */
     public function __construct($severity, $filename, $messages) {
         parent::__construct($severity, $filename);
-        $this->message = "XSLT error in {$filename}:\n" . $messages;
+        $this->message = "XSLT error in {$filename}";
     }
 }
