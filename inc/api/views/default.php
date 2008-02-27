@@ -52,8 +52,6 @@ class api_views_default extends api_views_common {
             $this->prepare();
         }
         
-        
-        
         $xmldom = $this->getDom($data, $exceptions);
         // ?XML=1 trick
         if ($this->request->getParam('XML') == '1') {
@@ -63,6 +61,7 @@ class api_views_default extends api_views_common {
             $this->sendResponse();
             return;
         }
+        
         if ($xmldom instanceof DOMDocument && $this->xsldom && $this->xslproc) {
             $xml = @$this->xslproc->transformToDoc($xmldom);
             if ($xml instanceof DOMDocument) {
@@ -96,7 +95,7 @@ class api_views_default extends api_views_common {
         } else if (is_string($data) && !empty($data)) {
             $xmldom = DOMDocument::loadXML($data);
         } else if (is_array($data)) {
-            $xmldom = DOMDocument::loadXML("<command/>");
+            @$xmldom = DOMDocument::loadXML("<command/>");
             api_helpers_xml::array2dom($data, $xmldom, $xmldom->documentElement);
         }
         
