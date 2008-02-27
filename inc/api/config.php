@@ -58,6 +58,9 @@ class api_config {
     /** api_config instance */
     private static $instance = null;
     
+    /** Custom loader. See setLoader() */
+    private static $loader = null;
+    
     public static function getInstance($force = FALSE) {
         if (! self::$instance instanceof api_config || $force) {
             self::$instance = new api_config();
@@ -67,20 +70,34 @@ class api_config {
     }
     
     /**
+     * Set a custom loader.
+     * The loader is an object used to load the configuration. The object
+     * must implement a method load($env) which returns a full configuration
+     * array. The parameter $env is the environment to load. Used to
+     * implement custom loading strategies which don't necessarily use YAML.
+     */
+    public static function setLoader($loader) {
+        self::$loader = $loader;
+    }
+    
+    /**
      * Constructor. Loads the configuration file into memory.
      */
     private function __construct() {
-        $base = API_PROJECT_DIR . 'conf/config';
-        
-        $configfile = $base . '.yml';
-        $configdir = $base . '.d';
-
         if (isset($_SERVER['OKAPI_ENV'])) {
             $this->env = $_SERVER['OKAPI_ENV'];
         } else {
             $this->env = self::$DEFAULT_ENV;
         }
         
+        if (!is_null(self::$loader)) {
+            $this->configArray = self::$loader->load($this->env);
+            return;
+        }
+        
+        $base = API_PROJECT_DIR . 'conf/config';
+        $configfile = $base . '.yml';
+        $configdir = $base . '.d';
         if (file_exists($configfile)) {
             $this->init($configfile);
         } else {
