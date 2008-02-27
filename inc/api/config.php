@@ -1,5 +1,5 @@
 <?php
-require_once(API_LIBS_DIR . 'vendor/spyc.php');
+require_once(dirname(__FILE__) . '/vendor/spyc.php');
  
 /**
  * Generic config file class.
