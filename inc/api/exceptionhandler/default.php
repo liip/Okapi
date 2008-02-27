@@ -51,6 +51,9 @@ class api_exceptionhandler_default extends api_exceptionhandler_base {
                    'name'       => api_helpers_class::getBaseName($e),
                    );
         
+        if(!empty($e->userInfo)) {
+            $d['userInfo'] = $e->userInfo;
+        }
         $this->data['exception'] = $d;
         $this->dispatch($this->data);
         return true;

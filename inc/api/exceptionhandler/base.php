@@ -49,6 +49,9 @@ abstract class api_exceptionhandler_base {
         print "<h1>Exception: " . api_helpers_class::getBaseName($e) . "</h1>";
         print "<p>Message: ".$e->getMessage()."</p>";
         print "<p>File: ".$e->getFile()." (".$e->getLine().")</p>";
+        if(!empty($e->userInfo)) {
+            print "<p>User Info: ".$e->userInfo."</p>";
+        }
         print "<h3>Trace:</h3><ul>";
         foreach($e->getTrace() as $trace) {
             
