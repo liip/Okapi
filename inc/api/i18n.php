@@ -280,7 +280,7 @@ class api_i18n {
      *
      * The translation for the key replaces the i18n:text node. If
      * the escapejs attribute of the i18n:text node is set, then
-     * the translation is escaped using api_helpers_string::escapeApostroph()
+     * the translation is escaped using api_helpers_string::escapeJSValue()
      * first.
      * 
      * @param $node DOMNode: i18n:text node.
@@ -296,7 +296,7 @@ class api_i18n {
         if (!empty($key)) {
             $text = $this->i18nGetMessage($key);
             if ($node->hasAttribute("escapejs")) {
-                $text = api_helpers_string::escapeApostroph($text);
+                $text = api_helpers_string::escapeJSValue($text);
             }
 
             if (is_array($text)) {

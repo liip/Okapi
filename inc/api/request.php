@@ -103,10 +103,7 @@ class api_request {
             $path = $lang['path'];
         }
         $this->url = API_HOST . $this->lang . API_MOUNTPATH . substr($path, 1);
-        
-        // Remove double-slashes
-        $path = preg_replace('#/{2,}#', '/', $path);
-        $this->path = $path;
+        $this->path = api_helpers_string::removeDoubleSlashes($path);
         
         // Path
         $this->filename = $this->parseFilename($this->path);
