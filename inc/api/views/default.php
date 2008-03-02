@@ -119,6 +119,8 @@ class api_views_default extends api_views_common {
         
         if (isset($attrib['contenttype']) && !empty($attrib['contenttype'])) {
             $this->response->setContentType($attrib['contenttype']);
+        } else {
+            $this->response->setContentType('text/html');
         }
         
         if (isset($attrib['encoding']) && !empty($attrib['encoding'])) {
