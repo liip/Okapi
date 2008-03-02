@@ -64,10 +64,9 @@ abstract class api_exceptionhandler_base {
     
     /**
      * Log the exception. This is called for all non-fatal exceptions.
-     * @todo: api_log doesn't exist, need a different default.
      */
     public function log(Exception $e) {
-        api_log::log((string) $e);
+        error_log("Extension encountered: " . (string) $e);
     }
     
     /**
