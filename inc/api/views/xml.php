@@ -3,10 +3,6 @@
  * View which outputs the DOM received from the command directly.
  */
 class api_views_xml extends api_views_common {
-    public function __construct($route) {
-        parent::__construct($route);
-    }
-    
     /**
      * Outputs the XML DOM directly without any modifications. The
      * exceptions are not output.
@@ -15,6 +11,8 @@ class api_views_xml extends api_views_common {
      * @todo Output exceptions as well.
      */
     public function dispatch($data, $exceptions = null) {
+        $data = $this->getDom($data, $exceptions);
+        
         $this->setXMLHeaders();
         $this->response->send();
         echo $data->saveXML();

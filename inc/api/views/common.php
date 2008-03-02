@@ -7,6 +7,10 @@
 abstract class api_views_common {
     /** api_response: Response object. */
     protected $response = null;
+    /** api_request: Request object. */
+    protected $request = null;
+    /** Route parameters. */
+    protected $route = array();
     
     /**
      * Set the response object to use.
@@ -84,5 +88,67 @@ abstract class api_views_common {
         
         $i = api_i18n::getInstance($lang);
         $i->i18n($xmlDoc);
+    }
+    
+    /**
+     * Returns a merged DOMDocument of the given data and exception list.
+     * 
+     * Data can be any of these three things:
+     *    - DOMDocument: Used directly
+     *    - string: Treated as an XML string and loaded into a DOMDocument
+     *    - array: Converted to a DOMDocument using api_helpers_xml::array2dom
+     * 
+     * The exceptions are merged into the DOM using the method
+     * api_views_default::mergeExceptions()
+     * 
+     * @param $data mixed: See above
+     * @param $exceptions array: Array of exceptions merged into the DOM.
+     * @return DOMDocument: DOM with exceptions
+     */
+    protected function getDom($data, $exceptions) {
+        $xmldom = null;
+        
+        // Use DOM or load XML from string or array.
+        if ($data instanceof DOMDocument) {
+            $xmldom = $data;
+        } else if (is_string($data) && !empty($data)) {
+            $xmldom = DOMDocument::loadXML($data);
+        } else if (is_array($data)) {
+            @$xmldom = DOMDocument::loadXML("<command/>");
+            api_helpers_xml::array2dom($data, $xmldom, $xmldom->documentElement);
+        }
+        
+        if (count($exceptions) > 0) {
+             $this->mergeExceptions($xmldom, $exceptions);
+        }
+        
+        return $xmldom;
+    }
+    
+    /**
+     * Merges exceptions into the DOM Document.
+     * Appends a node <exceptions> to the root node of the given DOM
+     * document.
+     *
+     * @param $xmldom DOMDocument: Response DOM document.
+     * @param $exceptions array: List of exceptions
+    */
+    protected function mergeExceptions(&$xmldom, $exceptions) {
+        if (count($exceptions) == 0) {
+            return;
+        }
+        
+        $exceptionsNode = $xmldom->createElement('exceptions');
+        foreach($exceptions as $exception) {
+            $exceptionNode = $xmldom->createElement('exception');
+            foreach($exception->getSummary() as $name => $value) {
+                $child = $xmldom->createElement($name);
+                $child->nodeValue = $value;
+                $exceptionNode->appendChild($child);
+            }
+            $exceptionsNode->appendChild($exceptionNode);
+        }
+        
+        $xmldom->documentElement->appendChild($exceptionsNode);
     }
 }
