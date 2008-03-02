@@ -68,7 +68,7 @@ class ControllerTest extends UnitTestCase {
     function testResponseHeaders() {
         $this->controller->process();
         
-        $this->assertEqual(array('Content-Type' => 'text/html; charset=UTF-8'),
+        $this->assertEqual(array('Content-Type' => 'text/html; charset=utf-8'),
             $this->response->getHeaders());
     }
     
