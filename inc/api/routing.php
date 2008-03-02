@@ -286,13 +286,15 @@ class api_routing_route implements api_routing_interface {
      * If optionalextension route configuration is set, then the path
      * is returned without the extensions. So in that case the route
      * matches no matter what extension is used.
+     *
+     * @param $request api_request: Request to get path of.
      */
     private function getPath($request) {
         $path = $request->getPath();
+        $ext = $request->getExtension();
         
         // Remove the extension if the user wished so
         if ($ext != '' && isset($this->routeConfig['optionalextension']) && $this->routeConfig['optionalextension']) {
-            $ext = $request->getExtension();
             $path = substr($path, 0, -(strlen($ext)+1));
         }
         
