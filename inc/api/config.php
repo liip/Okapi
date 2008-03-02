@@ -17,25 +17,27 @@ require_once(dirname(__FILE__) . '/vendor/spyc.php');
  * different environments. For example this configuration defines the two
  * environments default and trunk:
  *
- * <pre>
+ * \code
  * default:
  *     example: 1
  *
  * trunk:
- *     example: 2</pre>
+ *     example: 2
+ * \endcode
  * 
  * The environment variable OKAPI_ENV can be used to specify which
  * profile should be loaded. In Apache httpd mod_env can be used to
- * specify the environment. Example: <pre>SetEnv OKAPI_ENV trunk</pre>
+ * specify the environment. Example: <tt>SetEnv OKAPI_ENV trunk</tt>
  *
  * Values in the configuration file can reference Okapi constants as
  * defined in api_init. To use a constant, the syntax <tt>{CONSTANT}</tt>
  * is used. For example a log file could be configured relative to the
  * project root:
  *
- * <pre>
+ * \code
  * default:
- *     logfile: {API_PROJECT_DIR}logs/app.log</pre>
+ *     logfile: {API_PROJECT_DIR}logs/app.log
+ * \endcode
  *
  * @see http://httpd.apache.org/docs/2.2/mod/mod_env.html Apache httpd mod_env documentation
  * @see http://yaml.kwiki.org/?YamlInFiveMinutes YAML in five minutes
@@ -61,8 +63,13 @@ class api_config {
     /** Custom loader. See setLoader() */
     private static $loader = null;
     
-    public static function getInstance($force = FALSE) {
-        if (! self::$instance instanceof api_config || $force) {
+    /**
+     * Gets an instance of api_config.
+     * @param $forceReload bool: If true, forces instantiation of a
+     *        new instance. Used for testing.
+     */
+    public static function getInstance($forceReload = FALSE) {
+        if (! self::$instance instanceof api_config || $forceReload) {
             self::$instance = new api_config();
         }
         
@@ -162,8 +169,10 @@ class api_config {
      * configuration value from the currently active profile.
      *
      * For example this will return the "example" configuration value:
-     * <pre> $cfg = new api_config();
-     * $val = $cfg->example;</pre>
+     * \code
+     * $cfg = new api_config();
+     * $val = $cfg->example;
+     * \endcode
      *
      * @param $name string: Configuration key to return.
      * @return mixed: Configuration value extracted from the config file.
@@ -255,6 +264,6 @@ class api_config {
             }
         }
         
-        return $value;   
+        return $value;
     }
 }

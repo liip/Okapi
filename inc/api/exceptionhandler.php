@@ -4,13 +4,13 @@
  *
  * An example configuration as used at local.ch:
  *
- * <pre>
- *     exceptionhandler:
- *         lcl_testing_exception: rethrow
- *         404: '404'
- *         NoCommandFound: '404'
- *         "*": local
- * </pre>
+ * \code
+ * exceptionhandler:
+ *     lcl_testing_exception: rethrow
+ *     404: '404'
+ *     NoCommandFound: '404'
+ *     "*": local
+ * \endcode
  *
  * @config <b>exceptionhandler</b> (hash): Associative array configuring
  *         the exception handler to be used on a per-exception basis.

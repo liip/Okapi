@@ -4,13 +4,13 @@
  * files.
  * 
  * The catalog files have the following format:
- * <pre>
- *     <?xml version="1.0"?>
- *     <catalogue>
- *         <message key="Associate">Link</message>
- *         <message key="CHF">CHF</message>
- *     </catalogue>
- * </pre>
+ * \code
+ * <?xml version="1.0"?>
+ * <catalogue>
+ *     <message key="Associate">Link</message>
+ *     <message key="CHF">CHF</message>
+ * </catalogue>
+ * \endcode
  * 
  * XIncludes are supported in the catalogue files.
  * 

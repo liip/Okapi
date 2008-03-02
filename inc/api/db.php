@@ -5,21 +5,21 @@
  *
  * Example of a config.yml entry:
  *
- * <pre>
+ * \code
  * db:
  *    default:
  *        driver: mdb2
- *        dsn: blah\@localhost/foo
+ *        dsn: blah@localhost/foo
  *    ordbm:
  *        driver: doctrine
- *        dsn: blubb\@localhost/baz
+ *        dsn: blubb@localhost/baz
  *        modeldir: localinc/api/model/data
  *    raw:
  *        driver: pdo
  *        dsn: mysql:localhost;dbname=cookie
  *        user: scooby
  *        pass: doo
- * </pre>
+ * \endcode
  *
  * @config <b>db</b> (hash): Contains named database connections. The
  *         keys are the names, each connection is a hash with the config

@@ -6,9 +6,11 @@
  * file. The key `memcache' in the configuration is expected to hold
  * this structure:
  *
- * <pre>memcache:
+ * \code
+ * memcache:
  *    timeout: int
- *    hosts: [host1, host2, host3]</pre>
+ *    hosts: [host1, host2, host3]
+ * \endcode
  *
  * Timeout is the connection timeout in seconds. Hosts is an array of
  * memcached to connect to - the port can't currently be specified. If

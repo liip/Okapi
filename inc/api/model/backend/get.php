@@ -5,19 +5,19 @@
  *
  * An example configuration is:
  * 
- * <pre>
- *     backend:
- *         extapi:
- *             host: extapi.local.ch
- *             path: /0
- *             cities:
- *                 path: /cities.xml
- *                 params:
- *                    q: A
- *             citiestest:
- *                 port: 8080
- *                 path: /cities.xml
- * </pre>
+ * \code
+ * backend:
+ *     extapi:
+ *         host: extapi.local.ch
+ *         path: /0
+ *         cities:
+ *             path: /cities.xml
+ *             params:
+ *                q: A
+ *         citiestest:
+ *             port: 8080
+ *             path: /cities.xml
+ * \endcode
  *
  * This configuration defines the server "extapi" and two commands:
  *    - \b cities: http://extapi.local.ch/0/cities.xml?q=A

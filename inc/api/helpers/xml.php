@@ -7,17 +7,17 @@ class api_helpers_xml {
      * Converts an array to an XML DOM structure.
      *
      * Example usage:
-     * <pre>
-     *     $array = array('foo' => 'bar');
-     *     $dom = new DOMDocument();
-     *     $dom->loadXML("<doc/>");
-     *     api_helpers_xml::array2dom($array, $dom, $dom->documentElement);
-     * </pre>
+     * \code
+     * $array = array('foo' => 'bar');
+     * $dom = new DOMDocument();
+     * $dom->loadXML("<doc/>");
+     * api_helpers_xml::array2dom($array, $dom, $dom->documentElement);
+     * \endcode
      *
      * This will result in the XML document
-     * <pre>
-     *     \<doc>\<foo>bar\</foo>\</doc>
-     * </pre>
+     * \code
+     * <doc><foo>bar</foo></doc>
+     * \endcode
      *
      * @param $array array: The array to convert.
      * @param $domdoc DOMDocument: The document into which to insert the

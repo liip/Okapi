@@ -22,14 +22,16 @@ define('API_STATE_READY',   1);
 define('API_STATE_FALSE',   0);
 
 /**
-* Main controller to handle whole request. Should be used in your
-* application's index.php like this:
-* 
-* <pre> $ctrl = new api_controller();
-* $ctrl->process();</pre>
-*
-* @author   Silvan Zurbruegg
-*/
+ * Main controller to handle whole request. Should be used in your
+ * application's index.php like this:
+ * 
+ * \code
+ * $ctrl = new api_controller();
+ * $ctrl->process();
+ * \endcode
+ *
+ * @author   Silvan Zurbruegg
+ */
 class api_controller {
     /**
      * api_request: Request container. Contains parsed information about

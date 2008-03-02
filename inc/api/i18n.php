@@ -18,17 +18,17 @@
  * 
  * The following is an example for i18n:cleartext:
  *
- * <pre>
- *     <i18n:cleartext>
- *         <i18n:text>ClassifiedTitle</i18n:text>
- *         <i18n:prepend>- </i18n:prepend>
- *         <i18n:append>
- *             <xsl:text>: </xsl:text>
- *             <xsl:value-of select="/mail/classified/title" />
- *             <i18n:text> ClassifiedTitlePostfix</i18n:text>
- *         </i18n:append>
- *     </i18n:cleartext>
- * </pre>
+ * \code
+ * <i18n:cleartext>
+ *     <i18n:text>ClassifiedTitle</i18n:text>
+ *     <i18n:prepend>- </i18n:prepend>
+ *     <i18n:append>
+ *         <xsl:text>: </xsl:text>
+ *         <xsl:value-of select="/mail/classified/title" />
+ *         <i18n:text> ClassifiedTitlePostfix</i18n:text>
+ *     </i18n:append>
+ * </i18n:cleartext>
+ * \endcode
  *
  * i18n:append and i18n:prepend are added to the basic string without
  * automatic newlines or spaces.
