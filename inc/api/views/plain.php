@@ -1,28 +1,14 @@
 <?php
 /**
-* Used for text/plain output. 
-*
-* Extends api_views_default but sends text/plain headers
-* 
-* @see      api_views_default
-* @author   Silvan Zurbruegg
-*/
-
-
-final class api_views_plain extends api_views_default {
-    public function __construct($route) {
-        parent::__construct($route);
-        $this->omitXmlDecl=true;
-    }
-    
-    
+ * View which sets text/plain content type headers.
+ * @author   Silvan Zurbruegg
+ */
+class api_views_plain extends api_views_default {
     /**
-    * Sends text/plain Content-type
-    *
-    * @return   void
-    */
+     * Sends text/plain Content-type
+     */
     protected function setHeaders() {
+        parent::setHeaders();
         $this->response->setContentType('text/plain');
     }
 }
-

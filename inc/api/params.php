@@ -1,15 +1,26 @@
 <?php
+/**
+ * Represents the request parameters. Can be used as an array which
+ * represents all request parameters combined. In that it works the
+ * same way as the global $_REQUEST hash.
+ */
 class api_params extends ArrayObject {
-    private $post = Array();
-    private $get  = Array();
+    /** Hash with all POST parameters. */
+    private $post = array();
     
+    /** Hash with all GET parameters. */
+    private $get  = array();
     
+    /**
+     * Constructor. Initializes the array object.
+     */
     public function __construct($array = Array()) {
         parent::__construct($array, ArrayObject::ARRAY_AS_PROPS);
     }
     
     /**
-     * Set POST Data
+     * Set the POST parameters.
+     * @param $array hash: Associative array with all POST parameters.
      */
     public function setPost($array) {
         $this->post = $array;
@@ -17,7 +28,8 @@ class api_params extends ArrayObject {
     }
     
     /**
-     * Set GET Data
+     * Set the GET parameters.
+     * @param $array hash: Associative array with all GET parameters.
      */
     public function setGet($array) {
         $this->get = $array;
@@ -25,12 +37,15 @@ class api_params extends ArrayObject {
     }
     
     /**
-     * Get POST Data
+     * Returns a POST parameter with the given key. Returns the whole
+     * POST array if no param is given.
+     * @param $param string: Key of the POST parameter to return.
+     * @return mixed: Individual POST param or whole POST hash.
      */
     public function post($param = null) {
         if (isset($param)) {
             if (empty($this->post[$param])) {
-                return FALSE;
+                return false;
             }
             return $this->post[$param];
         }
@@ -38,7 +53,10 @@ class api_params extends ArrayObject {
     }
     
     /**
-     * Get GET Data
+     * Returns a GET parameter with the given key. Returns the whole
+     * GET array if no param is given.
+     * @param $param string: Key of the GET parameter to return.
+     * @return mixed: Individual GET param or whole GET hash.
      */
     public function get($param = null) {
         if (isset($param)) {

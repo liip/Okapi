@@ -1,91 +1,91 @@
 <?php
 /**
-* Default view class. 
-*
-* Does xsl transformations and dispatches output
-*
-* @author   Silvan Zurbruegg
-*/
-
+ * Default view class. Does XSLT transformations and dispatches output.
+ *
+ * @author   Silvan Zurbruegg
+ */
 class api_views_default extends api_views_common {
+    /** DOMDocument: XSLT document used for the transformations. */
+    protected $xsldom = null;
     
-    /**
-    * Xsl dom document
-    *
-    * @var      object
-    */
-    protected $xsldom= null;
-    
-    
-    /**
-    * Xsl processor instance
-    *
-    * @var      object
-    */
+    /** XsltProcessor: Instantiated XSLT processor. */
     protected $xslproc = null;
     
-    
     /**
-    * Whether xml prolog should be included in output
-    *
-    * @var      bol
-    */
+     * bool: If set to true, XML data which gives problem in HTML output
+     * is stripped from output using api_views_default::cleanXml().
+     */
     protected $omitXmlDecl = true;
     
-    private $xslfile = '';
-    
-    public function __construct($route) {
-        parent::__construct($route);
-       
-    }
-    
+    /** string: XSLT file used for transforming the output. */
+    protected $xslfile = '';
     
     /**
-    * Output transformed xml
-    *
-    * @param    object  xmldom  dom document
-    * @see      api_views_default::prepare()
-    * @return   void
-    */
+     * Outputs the responses by transforming it using the loaded XSLT.
+     * If the XML request parameter is set to 1, the DOM is output
+     * directly.
+     *
+     * @param $data mixed: See api_views_default::getDom()
+     * @param $exceptions array: Array of exceptions merged into the DOM.
+     * @exception api_exception_XsltParseError if the XSLT transformation
+     *            did not return a valid XML document.
+     */
     public function dispatch($data, $exceptions = null) {
-		if ($this->state != API_STATE_READY) {
+        if ($this->state != API_STATE_READY) {
             $this->prepare();
         }
         
         $xmldom = $this->getDom($data, $exceptions);
+        
         // ?XML=1 trick
         if ($this->request->getParam('XML') == '1') {
             $this->setXMLHeaders();
-            // Ported from popoon: mozilla does not display the XML neatly, if there's a xhtml namespace in it, so we spoof it here (mainly used for XML=1 purposes)
+            /* Ported from popoon: mozilla does not display the XML
+               neatly, if there's a xhtml namespace in it, so we spoof it
+               here (mainly used for XML=1 purposes) */
             print str_replace("http://www.w3.org/1999/xhtml","http://www.w3.org/1999/xhtml#trickMozillaDisplay", $xmldom->saveXML());
             $this->sendResponse();
             return;
         }
         
-        if ($xmldom instanceof DOMDocument && $this->xsldom && $this->xslproc) {
-            $xml = @$this->xslproc->transformToDoc($xmldom);
-            if ($xml instanceof DOMDocument) {
-                $this->transformI18n($this->request->getLang(), $xml);
-                
-                $xmlstr = $xml->saveXML();
-                if ($this->omitXmlDecl) {
-                    $xmlstr = $this->cleanXml($xmlstr);
-                }
-                
-                $this->contentLength = strlen($xmlstr);
-                $this->setHeaders();
-                echo $xmlstr;
-                $this->sendResponse();
-                return;
-                
-            } else {
-                throw new api_exception_XsltParseError(api_exception::THROW_FATAL, $this->xslfile,
-                        nl2br(var_export(libxml_get_errors(), true)));
+        if (! $xmldom instanceof DOMDocument && $this->xsldom && $this->xslproc) {
+            return;
+        }
+        
+        $xml = @$this->xslproc->transformToDoc($xmldom);
+        if ($xml instanceof DOMDocument) {
+            $this->transformI18n($this->request->getLang(), $xml);
+            
+            $xmlstr = $xml->saveXML();
+            if ($this->omitXmlDecl) {
+                $xmlstr = $this->cleanXml($xmlstr);
             }
+            
+            $this->setHeaders();
+            echo $xmlstr;
+            $this->sendResponse();
+            return;
+        } else {
+            throw new api_exception_XsltParseError(api_exception::THROW_FATAL, $this->xslfile,
+                    nl2br(var_export(libxml_get_errors(), true)));
         }
     }
     
-    
+    /**
+     * Returns a merged DOMDocument of the given data and exception list.
+     * 
+     * Data can be any of these three things:
+     *    - DOMDocument: Used directly
+     *    - string: Treated as an XML string and loaded into a DOMDocument
+     *    - array: Converted to a DOMDocument using api_helpers_xml::array2dom
+     * 
+     * The exceptions are merged into the DOM using the method
+     * api_views_default::mergeExceptions()
+     * 
+     * @param $data mixed: See above
+     * @param $exceptions array: Array of exceptions merged into the DOM.
+     * @return DOMDocument: DOM with exceptions
+     */
     protected function getDom($data, $exceptions) {
         $xmldom = null;
         
@@ -107,45 +107,38 @@ class api_views_default extends api_views_common {
     }
     
     /**
-    * Merges collected Exception info with xml
-    *
-    * @param    DOMDocument        xmldom        domxml object
-    * @param    array            exceptions    exception info
-    * @return    void
+     * Merges exceptions into the DOM Document.
+     * Appends a node <exceptions> to the root node of the given DOM
+     * document.
+     *
+     * @param $xmldom DOMDocument: Response DOM document.
+     * @param $exceptions array: List of exceptions
     */
     protected function mergeExceptions(&$xmldom, $exceptions) {
-        if (count($exceptions) > 0) {
-            $exceptionsNode = $xmldom->createElement('exceptions');
-            foreach($exceptions as $exception) {
-
-                $exceptionNode = $xmldom->createElement('exception');
-                
-                foreach($exception->getSummary() as $name => $value) {
-
-                	$child = $xmldom->createElement($name);
-                    $child->nodeValue = $value;
-                    $exceptionNode->appendChild($child);
-
-                }
-
-                $exceptionsNode->appendChild($exceptionNode);
-
-            }
-
-            $xmldom->documentElement->appendChild($exceptionsNode);
+        if (count($exceptions) == 0) {
+            return;
         }
-
-        return null;
+        
+        $exceptionsNode = $xmldom->createElement('exceptions');
+        foreach($exceptions as $exception) {
+            $exceptionNode = $xmldom->createElement('exception');
+            foreach($exception->getSummary() as $name => $value) {
+                $child = $xmldom->createElement($name);
+                $child->nodeValue = $value;
+                $exceptionNode->appendChild($child);
+            }
+            $exceptionsNode->appendChild($exceptionNode);
+        }
+        
+        $xmldom->documentElement->appendChild($exceptionsNode);
     }
-    
-    
-    
     
     /**
      * Removes content from the XML which will cause problems in
      * browsers.
-     *
      * Called from dispatch right before sending out the response body.
+     *
+     * @param $xmlstr string: XML string
      */
     protected function cleanXml($xmlstr) {
         $xmlstr = preg_replace("#^<\?xml.*\?>#","", $xmlstr);
@@ -168,13 +161,14 @@ class api_views_default extends api_views_common {
         return trim($xmlstr);
     }
     
-    
     /**
-    * Prepares for xsl transformation
-    *
-    * @see      api_views_default::dispatch()
-    * @return   bool
-    */
+     * Prepares for the XSLT transformation. Loads the XSLT stylesheet.
+     * 
+     * @exception api_exception_FileNotFound if the XSLT stylesheet does
+     *            not exist.
+     * @exception api_exception_XmlParseError if the XSLT stylesheet
+     *            does not contain valid XML.
+     */
     public function prepare() {
         $defaults = array('theme' => 'default', 'css' => 'default',
                           'view' => 'default', 'passdom' => 'no');
@@ -186,18 +180,14 @@ class api_views_default extends api_views_common {
         }
         
         if (isset($attrib['contenttype']) && !empty($attrib['contenttype'])) {
-            $this->contentType = $attrib['contenttype'];
-        } else {
-            $this->contentType = $this->contentTypeDefault;
-        }
-
-        if (isset($attrib['encoding']) && !empty($attrib['encoding'])) {
-            $this->contentEncoding = $attrib['encoding'];
-        } else {
-            $this->contentEncoding = $this->contentEncodingDefault;
+            $this->response->setContentType($attrib['contenttype']);
         }
         
-        $this->xslfile='';
+        if (isset($attrib['encoding']) && !empty($attrib['encoding'])) {
+            $this->response->setCharset($attrib['encoding']);
+        }
+        
+        $this->xslfile = '';
         if (!isset($attrib['theme'])) {
             $attrib['theme'] = 'default';
         }
@@ -206,9 +196,9 @@ class api_views_default extends api_views_common {
             $this->xslfile = API_THEMES_DIR.$attrib['theme']."/".$attrib['xsl'];
         } 
         if ($this->request->getParam('XML') == '1') {
-            $this->contentType = 'text/xml';
+            $this->setXMLHeaders();
             $this->state = API_STATE_READY;
-            return TRUE;
+            return true;
         }
         
         $this->xsldom = new DOMDocument();
@@ -234,10 +224,10 @@ class api_views_default extends api_views_common {
     }
     
     /**
-     * Set XSLT parameters which are passed in.
+     * Set XSLT parameters passed in to the stylesheet.
      *
-     * @param $xslproc XsltProcessor: The XSLT object (instance of XsltProcessor)
-     * @param $attrib array:  The view attributes from the route.
+     * @param $xslproc XsltProcessor: The XSLT object.
+     * @param $attrib array: The view attributes from the route.
      */
     protected function setXslParameters($xslproc, $attrib) {
         $this->xslproc->setParameter("", "webroot", API_WEBROOT);
@@ -253,11 +243,6 @@ class api_views_default extends api_views_common {
                 $this->xslproc->setParameter("", $key, $val);
             }
         }
-    }
-    
-    protected function setHeaders() {
-        $this->response->setContentType($this->contentType);
-        $this->response->setCharset($this->contentEncoding);
     }
     
     /**

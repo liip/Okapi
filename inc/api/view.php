@@ -1,71 +1,79 @@
 <?php
 /**
-* View factory
-*
-* Instantiates and returns a view object according to name.
-*
-* @author   Silvan Zurbruegg
-*/
+ * View factory.
+ *
+ * Instantiates and returns a view object according to name.
+ *
+ * @author   Silvan Zurbruegg
+ */
 class api_view {
-	private static $xslAttributeKeys = array('view','theme','xsl','css','contenttype','encoding','passdom','omitextension','commandParams');
-    private static $classNameBase 	 = "api_views_";
+    /** XSLT params which the command can overwrite in the view configuration. */
+    private static $xslAttributeKeys = array(
+        'view', 'theme',
+        'xsl', 'omitextension');
+    /** Prefix for view class names. */
+    private static $classNameBase    = "api_views_";
     
+    /** Protected constructor. Use api_view::factory(). */
     protected function __construct() {
     }
     
-    
     /**
-    * Return view object according to name
-    *
-    * If a filename with extension is part of the request uri, 
-    * the classname of the view is attempted to be resolved 
-    * considering the extension (i.e. /foo.rss -> api_views_default_rss)
-    * If no subview matching the extension is available, try
-    * again for a standard view for the particular extension
-    * (i.e. api_views_ext). Default is to instantiate the configured
-    * view.
-    */
+     * Return view object according to name.
+     *
+     * If a filename with extension is part of the request uri, the
+     * class name of the view is attempted to be resolved  considering
+     * the extension (i.e. /foo.rss -> api_views_default_rss). If no
+     * subview matching the extension is available, try again for a
+     * standard view for the particular extension (i.e. api_views_ext).
+     * Default is to instantiate the configured view.
+     *
+     * @param $name string: View name to instantiate.
+     * @param $request api_request: Request object.
+     * @param $route hash: Route which matched the current request.
+     * @param $response api_response: Response object.
+     * @todo  Is omitextension still needed here?
+     */
     public static function factory($name, $request, $route, $response) {
-        
         $ext = null;
         if ($request->getFilename() != '') {
-        	preg_match("#\.([a-z]{3,4})$#", $request->getFilename(), $matches);
-        	if (isset($matches[1]) && !empty($matches[1])) {
-        		$ext = $matches[1];
-        	}
+            preg_match("#\.([a-z]{3,4})$#", $request->getFilename(), $matches);
+            if (isset($matches[1]) && !empty($matches[1])) {
+                $ext = $matches[1];
+            }
         }
         
         $omitExt = (!empty($route['view']['omitextension']) && $route['view']['omitextension']) ? true : false;
         $className = api_view::$classNameBase.strtolower($name);
         if ($ext != null && $omitExt === false) {
-       		
-       		/**
-       		 * Try with view api_views_viewname_ext.
-       		 * View is a subview of defined view
-       		 **/
-       		$classNameExt = $className."_".$ext;
+            
+            /**
+             * Try with view api_views_viewname_ext.
+             * View is a subview of defined view
+             **/
+            $classNameExt = $className."_".$ext;
             if (class_exists($classNameExt)) {
-        	 	$obj = new $classNameExt($route);
-        	 	$obj->setResponse($response);
-        		if ($obj instanceof $classNameExt) {
-        			return $obj;		
-        		}
-        	} else {
-        		
-        		/**
-        		 * Try with api_views_ext 
-        		 * View is a standard view for ext 
-        		 */
-        		$classNameExt = api_view::$classNameBase.$ext;
-        		if (class_exists($classNameExt)) {
-        			$obj = new $classNameExt($route);
-        			$obj->setResponse($response);
-      				if ($obj instanceof $classNameExt) {
-      					return $obj;
-      				}  			
-        		}
-        	
-        	}
+                $obj = new $classNameExt($route);
+                $obj->setResponse($response);
+                if ($obj instanceof $classNameExt) {
+                    return $obj;        
+                }
+            } else {
+                
+                /**
+                 * Try with api_views_ext 
+                 * View is a standard view for ext 
+                 */
+                $classNameExt = api_view::$classNameBase.$ext;
+                if (class_exists($classNameExt)) {
+                    $obj = new $classNameExt($route);
+                    $obj->setResponse($response);
+                    if ($obj instanceof $classNameExt) {
+                        return $obj;
+                    }           
+                }
+            
+            }
         }
         
         if (class_exists($className)) {
@@ -79,10 +87,10 @@ class api_view {
         return false;
     }
     
-    
+    /**
+     * @todo Get rid of this additional magic.
+     */
     public static function getXslAttributeKeys() {
-    	return self::$xslAttributeKeys;
+        return self::$xslAttributeKeys;
     }
-    
-    
 }

@@ -1,16 +1,28 @@
 <?php
 /**
  * Response class which handles outputting the header and body.
+ *
+ * Output buffering is used and the buffer is flushed only when calling
+ * api_response::send().
  */
 class api_response {
+    /** Headers to send to the client. */
     protected $headers = array();
+    /** Content type to send to the client as header. */
     protected $contenttype = null;
+    /** Character set of the response, sent together with the response type. */
     protected $charset = 'utf-8';
+    /** HTTP response code sent to the client. */
     protected $code = null;
     
-    public static function getInstance($forcenew = false) {
+    /**
+     * Gets an instance of api_response.
+     * @param $forceReload bool: If true, forces instantiation of a new
+     *        instance. Used for testing.
+     */
+    public static function getInstance($forceReload = false) {
         static $instance;
-        if ((!isset($instance) || !($instance instanceof api_response)) || $forcenew) {
+        if ((!isset($instance) || !($instance instanceof api_response)) || $forceReload) {
             $instance = new api_response();
         }
         return $instance;
@@ -24,7 +36,10 @@ class api_response {
     }
     
     /**
-     * Set a single header. Overwrites existing header if it exists.
+     * Set a single header. Overwrites an existing header of the same
+     * name if it exists.
+     * @param $header string: Header name.
+     * @param $value string: Value of the header.
      */
     public function setHeader($header, $value) {
         $this->headers[$header] = $value;
@@ -32,6 +47,7 @@ class api_response {
     
     /**
      * Returns an associative array of all set headers.
+     * @return hash: All headers which have been set.
      */
     public function getHeaders() {
         $headers = $this->headers;
@@ -41,7 +57,6 @@ class api_response {
             if (!is_null($this->charset)) {
                 $ct .= '; charset=' . $this->charset;
             }
-            
             $headers['Content-Type'] = $ct;
         }
         
@@ -50,7 +65,8 @@ class api_response {
     
     /**
      * Sets the content type of the current request. By default no
-     * content type is set.
+     * content type header is sent to the client.
+     * @param $contenttype string: Content type to send.
      */
     public function setContentType($contenttype) {
         $this->contenttype = $contenttype;
@@ -61,6 +77,7 @@ class api_response {
      * set is only used when content type has been set. The default
      * character set is utf-8 - set to null if you want to send
      * a Content-Type header without character set information.
+     * @param $charset string: Character set to send.
      */
     public function setCharset($charset) {
         $this->charset = $charset;
@@ -68,6 +85,7 @@ class api_response {
     
     /**
      * Sets the response code of the current request.
+     * @param $code int: Response code to send.
      * @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html HTTP status codes
      */
     public function setCode($code) {
@@ -101,9 +119,10 @@ class api_response {
         $this->send();
         exit();
     }
-
+    
     /**
-     * Send all content to the browser.
+     * Sends the status code, and all headers to the client. Then flushes
+     * the output buffer and thus sends the content out.
      */
     public function send() {
         if (!is_null($this->code)) {

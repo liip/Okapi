@@ -1,128 +1,82 @@
 <?php
 /**
-* Abstract class to be extended by views
-*
-* @author   Silvan Zurbruegg
-*/
-
+ * Abstract class to be extended by views
+ *
+ * @author   Silvan Zurbruegg
+ */
 abstract class api_views_common {
-    /**
-     * State
-     * 
-     * @var     int 
-     */
-    public $state = API_STATE_FALSE;
-   
-    /**
-    * Default Content-Type
-    * @var      string
-    */
-    protected $contentTypeDefault = 'text/html';
-
-    /*
-    * Content Type
-    *
-    * @var      string
-    */
-    protected $contentType = '';
-
-
-    /**
-    * Default Encoding 
-    * @var      string
-    */
-    protected $contentEncodingDefault= 'UTF-8';
- 
-    
-    /**
-    * Encoding
-    *
-    * @var      string
-    */ 
-    protected $contentEncoding = '';
-
-    /**
-    * Content Length
-    *
-    * Can be set from dispatch method and used for example
-    * by setHeaders()
-    * 
-    * @var      int
-    */
-    protected $contentLength = 0;
-    
-    /**
-     * 
-     * @var api_response
-     *
-     */
-    
+    /** api_response: Response object. */
     protected $response = null;
     
-    public function setResponse($response) { $this->response = $response; }
-    public function setRequest($request) { $this->request = $request; }
-
     /**
-     * Constructor
-     * 
-     * @param   request  api_request  Request information.
-     * @param   route    array        Route information.
-     * @param   response api_response Response object.
+     * Set the response object to use.
+     * @param $response api_response: Response object.
      */
-    protected function __construct($route) {
+    public function setResponse($response) {
+        $this->response = $response;
+    }
+    
+    /**
+     * Set the request object to use.
+     * @param $request api_request: Request object.
+     */
+    public function setRequest($request) {
+        $this->request = $request;
+    }
+    
+    /**
+     * Constructor.
+     * @param $route hash: Route parameters.
+     */
+    public function __construct($route) {
         $this->request = api_request::getInstance();
         $this->route = $route;
         $this->response = api_response::getInstance();
     }
     
-    
     /**
-    * Prepare for dispatching
-    *
-    * Gets called before dispatch()
-    * Useful for instantiation of dom objects etc.
-    *
-    * @param    array   params  array of request params
-    * @see      api_views_common::dispatch()
-    * @return   void
-    */
+     * Prepare for dispatching
+     *
+     * Gets called before dispatch()
+     * Useful for instantiation of DOM objects etc.
+     */
     public function prepare() {
        return true;
     }
     
+    /**
+     * To be implemented by views for outputting response.
+     * @param $data DOMDocument: DOM document to transform.
+     * @param $exceptions array: Array of exceptions merged into the DOM.
+     */
+    abstract function dispatch($data, $exceptions = null);
     
     /**
-    * Sends text/xml Content-type
-    *
-    * @return   void
-    */
+     * Sends text/xml content type headers.
+     *
+     * @return   void
+     */
     protected function setXMLHeaders() {
         $this->response->setContentType('text/xml');
         $this->response->setCharset('utf-8');
     }
     
-    
     /**
      * Usable by views for setting specific headers
-     *
      * Should use the $this->response object to set headers.
-     *
-     * @return   void
      */
     protected function setHeaders() {
     }
     
-    
     /**
-    * To be implemented by views for dispatching output
-    *
-    * @return       void
-    */
-    abstract function dispatch($xmldom);
-    
-    
+     * Translates content in the given DOM using api_i18n.
+     *
+     * @param $lang string: Language to translate to.
+     * @param $xmlDoc DOMDocument: DOM to translate.
+     * @config <b>lang['i18ntransform']</b> (bool): If set to false,
+     *         no transformations are done. Defaults to true.
+     */
     protected function transformI18n($lang, $xmlDoc) {
-	
         $cfg = api_config::getInstance()->lang;
         if(isset($cfg['i18ntransform']) && $cfg['i18ntransform'] === false){
             return;

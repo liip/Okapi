@@ -1,10 +1,11 @@
 <?php
-final class api_views_xmlhead extends api_views_default {
-    public function __construct($route) {
-        parent::__construct($route);
-    }
-
+/**
+ * View which sets XML content type headers.
+ * @author   Silvan Zurbruegg
+ */
+class api_views_xmlhead extends api_views_default {
     protected function setHeaders() {
+        parent::setHeaders();
         $this->setXMLHeaders();
     }
 }

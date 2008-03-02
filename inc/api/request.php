@@ -1,27 +1,36 @@
 <?php
 require('api/params.php');
+
 /**
- * Parses the request parameters and stored them in a
- * easily accessible form which can be passed around to
- * commands.
+ * Parses the request and stores all information it can extract from
+ * the request in a easily accessible form.
  */
 class api_request {
+    /** Hostname of the current request. */
     protected $host = '';
-    protected $lookupHost = '';
+    /** Subdomain of the current request's hostname. */
     protected $sld = '';
+    /** Top domain of the current request's hostname. */
     protected $tld = '';
+    /** Path of the current request. */
     protected $path = '';
+    /** Full URL of the current request. */
     protected $url = '';
-    protected $verb = '';       // HTTP verb of the current request
+    /** HTTP verb of the current request. */
+    protected $verb = '';
+    /** Language for the current request. */
     protected $lang = '';
+    /** api_params: Request parameters. */
     protected $params = null;
+    /** Filename extracted from the path. */
     protected $filename = '';
+    /** Extension extracted from the path. */
     protected $extension = false;
     
     /**
      * Gets an instance of api_request.
-     *
-     * @param $forceReload bool: If true, forces instantiation of a new instance.
+     * @param $forceReload bool: If true, forces instantiation of a
+     *        new instance. Used for testing.
      */
     public static function getInstance($forceReload = false) {
         static $instance;
@@ -39,7 +48,6 @@ class api_request {
      */
     protected function __construct() {
         $this->host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
-        $this->lookupHost = $this->host;
         
         $config = api_config::getInstance();
         $this->outputLangs = $config->lang['languages'];
@@ -56,7 +64,6 @@ class api_request {
         if ($hostinfo) {
             $this->sld = $hostinfo['sld'];
             $this->tld = $hostinfo['tld'];
-            $this->lookupHost = $hostinfo['host'];
         }
         
         $path = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
@@ -85,20 +92,20 @@ class api_request {
         $this->verb = isset($_SERVER['REQUEST_METHOD']) ? strtoupper($_SERVER['REQUEST_METHOD']) : 'GET';
         
         $this->params = new api_params();
-
         $this->params->setGet($_GET);
-        
-        // Get / Post parameters
         if ($this->verb == 'POST') {
             $this->params->setPost($_POST);
         }
-
+        
         if ($this->lang === '') {
             $lang = $this->parseLanguage($path);
             $this->lang = $lang['lang'];
             $path = $lang['path'];
         }
         $this->url = API_HOST . $this->lang . API_MOUNTPATH . substr($path, 1);
+        
+        // Remove double-slashes
+        $path = preg_replace('#/{2,}#', '/', $path);
         $this->path = $path;
         
         // Path
@@ -119,18 +126,10 @@ class api_request {
     public function getHost() {
         return $this->host;
     }
-    
-    /**
-     * Returns the hostname to be used for route lookups. This
-     * is either the host attribute of the matching host in the config
-     * or it's sld or name attribute. (in this order of priority)
-     */
-    public function getLookupHost() {
-        return $this->lookupHost;
-    }
 
     /**
      * Returns the subdomain of the current request's hostname.
+     * @see api_init::getHostConfig()
      */
     public function getSld() {
         return $this->sld;
@@ -138,16 +137,18 @@ class api_request {
 
     /**
      * Returns the top domain of the current request's hostname.
+     * @see api_init::getHostConfig()
      */
     public function getTld() {
         return $this->tld;
     }
     
     /**
-     * Returns the path of the current request.
+     * Returns the path of the current request. Language and path prefix
+     * are removed.
      */
     public function getPath() {
-        return preg_replace('#/{2,}#','/',$this->path);
+        return $this->path;
     }
     
     /**
@@ -195,6 +196,14 @@ class api_request {
     }
     
     /**
+     * Returns the extension of the file name. This consists of three or
+     * four letters.
+     */
+    public function getExtension() {
+        return $this->extension;
+    }
+    
+    /**
      * Returns the request parameters.
      */
     public function getParameters() {
@@ -205,6 +214,10 @@ class api_request {
      * Returns a single request parameter.
      * You can pass in a default value which is returned in case the
      * param does not exist. Null is returned by default.
+     * @param $param: Key of the request parameter to return.
+     * @param $default: Default value to return if the key does
+     *        not exist in the request parameters.
+     * @return string: Request parameter or default.
      */
     public function getParam($param, $default = null) {
         if (isset($this->params[$param])) {
@@ -215,22 +228,17 @@ class api_request {
     }
     
     /**
-     * Returns the extension
-     */
-    public function getExtension() {
-        return $this->extension;
-    }
-    /**
      * Parses out a file name from the current path.
      * The last path component is returned if it contains an extension
      * of at least one character.
+     * @param $path string: Path to parse.
+     * @return string: File name
      */
     private function parseFilename($path) {
         preg_match("#[\s\w\xc0-\xff\-\_\%2F\+]*\.[a-z0-9]{1,}$#i", $path, $matches);
         if (isset($matches[0])) {
             return api_helpers_string::ensureUtf8(urldecode($matches[0]));
         }
-        
         return '';
     }
     
@@ -239,6 +247,8 @@ class api_request {
      * On finding a language, an associative array is returned
      * containing the new path and the language.
      * If no language is found, null is returned.
+     * @param $path string: Path to parse.
+     * @return hash: Parsed path.
      */
     private function getLanguageFromPath($path) {
         // Path
@@ -259,6 +269,8 @@ class api_request {
      *   - Path (beginning of path).
      *   - HTTP Accept headers.
      *   - Default.
+     * @param $path string: Path to parse.
+     * @return hash: Parsed path.
      */
     private function parseLanguage($path) {
         $newpath = $path;
@@ -282,7 +294,7 @@ class api_request {
                 }
             }
         }
-
+        
         return array('path' => $newpath,
                      'lang' => $this->defaultLang);
     }
