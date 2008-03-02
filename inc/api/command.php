@@ -47,8 +47,7 @@ abstract class api_command {
     
     /**
      * Get XSL parameters from command. Used to overwrite view configuration
-     * from the route. The accepted keys in the returned array are defined in
-     * api_view::getXslAttributeKeys().
+     * from the route.
      * @return  array: Associative array with params.
      */
     public function getXslParams() {

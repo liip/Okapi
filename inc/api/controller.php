@@ -302,23 +302,9 @@ class api_controller {
      * Uses api_command::getXslParams() method to overwrite the
      * view parameters. All parameters returned by the command
      * are written into the 'view' array of the route.
-     *
-     * Only valid keys as defined by api_view::getXslAttributeKeys()
-     * are used.
      */
     private function updateViewParams() {
-        if (! method_exists($this->command, "getXslParams")) {
-            return;
-        }
-            
-        $xslattr = api_view::getXslAttributeKeys();
-        $xo = $this->command->getXslParams();
-        if (is_array($xo)) {
-            foreach($xo as $name => $value) {
-                if (in_array($name, $xslattr)) {
-                    $this->route['view'][$name] = $value;
-                }
-            }
-        }
+        $this->route['view'] = array_merge($this->route['view'],
+                $this->command->getXslParams());
     }
 }

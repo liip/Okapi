@@ -7,10 +7,6 @@
  * @author   Silvan Zurbruegg
  */
 class api_view {
-    /** XSLT params which the command can overwrite in the view configuration. */
-    private static $xslAttributeKeys = array(
-        'view', 'theme',
-        'xsl', 'omitextension');
     /** Prefix for view class names. */
     private static $classNameBase    = "api_views_";
     
@@ -85,12 +81,5 @@ class api_view {
         }
         
         return false;
-    }
-    
-    /**
-     * @todo Get rid of this additional magic.
-     */
-    public static function getXslAttributeKeys() {
-        return self::$xslAttributeKeys;
     }
 }
