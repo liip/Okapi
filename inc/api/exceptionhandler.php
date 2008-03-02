@@ -134,6 +134,7 @@ class api_exceptionhandler {
      * Prepends the string "api_exceptionhandler_" to the given key.
      * Used to construct the full class name from a configuration value.
      * 
+     * @param $name string: Exception class name
      * @return string
      */
     private static function getExceptionHandlerClassName($name) {

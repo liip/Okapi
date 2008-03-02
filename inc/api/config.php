@@ -78,10 +78,13 @@ class api_config {
     
     /**
      * Set a custom loader.
+     * 
      * The loader is an object used to load the configuration. The object
      * must implement a method load($env) which returns a full configuration
      * array. The parameter $env is the environment to load. Used to
      * implement custom loading strategies which don't necessarily use YAML.
+     * 
+     * @param $loader object: Custom loader object.
      */
     public static function setLoader($loader) {
         self::$loader = $loader;

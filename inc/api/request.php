@@ -214,8 +214,8 @@ class api_request {
      * Returns a single request parameter.
      * You can pass in a default value which is returned in case the
      * param does not exist. Null is returned by default.
-     * @param $param: Key of the request parameter to return.
-     * @param $default: Default value to return if the key does
+     * @param $param string: Key of the request parameter to return.
+     * @param $default string: Default value to return if the key does
      *        not exist in the request parameters.
      * @return string: Request parameter or default.
      */
@@ -269,6 +269,7 @@ class api_request {
      *   - Path (beginning of path).
      *   - HTTP Accept headers.
      *   - Default.
+     * 
      * @param $path string: Path to parse.
      * @return hash: Parsed path.
      */

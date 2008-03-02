@@ -73,7 +73,7 @@ class api_db {
      * Returns a connection from the driver using it's getDBConnection()
      * method.
      *
-     * @param $config array: Configuration for the connection to loade.
+     * @param $config array: Configuration for the connection to load.
      * @return DatabaseConnection: Database connection retrieved from
      *         the driver.
      */

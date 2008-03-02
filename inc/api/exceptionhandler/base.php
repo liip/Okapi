@@ -26,6 +26,10 @@ abstract class api_exceptionhandler_base {
     /**
      * Extracts source lines from the given files. This is used to extract
      * some context of the exception.
+     *
+     * @param $file string: Full path to the file to get source lines.
+     * @param $start int: Line number of the first line to return.
+     * @param $end int: Line number of the last line to return.
      * @return array: Requested lines of the file.
      */
     public function getSourceFromFile($file, $start, $end) {
@@ -64,6 +68,7 @@ abstract class api_exceptionhandler_base {
     
     /**
      * Log the exception. This is called for all non-fatal exceptions.
+     * @param $e Exception: The exception to log.
      */
     public function log(Exception $e) {
         error_log("Extension encountered: " . (string) $e);

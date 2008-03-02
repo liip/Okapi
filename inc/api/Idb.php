@@ -5,6 +5,7 @@
 interface api_Idb {
     /**
      * Return a valid connection to the database.
+     * @param $config array: Configuration for the connection to load.
      */
-    public function getDBConnection($cfg);
+    public function getDBConnection($config);
 }

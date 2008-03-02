@@ -183,6 +183,7 @@ class api_init {
      *         Path where this application is mounted on. This has
      *         implications for the routing engine (see api_routing). Defaults
      *         to "/".
+     * @param $hostname: Host name to return config for.
      */
     public static function getHostConfig($hostname) {
         $hosts = array();

@@ -138,6 +138,7 @@ class api_response {
     
     /**
      * Send the status header line.
+     * @param $code int: Response code to send.
      * @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html HTTP status codes
      */
     protected function sendStatus($code) {

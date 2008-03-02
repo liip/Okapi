@@ -13,8 +13,9 @@ class api_params extends ArrayObject {
     
     /**
      * Constructor. Initializes the array object.
+     * @param $array array: Default contents of the array.
      */
-    public function __construct($array = Array()) {
+    public function __construct($array = array()) {
         parent::__construct($array, ArrayObject::ARRAY_AS_PROPS);
     }
     
@@ -24,7 +25,7 @@ class api_params extends ArrayObject {
      */
     public function setPost($array) {
         $this->post = $array;
-        $this->exchangeArray(array_merge($this->getArrayCopy(), $array));
+        $this->exchangearray(array_merge($this->getArrayCopy(), $array));
     }
     
     /**
@@ -33,7 +34,7 @@ class api_params extends ArrayObject {
      */
     public function setGet($array) {
         $this->get = $array;
-        $this->exchangeArray(array_merge($this->getArrayCopy(), $array));
+        $this->exchangearray(array_merge($this->getArrayCopy(), $array));
     }
     
     /**
