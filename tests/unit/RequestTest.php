@@ -45,6 +45,16 @@ class RequestTest extends UnitTestCase {
     }
 
     /**
+     * Test if the path is correctly parsed and double-slashes
+     * are removed.
+     */
+    function testRequestPathRemoveDoubleSlashes() {
+        $_SERVER["REQUEST_URI"] = '/the//command';
+        $r = api_request::getInstance(true);
+        $this->assertEqual('/the/command', $r->getPath());
+    }
+
+    /**
      * Path must not include any URL parameters.
      */
     function testRequestPathWithoutParams() {

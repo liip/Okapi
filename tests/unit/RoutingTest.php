@@ -350,7 +350,6 @@ class RoutingTest extends UnitTestCase {
      * An URL can have multiple Slashes at the beginning or end,
      * they will be normalized to just one
      */
-
     function testMultipleSlashes() {
         $m = new api_routing();
         $m->route('/test/')->config(array('command' => 'test'));;
@@ -378,7 +377,6 @@ class RoutingTest extends UnitTestCase {
         $route = $m->getRoute($request);
         $this->assertEqual($route, array('command' => 'test',
             'method' => 'process', 'view' => array()));
-        
     }
     
      /**
