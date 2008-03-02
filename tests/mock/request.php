@@ -11,11 +11,9 @@ class mock_request extends api_request {
         parent::__construct();
         
         foreach ($params as $key => $value) {
-            $this->$key = $value;
+            if ($key != 'path')
+                $this->$key = $value;
         }
-        
-        // Simulate api_request
-        $this->path = preg_replace('#/{2,}#', '/', $this->path);
     }
 }
 ?>

@@ -481,9 +481,7 @@ class RoutingTest extends UnitTestCase {
       * Tests if extensions can be omitted and stripped so the variable 
       * is without extension
       */
-      
-    function testOptionalExtension() {
-        // i don't want the extension
+    function testOptionalExtensionWithoutExtension() {
         $m = new api_routing();
         $m->route('/:command/:method', array("optionalextension"=>TRUE))->config(Array());
         
@@ -491,9 +489,13 @@ class RoutingTest extends UnitTestCase {
         $route = $m->getRoute($request);
         $this->assertEqual($route, array('command' => 'bar',
             'method' => 'baz', 'view' => array()));
-        
-        $m->clear();
-        // i want the extension
+    }
+    
+     /**
+      * Tests if extensions can be omitted and stripped so the variable 
+      * is without extension
+      */
+    function testOptionalExtensionWithExtension() {
         $m = new api_routing();
         $m->route('/:command/:method', array("optionalextension"=>FALSE))->config(Array());
         
@@ -501,9 +503,13 @@ class RoutingTest extends UnitTestCase {
         $route = $m->getRoute($request);
         $this->assertEqual($route, array('command' => 'bar',
             'method' => 'baz.xml', 'view' => array()));
-       
-        $m->clear();
-        //default behaviour
+    }
+    
+     /**
+      * Tests if extensions can be omitted and stripped so the variable 
+      * is without extension
+      */
+    function testOptionalExtensionDefault() {
         $m = new api_routing();
         $m->route('/:command/:method', array())->config(Array());
         
