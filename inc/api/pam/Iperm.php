@@ -2,7 +2,7 @@
 /**
  * Interface for permission objects.
  */
-interface api_pam_interface_perm {
+interface api_pam_Iperm {
     /**
      * Checks if the user has access to the given object.
      * @param $uid mixed: User ID of the user who's currently logged in.

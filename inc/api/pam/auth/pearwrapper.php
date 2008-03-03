@@ -4,7 +4,7 @@
  * classes.
  * @see http://pear.php.net/package/Auth
  */
-class api_pam_auth_pearwrapper extends api_pam_common implements api_pam_interface_auth {
+class api_pam_auth_pearwrapper extends api_pam_common implements api_pam_Iauth {
     /** Instance of PEAR Auth. */
     private $pAuth = null;
     

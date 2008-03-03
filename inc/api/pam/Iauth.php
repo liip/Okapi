@@ -2,7 +2,7 @@
 /**
  * Interface for authentication objects.
  */
-interface api_pam_interface_auth {
+interface api_pam_Iauth {
     /**
      * Login in with the given username and password. The authentication
      * object is responsible for handling the session state.
