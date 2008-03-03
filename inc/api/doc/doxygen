@@ -55,3 +55,8 @@ GENERATE_LATEX         = NO
 # config - all configuration values that Okapi recognizes
 ALIASES += "config=\xrefitem configurations \"Configuration value\" \"Configuration values\""
 ALIASES += "define=\xrefitem defines \"Global constant\" \"Global constants\" \b"
+
+#---------------------------------------------------------------------------
+# Input filter for README files
+#---------------------------------------------------------------------------
+FILTER_PATTERNS        = *README*="doc/readme_filter.sh"
