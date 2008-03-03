@@ -4,7 +4,7 @@
  * by all of the different routing classes. This permits consistent
  * adding and configuring of routes.
  */
-interface api_routing_interface {
+interface api_Irouting {
     /**
      * Defines the actual route expression for the given route. See
      * api_routing_route::parseRoute() for how the route is parsed.
@@ -44,7 +44,7 @@ interface api_routing_interface {
 /**
  * Configures how requests are routed to controllers.
  */
-class api_routing implements api_routing_interface {
+class api_routing implements api_Irouting {
     /** Array of api_routing_route: List of all configured routes. */
     static $routes = array();
     
@@ -59,7 +59,7 @@ class api_routing implements api_routing_interface {
      * Adds an api_routing_route object to the routing table.
      *
      * This happens automatically with methods which are part
-     * of api_routing_interface but this method is needed in case
+     * of api_Irouting but this method is needed in case
      * you want to manually instantiate api_routing_route objects.
      *
      * @param $route api_routing_route: Route to add.
@@ -109,7 +109,7 @@ class api_routing implements api_routing_interface {
 /**
  * Standard route. Matches path to commands.
  */
-class api_routing_route implements api_routing_interface {
+class api_routing_route implements api_Irouting {
     /** Default parameters. */
     private $default = array(
         'method' => 'process',
