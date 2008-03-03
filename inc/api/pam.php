@@ -96,7 +96,7 @@ class api_pam {
      * @param $user string: User name
      * @param $pass string: Password
      * @return bool: Return value of the authentication login method
-     * @see api_pam_interface_auth::login()
+     * @see api_pam_Iauth::login()
      */
     public function login($user, $pass) {
         if (($ao = $this->getAuthObj()) !== false) {
@@ -109,7 +109,7 @@ class api_pam {
      * Log out the current user. Calls the logout method of the
      * authentication object.
      * @return bool: Return value of the authentication logout method
-     * @see api_pam_interface_auth::logout()
+     * @see api_pam_Iauth::logout()
      */
     public function logout() {
         if (($ao = $this->getAuthObj()) !== false) {
@@ -122,7 +122,7 @@ class api_pam {
      * Check if the user is currently logged in. Calls the checkAuth
      * method of the authentication object.
      * @return bool: True if the user is logged in.
-     * @see api_pam_interface_auth::checkAuth()
+     * @see api_pam_Iauth::checkAuth()
      */
     public function checkAuth() {
         if (($ao = $this->getAuthObj()) !== false) {
@@ -136,7 +136,7 @@ class api_pam {
      * method of the authentication object.
      * @return mixed: User ID. Variable type depends on authentication
      *         class.
-     * @see api_pam_interface_auth::getUserId()
+     * @see api_pam_Iauth::getUserId()
      */
     public function getUserId() {
         if (($ao = $this->getAuthObj()) !== false) {
@@ -149,7 +149,7 @@ class api_pam {
      * Gets the user name of the currently logged in user. Calls the
      * getUserName() method of the authentication object.
      * @return string: User name
-     * @see api_pam_interface_auth::getUserName()
+     * @see api_pam_Iauth::getUserName()
      */
     public function getUserName() {
         if (($ao = $this->getAuthObj()) !== false) {
@@ -162,7 +162,7 @@ class api_pam {
      * Gets the additional meta information about the currently logged in
      * user. Calls the getAuthData() method of the authentication object.
      * @return hash: Information key/value pair
-     * @see api_pam_interface_auth::getAuthData()
+     * @see api_pam_Iauth::getAuthData()
      */
     public function getAuthData() {
         if (($ao = $this->getAuthObj()) !== false) {
@@ -180,7 +180,7 @@ class api_pam {
      * @param $acValue string: Access control value. Used in the same way as
      *        the $acObject param.
      * @return bool: True if the user is allowed to access the object
-     * @see api_pam_interface_perm::isAllowed()
+     * @see api_pam_Iperm::isAllowed()
      */
     public function isAllowed($acObject, $acValue) {
         if (($po = $this->getPermObj()) !== false) {
@@ -268,7 +268,7 @@ class api_pam {
     
     /**
      * Returns the current permission object.
-     * @return api_pam_interface_perm: Permission object.
+     * @return api_pam_Iperm: Permission object.
      */
     private function getPermObj() {
         return $this->pamGetObject($this->permprefix, $this->getPermScheme());
@@ -276,7 +276,7 @@ class api_pam {
     
     /**
      * Returns the current authentication object.
-     * @return api_pam_interface_auth: Authentication object.
+     * @return api_pam_Iauth: Authentication object.
      */
     private function getAuthObj() {
         return $this->pamGetObject($this->authprefix, $this->getAuthScheme());
