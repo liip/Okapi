@@ -52,11 +52,13 @@ class api_model_http extends api_model {
             throw new api_exception_Backend(
                 api_exception::THROW_FATAL,
                 array('url' => $this->url),
+                0,
                 "Empty response returned.");
         } else if ($status != 200) {
             throw new api_exception_Backend(
                 api_exception::THROW_FATAL,
                 array('url' => $this->url),
+                0,
                 "Got a bad HTTP status: " . $status);
         }
         
@@ -83,6 +85,7 @@ class api_model_http extends api_model {
             throw new api_exception_Backend(
                 api_exception::THROW_FATAL,
                 array('url' => $this->url),
+                0,
                 "Could not initialize CURL object");
         }
         
