@@ -126,8 +126,11 @@ abstract class api_command {
         $cmdNode->setAttribute("name", $commandname);
         
         foreach ($this->data as $d) {
-            $node = $dom->importNode($d->getDOM()->documentElement, true);
-            $dom->documentElement->appendChild($node);
+            $dataDom = $d->getDOM();
+            if (!is_null($dataDom)) {
+                $node = $dom->importNode($d->getDOM()->documentElement, true);
+                $dom->documentElement->appendChild($node);
+            }
         }
         
         return $dom;
