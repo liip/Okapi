@@ -49,6 +49,7 @@ class api_exceptionhandler_default extends api_exceptionhandler_base {
                    'file'       => $e->getFile(),
                    'line'       => $e->getLine(),
                    'name'       => api_helpers_class::getBaseName($e),
+                   'params'     => $e->getParams(),
                    );
         
         if(!empty($e->userInfo)) {

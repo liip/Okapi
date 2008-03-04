@@ -17,6 +17,8 @@ class api_exception_LibxmlError extends api_exception {
         $this->userInfo = "";
         
         $errors = libxml_get_errors();
+        $errorHash = array();
+        
         if ($errors) {
             foreach ($errors as $error) {
                 $this->userInfo .= $error->message;
@@ -24,8 +26,18 @@ class api_exception_LibxmlError extends api_exception {
                     $this->userInfo .= " in file ".$error->file ." line:".$error->line ;
                 }
                 $this->userInfo .= "<br/>";
+                
+                array_push($errorHash, array(
+                    'level' => $error->level,
+                    'code' => $error->column,
+                    'message' => $error->message,
+                    'file' => $error->file,
+                    'line' => $error->line,
+                ));
             }
         }
         libxml_clear_errors();
+        
+        $this->setParam('xmlerrors', $errorHash);
     }
 }

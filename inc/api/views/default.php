@@ -53,7 +53,8 @@ class api_views_default extends api_views_common {
         }
         
         $xml = @$this->xslproc->transformToDoc($xmldom);
-        if ($xml instanceof DOMDocument) {
+        $xslt_errors = libxml_get_errors();
+        if (count($xslt_errors) == 0 && $xml instanceof DOMDocument) {
             $this->transformI18n($this->request->getLang(), $xml);
             
             $xmlstr = $xml->saveXML();
@@ -66,8 +67,7 @@ class api_views_default extends api_views_common {
             $this->sendResponse();
             return;
         } else {
-            throw new api_exception_XsltParseError(api_exception::THROW_FATAL, $this->xslfile,
-                    nl2br(var_export(libxml_get_errors(), true)));
+            throw new api_exception_XsltParseError(api_exception::THROW_FATAL, $this->xslfile);
         }
     }
     

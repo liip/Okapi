@@ -71,6 +71,14 @@ class api_exception extends Exception {
     }
     
     /**
+     * Returns all params currently set.
+     * @return array: Parameters with details about the exception.
+     */
+    public function getParams() {
+        return $this->params;
+    }
+    
+    /**
      * Sets a new param array.
      * @param $params array: Parameters giving details about the exception.
      */
