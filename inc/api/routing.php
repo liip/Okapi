@@ -278,6 +278,15 @@ class api_routing_route implements api_Irouting {
             }
         }
         
+        if (isset($this->routeConfig['namespace']) && $this->routeConfig['namespace']) {
+            foreach ($this->params as $param => $val) {
+                if (!is_array($val)) {
+                    $val = preg_replace("/\{([\w\d]+)\}/e", 'api_helpers_string::clean($params[\'$1\'])', $val);
+                    $params[$param] = $val;
+                }
+            }
+        }
+        
         return $params;
     }
     
