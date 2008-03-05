@@ -20,7 +20,7 @@ class ConfigTest extends UnitTestCase {
     function testEnvDev() {
         $_SERVER['OKAPI_ENV'] = 'debug';
         $cfg = api_config::getInstance(TRUE);
-        $this->assertEqual($cfg->config_test, 'debug');
+        $this->assertEqual($cfg->config_test, 'main');
     }
 
     /**
