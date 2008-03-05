@@ -552,5 +552,16 @@ class RoutingTest extends UnitTestCase {
         $this->assertEqual($route, array('command' => 'catchall',
             'method' => 'process', 'view' => array(), 'test/another'));
     }
+    
+    function testNamespaceRoute() {
+        $m = new api_routing();
+        $m->route('/test/:command', array("namespace"=>TRUE))->config(array('command' => 'foo_{command}', 'method'=>'blah', 'random'=>'{method}_shaboom'));
+        
+        $request = new mock_request(array('path' => '/test/bar'));
+        $route = $m->getRoute($request);
+        $this->assertEqual($route, array('command'=>'foo_bar',
+            'method' => 'blah', 'random'=>'blah_shaboom', 'view'=> array()));
+        
+    }
 
 }
