@@ -76,6 +76,43 @@ class ControllerTest extends UnitTestCase {
         $this->controller->process();
 
         $this->assertEqual($this->controller->getCommandName(), 'foo_command_bar');
+        $this->assertEqual($this->controller->getFinalViewName(), 'foo_views_default');
+        
+    }
+    
+    /**
+     * Check exception if command does not exist
+     *
+     */
+    function testNamespacesNotExisting() {
+        $_SERVER['REQUEST_URI'] = '/namespacetest/blah/nocommand/the';
+        api_request::getInstance(true);
+        
+        $this->controller = new api_controller();
+        $this->response = new testResponse();
+        $this->controller->setResponse($this->response);
+
+
+        $this->expectException(new api_exception_NoCommandFound('Command blah_commands_nocommand or blah_command_nocommand not found.'));
+        $this->controller->process();
+    }
+    
+    
+    /**
+     * Check default-namespace-view usage if there is no view in this namespace 
+     *
+     */
+    function testNamespacesWithoutView() {
+        $_SERVER['REQUEST_URI'] = '/namespacetest/bar/foo/blah';
+        api_request::getInstance(true);
+        
+        $this->controller = new api_controller();
+        $this->response = new testResponse();
+        $this->controller->setResponse($this->response);
+        $this->controller->process();
+
+        $this->assertEqual($this->controller->getCommandName(), 'bar_command_foo');
+        $this->assertEqual($this->controller->getFinalViewName(), 'api_views_default');
         
     }
     
