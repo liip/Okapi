@@ -278,7 +278,7 @@ class api_routing_route implements api_Irouting {
             }
         }
         
-        if (isset($this->routeConfig['namespace']) && $this->routeConfig['namespace']) {
+        if (isset($this->routeConfig['rewrite']) && $this->routeConfig['rewrite']) {
             foreach ($this->params as $param => $val) {
                 if (!is_array($val)) {
                     $val = preg_replace("/\{([\w\d]+)\}/e", 'api_helpers_string::clean($params[\'$1\'])', $val);
