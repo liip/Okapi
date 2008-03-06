@@ -140,7 +140,12 @@ class api_controller {
         if (is_null($route) || !is_array($route)) {
             throw new api_exception_NoCommandFound();
         }
-        $cmd = 'api_command_' . $route['command'];
+        if (isset($route['namespace'])) {
+            $route['namespace'] = api_helpers_string::clean($route['namespace']);
+        } else {
+            $route['namespace'] = "api";
+        }
+        $cmd = $route['namespace'].'_command_' . $route['command'];
         if (!class_exists($cmd)) {
             // Try old naming (api_commands_*)
             $cmd = 'api_commands_' . $route['command'];
@@ -308,5 +313,13 @@ class api_controller {
     private function updateViewParams() {
         $this->route['view'] = array_merge($this->route['view'],
                 $this->command->getXslParams());
+    }
+    
+    /**
+     * Returns the command name, needed by tests
+     *
+     */
+    public function getCommandName() {
+        return get_class($this->command);
     }
 }
