@@ -183,7 +183,7 @@ class api_model_backend_get extends api_model_http {
             
             // Build query of remaining params
             if (count($params) > 0) {
-                $url .= '?' . http_build_query($params);
+                $url .= '?' . $this->buildQueryString($params);
             }
         }
         
@@ -236,5 +236,16 @@ class api_model_backend_get extends api_model_http {
             }
             return null;
         }
+    }
+    
+    /**
+     * Constructs the query string from the given array. Uses
+     * http_build_query by default but is a good candiate to be
+     * overwritten if necessary.
+     * @param $params mixed: Variable to build query string for.
+     * @see http://php.net/manual/en/function.http-build-query.php
+     */
+    protected function buildQueryString($params) {
+        return http_build_query($params);
     }
 }
