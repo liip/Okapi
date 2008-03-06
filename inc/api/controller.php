@@ -143,16 +143,21 @@ class api_controller {
         if (isset($route['namespace'])) {
             $route['namespace'] = api_helpers_string::clean($route['namespace']);
         } else {
-            $route['namespace'] = "api";
+            $route['namespace'] = API_NAMESPACE;
         }
+        
+        
         $cmd = $route['namespace'].'_command_' . $route['command'];
+        
         if (!class_exists($cmd)) {
-            // Try old naming (api_commands_*)
-            $cmd = 'api_commands_' . $route['command'];
+            $cmd_old = $cmd;
+            // Try old naming (NAMESPACE_commands_*)
+            $cmd = $route['namespace'] . '_commands_' . $route['command'];
             if (class_exists($cmd)) {
-                error_log("$cmd: using api_commands_* is deprecated. Please use api_command_* instead.");
+                error_log("$cmd: using ${route['namespace']}_commands_* is deprecated. Please use ${route['namespace']}_command_* instead.");
             } else {
-                throw new api_exception_NoCommandFound("Command $cmd not found.");
+                // Inform that both classes could not be found
+                throw new api_exception_NoCommandFound("Command $cmd or $cmd_old not found.");
             }
         }
         
@@ -321,5 +326,13 @@ class api_controller {
      */
     public function getCommandName() {
         return get_class($this->command);
+    }
+    
+    /**
+     * Returns the final, dispatched view  name, needed by tests
+     *
+     */
+    public function getFinalViewName() {
+        return get_class($this->view);
     }
 }

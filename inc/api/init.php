@@ -70,6 +70,7 @@ class api_init {
             define('DEVEL',0);
         }
         
+        define('API_NAMESPACE', "api");
         define('API_PROJECT_DIR', realpath(dirname(__FILE__) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR);
         define('API_INCLUDE_DIR', API_PROJECT_DIR."inc".DIRECTORY_SEPARATOR);
         define('API_LIBS_DIR', API_INCLUDE_DIR."api".DIRECTORY_SEPARATOR);

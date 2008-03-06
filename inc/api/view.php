@@ -8,7 +8,10 @@
  */
 class api_view {
     /** Prefix for view class names. */
-    private static $classNameBase    = "api_views_";
+    private static $classNameBase    = "_views_";    
+    
+    /* FIXME: make this somehow global/config option */
+    private static $defaultNamespace = API_NAMESPACE;
     
     /** Protected constructor. Use api_view::factory(). */
     protected function __construct() {
@@ -31,6 +34,7 @@ class api_view {
      * @todo  Is omitextension still needed here?
      */
     public static function factory($name, $request, $route, $response) {
+        $rgNamespace = Array();
         $ext = null;
         if ($request->getFilename() != '') {
             preg_match("#\.([a-z]{3,4})$#", $request->getFilename(), $matches);
@@ -39,10 +43,27 @@ class api_view {
             }
         }
         
+        if (isset($route['namespace'])) {
+            $rgNamespace[] = $route['namespace'];
+        }
+        $rgNamespace[] = api_view::$defaultNamespace;
+        
+        
+        foreach ($rgNamespace as $ns) {
+            if (($obj = api_view::getViewWithNamespace($ns, $ext, $name, $route, $response)) != false) {
+                return $obj;
+            }
+        }
+        
+        return false;
+    }
+    
+    
+    private static function getViewWithNamespace($ns, $ext, $name, $route, $response) {
         $omitExt = (!empty($route['view']['omitextension']) && $route['view']['omitextension']) ? true : false;
-        $className = api_view::$classNameBase.strtolower($name);
+        $className = $ns.api_view::$classNameBase.strtolower($name);
+        
         if ($ext != null && $omitExt === false) {
-            
             /**
              * Try with view api_views_viewname_ext.
              * View is a subview of defined view
@@ -52,7 +73,7 @@ class api_view {
                 $obj = new $classNameExt($route);
                 $obj->setResponse($response);
                 if ($obj instanceof $classNameExt) {
-                    return $obj;        
+                    return $obj;
                 }
             } else {
                 
@@ -79,6 +100,8 @@ class api_view {
                 return $obj;
             }
         }
+        
+        
         
         return false;
     }
