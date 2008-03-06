@@ -76,10 +76,11 @@ class api_init {
         define('API_LIBS_DIR', API_INCLUDE_DIR."api".DIRECTORY_SEPARATOR);
         define('API_LOCAL_INCLUDE_DIR', API_PROJECT_DIR.'localinc'.DIRECTORY_SEPARATOR);
         define('API_THEMES_DIR', API_PROJECT_DIR.'themes'.DIRECTORY_SEPARATOR);
-      
+        define('API_VENDOR_DIR', API_PROJECT_DIR.'lib'.DIRECTORY_SEPARATOR);
+          
         // Set PHP include path (localinc - inc - include_path)
         
-        $incPath = API_LOCAL_INCLUDE_DIR.PATH_SEPARATOR.API_INCLUDE_DIR;
+        $incPath = API_LOCAL_INCLUDE_DIR.PATH_SEPARATOR.API_VENDOR_DIR.PATH_SEPARATOR.API_INCLUDE_DIR;
         $incPath.= PATH_SEPARATOR.ini_get("include_path");
         
         // Prepend extension directories to include path
