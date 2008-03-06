@@ -553,7 +553,7 @@ class RoutingTest extends UnitTestCase {
             'method' => 'process', 'view' => array(), 'test/another'));
     }
     
-    function testNamespaceRoute() {
+    function testRewriteRoute() {
         $m = new api_routing();
         $m->route('/test/:command', array("rewrite"=>TRUE))->config(array('command' => 'foo_{command}', 'method'=>'blah', 'random'=>'{method}_shaboom'));
         
