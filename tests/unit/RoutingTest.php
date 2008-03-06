@@ -553,15 +553,29 @@ class RoutingTest extends UnitTestCase {
             'method' => 'process', 'view' => array(), 'test/another'));
     }
     
+    /**
+     * Tests if parameters can be extended if the config option is set
+     *
+     */
     function testRewriteRoute() {
         $m = new api_routing();
-        $m->route('/test/:command', array("rewrite"=>TRUE))->config(array('command' => 'foo_{command}', 'method'=>'blah', 'random'=>'{method}_shaboom'));
+        $m->route('/test/:method/:command', array("rewrite"=>TRUE))->config(array('command' => 'foo_{command}', 'method'=>'blubb', 'random'=>'{method}_shaboom'));
         
-        $request = new mock_request(array('path' => '/test/bar'));
+        $request = new mock_request(array('path' => '/test/blah/bar'));
         $route = $m->getRoute($request);
         $this->assertEqual($route, array('command'=>'foo_bar',
             'method' => 'blah', 'random'=>'blah_shaboom', 'view'=> array()));
         
+    }
+    
+    function testNamespaceRoute() {
+        $m = new api_routing();
+        $m->route('/:namespace/test/:command')->config(array('command' => 'foo', 'method'=>'blah'));
+        
+        $request = new mock_request(array('path' => '/nsp/test/bar'));
+        $route = $m->getRoute($request);
+        $this->assertEqual($route, array('command'=>'bar',
+            'method' => 'blah', 'view'=> array(), 'namespace' => 'nsp'));
     }
 
 }

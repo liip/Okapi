@@ -63,6 +63,23 @@ class ControllerTest extends UnitTestCase {
     }
     
     /**
+     * Check that the command is set right when we use namespaces
+     *
+     */
+    function testNamespaces() {
+        $_SERVER['REQUEST_URI'] = '/namespacetest/foo/bar/blah';
+        api_request::getInstance(true);
+        
+        $this->controller = new api_controller();
+        $this->response = new testResponse();
+        $this->controller->setResponse($this->response);
+        $this->controller->process();
+
+        $this->assertEqual($this->controller->getCommandName(), 'foo_command_bar');
+        
+    }
+    
+    /**
      * Check that the headers are set correctly.
      */
     function testResponseHeaders() {
