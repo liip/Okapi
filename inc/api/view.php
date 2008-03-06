@@ -43,9 +43,10 @@ class api_view {
             }
         }
         
-        if (isset($route['namespace'])) {
+        if (isset($route['namespace']) && $route['namespace'] != API_NAMESPACE) {
             $rgNamespace[] = $route['namespace'];
         }
+        
         $rgNamespace[] = api_view::$defaultNamespace;
         
         
@@ -81,7 +82,7 @@ class api_view {
                  * Try with api_views_ext 
                  * View is a standard view for ext 
                  */
-                $classNameExt = api_view::$classNameBase.$ext;
+                $classNameExt = $ns.api_view::$classNameBase.$ext;
                 if (class_exists($classNameExt)) {
                     $obj = new $classNameExt($route);
                     $obj->setResponse($response);
