@@ -555,7 +555,7 @@ class RoutingTest extends UnitTestCase {
     
     function testNamespaceRoute() {
         $m = new api_routing();
-        $m->route('/test/:command', array("namespace"=>TRUE))->config(array('command' => 'foo_{command}', 'method'=>'blah', 'random'=>'{method}_shaboom'));
+        $m->route('/test/:command', array("rewrite"=>TRUE))->config(array('command' => 'foo_{command}', 'method'=>'blah', 'random'=>'{method}_shaboom'));
         
         $request = new mock_request(array('path' => '/test/bar'));
         $route = $m->getRoute($request);
