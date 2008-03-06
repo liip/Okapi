@@ -44,31 +44,31 @@
 class api_pam {
     /** api_pam: Instance returned by getInstance() */
     private static $instance = null;
-    
+
     /** string constant: Prefix for all class names in this package. */
     private $clsNameBase = 'api_pam';
-    
+
     /** string constant: Prefix for the permission classes in this package. */
     private $permprefix = 'perm';
-    
+
     /** string constant: Prefix for the authentication classes in this package. */
     private $authprefix = 'auth';
-    
+
     /** array: Configuration of the authentication part. */
     private $authConf = array();
-    
+
     /** array: Configuration of the permission part. */
     private $permConf = array();
-    
+
     /** string constant: Key for default settings. */
     private $confDefaultName = 'default';
-    
+
     /** string: Authentication scheme in use. */
     private $authScheme = '';
-    
+
     /** string: Permission scheme in use. */
     private $permScheme = '';
-    
+
     /**
      * Constructor. Loads the PAM configuration.
      */
@@ -76,23 +76,23 @@ class api_pam {
         $pamConf = api_config::getInstance()->pam;
         $this->pamLoadConfig($pamConf);
     }
-    
+
     /**
      * Return an instance of this class.
      * @return api_pam: Instance.
      */
-    public function getInstance() {
+    public static function getInstance() {
         if (!self::$instance instanceof api_pam) {
             self::$instance = new api_pam();
         }
         return self::$instance;
     }
-    
+
     /**
      * Login in with the given username and password. Calls the login
      * method on the authentication object. The authentication object
      * is responsible for handling the session state.
-     * 
+     *
      * @param $user string: User name
      * @param $pass string: Password
      * @return bool: Return value of the authentication login method
@@ -104,7 +104,7 @@ class api_pam {
         }
         return false;
     }
-    
+
     /**
      * Log out the current user. Calls the logout method of the
      * authentication object.
@@ -117,7 +117,7 @@ class api_pam {
         }
         return false;
     }
-    
+
     /**
      * Check if the user is currently logged in. Calls the checkAuth
      * method of the authentication object.
@@ -130,7 +130,7 @@ class api_pam {
         }
         return false;
     }
-    
+
     /**
      * Gets the ID of the currently logged in user. Calls the getUserId()
      * method of the authentication object.
@@ -144,7 +144,7 @@ class api_pam {
         }
         return 0;
     }
-    
+
     /**
      * Gets the user name of the currently logged in user. Calls the
      * getUserName() method of the authentication object.
@@ -157,7 +157,7 @@ class api_pam {
         }
         return "";
     }
-    
+
     /**
      * Gets the additional meta information about the currently logged in
      * user. Calls the getAuthData() method of the authentication object.
@@ -170,7 +170,7 @@ class api_pam {
         }
         return "";
     }
-    
+
     /**
      * Checks if the logged in user has access to the given object.
      * Calls isAllowed() of the permission object.
@@ -189,15 +189,15 @@ class api_pam {
         }
         return false;
     }
-    
+
     /**
      * Set an authentication scheme to use. This makes it possible to
      * run more than one different ways of authentication inside the
      * same application.
-     * 
+     *
      * To specify more than the default authentication scheme in the
      * configuration, use an array:
-     * 
+     *
      * \code
      * pam:
      *     auth:
@@ -227,10 +227,10 @@ class api_pam {
             $this->authScheme = $schemeName;
             return true;
         }
-        
+
         return false;
     }
-    
+
     /**
      * Returns the name of the currently active authentication
      * scheme. See api_pam::setAuthScheme() for details about
@@ -240,7 +240,7 @@ class api_pam {
     public function getAuthScheme() {
         return (empty($this->authScheme)) ? $this->confDefaultName : $this->authScheme;
     }
-    
+
     /**
      * Set a permission scheme to use. This works exactly the same way
      * as authentication schemes, documented under api_pam::setAuthScheme().
@@ -252,10 +252,10 @@ class api_pam {
             $this->permScheme = $schemeName;
             return true;
         }
-        
+
         return false;
     }
-    
+
     /**
      * Returns the name of the currently active permission
      * scheme. See api_pam::setAuthScheme() for details about
@@ -265,7 +265,7 @@ class api_pam {
     public function getPermScheme() {
         return (empty($this->permScheme)) ? $this->confDefaultName : $this->permScheme;
     }
-    
+
     /**
      * Returns the current permission object.
      * @return api_pam_Iperm: Permission object.
@@ -273,7 +273,7 @@ class api_pam {
     private function getPermObj() {
         return $this->pamGetObject($this->permprefix, $this->getPermScheme());
     }
-    
+
     /**
      * Returns the current authentication object.
      * @return api_pam_Iauth: Authentication object.
@@ -281,7 +281,7 @@ class api_pam {
     private function getAuthObj() {
         return $this->pamGetObject($this->authprefix, $this->getAuthScheme());
     }
-    
+
     /**
      * Returns a authentication or permission object. Re-uses existing
      * objects if possible.
@@ -292,9 +292,9 @@ class api_pam {
     private function pamGetObject($prefix, $scheme) {
         $objArr = $prefix."Obj";
         $cfgArr = $prefix."Conf";
-        
+
         $instBase = $this->clsNameBase."_".$prefix;
-        
+
         if (isset($this->{$objArr}[$scheme]) && ($this->{$objArr}[$scheme] instanceof $instBase)) {
             return $this->{$objArr}[$scheme];
         } else if (isset($this->{$cfgArr}[$scheme])) {
@@ -302,7 +302,7 @@ class api_pam {
         }
         return false;
     }
-    
+
     /**
      * Creates a new authentication or permission object.
      * @param $prefix string: Object type to return - "auth" or "perm"
@@ -314,7 +314,7 @@ class api_pam {
         if (! class_exists($className)) {
             return false;
         }
-        
+
         $opts = isset($cfg['options']) ? $cfg['options'] : array();
         $obj = new $className($opts);
         if ($obj instanceof $className) {
@@ -322,7 +322,7 @@ class api_pam {
         }
         return false;
     }
-    
+
     /**
      * Loads the configuration from the configuration file.
      * @param $pamConf hash: PAM configuration from api_config
@@ -331,12 +331,12 @@ class api_pam {
         if (isset($pamConf['auth'])) {
             $this->authConf = $this->pamLoadComponentConfig($pamConf['auth']);
         }
-        
+
         if (isset($pamConf['perm'])) {
             $this->permConf = $this->pamLoadComponentConfig($pamConf['perm']);
         }
     }
-    
+
     /**
      * Loads the configuration for an individual component (authentication
      * or permission) from the configuration file. Splits the configuration
@@ -346,7 +346,7 @@ class api_pam {
      */
     private function pamLoadComponentConfig($compArr) {
         $cfg = array();
-        
+
         if (isset($compArr[0]) && is_array($compArr[0])) {
             foreach($compArr as $conf) {
                 $confName = (isset($conf['name'])) ? $conf['name'] : $this->confDefaultName;
@@ -356,7 +356,7 @@ class api_pam {
             $confName = (isset($compArr['name'])) ? $compArr['name'] : $this->confDefaultName;
             $cfg[$confName] = $compArr;
         }
-        
+
         return $cfg;
     }
 }
