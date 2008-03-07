@@ -10,7 +10,7 @@ class api_pam_common {
      * Constructor. Sets the configuration for the component.
      * @param $opts hash: Options for the component.
      */
-    protected function __construct($opts) {
+    public function __construct($opts) {
         $this->opts = $opts;
     }
     

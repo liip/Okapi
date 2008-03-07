@@ -347,6 +347,7 @@ class api_pam {
     private function pamLoadComponentConfig($compArr) {
         $cfg = array();
 
+        
         if (isset($compArr[0]) && is_array($compArr[0])) {
             foreach($compArr as $conf) {
                 $confName = (isset($conf['name'])) ? $conf['name'] : $this->confDefaultName;
@@ -356,7 +357,8 @@ class api_pam {
             $confName = (isset($compArr['name'])) ? $compArr['name'] : $this->confDefaultName;
             $cfg[$confName] = $compArr;
         }
-
+        
+        
         return $cfg;
     }
 }
