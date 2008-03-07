@@ -98,7 +98,9 @@ class api_init {
             $inc = "";
             foreach (glob(API_PROJECT_DIR . 'ext/*') as $dir) {
                 $inc .= $dir . PATH_SEPARATOR;
-                $lib .= $dir."/lib" . PATH_SEPARATOR;
+                if (is_dir($dir."/lib")) {
+                    $lib .= $dir."/lib" . PATH_SEPARATOR;
+                }
             }
             
             $incPath = $inc . PATH_SEPARATOR . $lib . PATH_SEPARATOR . $incPath;
