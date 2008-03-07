@@ -2,6 +2,8 @@
 /**
  * Initializes the Okapi environment by setting up global constants
  * and include paths.
+ * 
+ *
  */
 class api_init {
     /** bool: True if Okapi has been initialized already. Used so that
@@ -13,11 +15,12 @@ class api_init {
      *
      * Defines a whole bunch of constants and sets the include path.
      * The include path contains the following components in this order:
+     *    -# API_LOCAL_INCLUDE_DIR - API_LOCAL_VENDOR_DIR
      *    -# All directories in the "ext/" directory. If there are two
      *       directories inside that directory, both are added individually
      *       to the include path.
-     *    -# API_LOCAL_INCLUDE_DIR
-     *    -# API_INCLUDE_DIR
+     *    -# All lib dirs in the exts
+     *    -# API_INCLUDE_DIR - API_VENDOR_DIR
      *    -# existing include_path
      *
      * @define API_PROJECT_DIR
@@ -32,6 +35,10 @@ class api_init {
      * @define API_LOCAL_INCLUDE_DIR
      *         Include path where the project's PHP code files are located.
      *         Points to the "localinc" directory inside API_PROJECT_DIR.
+     * @define API_LOCAL_VENDOR_DIR
+     *         Include path of the lib directory under localinc
+     * @define API_VENDOR_DIR
+     *         Include path of the lib directory under inc
      * @define API_THEMES_DIR
      *         Include path where the XSLT themes are located. Points to the
      *         "themes" directory inside API_PROJECT_DIR.
@@ -76,19 +83,28 @@ class api_init {
         define('API_LIBS_DIR', API_INCLUDE_DIR."api".DIRECTORY_SEPARATOR);
         define('API_LOCAL_INCLUDE_DIR', API_PROJECT_DIR.'localinc'.DIRECTORY_SEPARATOR);
         define('API_THEMES_DIR', API_PROJECT_DIR.'themes'.DIRECTORY_SEPARATOR);
-        define('API_VENDOR_DIR', API_PROJECT_DIR.'lib'.DIRECTORY_SEPARATOR);
-          
-        // Set PHP include path (localinc - inc - include_path)
+        define('API_VENDOR_DIR', API_INCLUDE_DIR.'lib'.DIRECTORY_SEPARATOR);
+        define('API_LOCAL_VENDOR_DIR', API_LOCAL_INCLUDE_DIR.'lib'.DIRECTORY_SEPARATOR);
         
-        $incPath = API_LOCAL_INCLUDE_DIR.PATH_SEPARATOR.API_VENDOR_DIR.PATH_SEPARATOR.API_INCLUDE_DIR;
+          
+        // Set PHP include path (localinc - localinc/lib - ext - ext/lib - inc - inc/lib - include_path)
+        
+        $incPath = API_INCLUDE_DIR . PATH_SEPARATOR . API_VENDOR_DIR;
         $incPath.= PATH_SEPARATOR.ini_get("include_path");
         
         // Prepend extension directories to include path
         if (is_dir(API_PROJECT_DIR . 'ext/')) {
+            $lib = "";
+            $inc = "";
             foreach (glob(API_PROJECT_DIR . 'ext/*') as $dir) {
-                $incPath = $dir . PATH_SEPARATOR . $incPath;
+                $inc .= $dir . PATH_SEPARATOR;
+                $lib .= $dir."/lib" . PATH_SEPARATOR;
             }
+            
+            $incPath = $inc . PATH_SEPARATOR . $lib . PATH_SEPARATOR . $incPath;
         }
+
+        $incPath = API_LOCAL_INCLUDE_DIR . PATH_SEPARATOR . API_LOCAL_VENDOR_DIR . PATH_SEPARATOR . $incPath;
         
         ini_set("include_path", $incPath);
         
