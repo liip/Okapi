@@ -29,6 +29,8 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
         if (self::$zaAuth->hasIdentity()) {
             return TRUE;
         } else if (isset(self::$zaAdapter)) {
+
+            
             $zaResult = self::$zaAuth->authenticate(self::$zaAdapter);
             
             return $zaResult->isValid();
@@ -51,6 +53,7 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
     }
     
     public  function login($user, $pass) {
+        self::$zaAuth->clearIdentity();
         $rgOpts = $this->opts['container'];
         
         $strAdapter = $rgOpts['driver'];
