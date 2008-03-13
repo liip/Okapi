@@ -6,9 +6,7 @@
  */
 class api_model_dom {
     /**
-     * The dom-object
-     *
-     * @var DOMDocument
+     * DOMDocument: The dom-object
      */
     private $dom = NULL;
     
