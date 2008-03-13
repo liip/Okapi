@@ -11,9 +11,7 @@ class api_view {
     private static $classNameBase    = "_views_";    
     
     /**
-     * The default namespace
-     *
-     * @var String
+     * String: The default namespace
      * @todo this would be nice in the config file with a default value
      */
     private static $defaultNamespace = API_NAMESPACE;
