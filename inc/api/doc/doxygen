@@ -17,7 +17,6 @@ TAB_SIZE               = 4
 #---------------------------------------------------------------------------
 # Build related
 #---------------------------------------------------------------------------
-EXTRACT_ALL            = YES
 EXTRACT_PRIVATE        = YES
 EXTRACT_STATIC         = YES
 HIDE_IN_BODY_DOCS      = NO
