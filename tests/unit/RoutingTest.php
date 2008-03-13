@@ -524,7 +524,7 @@ class RoutingTest extends UnitTestCase {
      */
     function testDynamicView() {
         $m = new api_routing();
-        $m->route('/:foo/:command/:method', array("dynamicview"=>TRUE))
+        $m->route('/:foo/:command/:method', array("substitute"=>TRUE))
             ->config(Array(
             'view' => Array('xsl' => '{foo}.xsl')));
         $request = new mock_request(array('path' => '/ba\'_r/baz/blubb'));
@@ -559,7 +559,7 @@ class RoutingTest extends UnitTestCase {
      */
     function testRewriteRoute() {
         $m = new api_routing();
-        $m->route('/test/:method/:command', array("rewrite"=>TRUE))->config(array('command' => 'foo_{command}', 'method'=>'blubb', 'random'=>'{method}_shaboom'));
+        $m->route('/test/:method/:command', array("substitute"=>TRUE))->config(array('command' => 'foo_{command}', 'method'=>'blubb', 'random'=>'{method}_shaboom'));
         
         $request = new mock_request(array('path' => '/test/blah/bar'));
         $route = $m->getRoute($request);
