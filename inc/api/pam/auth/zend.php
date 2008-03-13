@@ -51,7 +51,6 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
      * Returns the identity from storage or null if no identity is available
      *
      * @return mixed|null
-     * @todo is supposed to only return the ID, instead of the whole identity
      */
     public  function getAuthData() {
         return self::$zaAuth->getIdentity();
@@ -71,7 +70,7 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
      * Returns the identity from storage or null if no identity is available
      *
      * @return mixed|null
-     * @todo is supposed to only return the ID instead of the whole identidy
+     * @todo is supposed to only return the Username instead of the whole identidy
      */
     public  function getUserName() {
         return self::$zaAuth->getIdentity();
