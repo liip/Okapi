@@ -74,8 +74,8 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
     /**
      * Trigger the Login-Process
      *
-     * @param String $user Username
-     * @param String $pass Password
+     * @param $user string: Username
+     * @param $pass string: Password
      * @return boolean true if authenticated successfuly
      * @todo clean up the "very ugly stuff"
      */

@@ -2,27 +2,21 @@
 /**
  * Dom model object. Represents an XML DOM and returns an XML DOM
  * for that DOM in getDOM().
- * 
  */
 class api_model_dom {
-    /**
-     * DOMDocument: The dom-object
-     */
+    /** DOMDocument: The dom-object */
     private $dom = NULL;
     
     /**
-     * creates a new api_model_dom from a dom object
-     *
-     * @param DOMDocument $dom
+     * Constructor.
+     * @param $dom DOMDocument: document to represent.
      */
     public function __construct($dom) {
         $this->dom = $dom;
     }
     
-
     /**
-     * Returns the saved DOM for the view
-     * 
+     * Returns the DOM for the view
      * @return DOMDocument
      */
     public function getDOM() {

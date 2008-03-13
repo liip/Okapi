@@ -127,7 +127,7 @@ abstract class api_views_common {
     
     /**
      * Merges exceptions into the DOM Document.
-     * Appends a node <exceptions> to the root node of the given DOM
+     * Appends a node \<exceptions> to the root node of the given DOM
      * document.
      *
      * @param $xmldom DOMDocument: Response DOM document.
