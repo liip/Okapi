@@ -1,22 +1,16 @@
 <?php
+require_once('Zend/Auth.php');
+
 /**
  * Implements a PAM authentication class using the Zend Auth
  * classes.
  * @see http://framework.zend.com/manual/zend.auth.html
  */
-
-require_once('Zend/Auth.php');
-
 class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
-
-    /**
-     * @var Zend_Auth
-     */
+    /** Zend_Auth instance which is proxied through this class. */
     protected static $zaAuth = null;
-
-    /**
-     * @var Zend_Auth_Adapter
-     */
+    
+    /** Zend_Auth_Adapter: Active adapter which handles the user lookups. */
     private static $zaAdapter;
     
     /**
@@ -29,10 +23,10 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
     }
     
     /**
+     * Check if the user is currently logged in.
      * @return boolean true if authenticated successfuly
      * @see Zend_Auth_Result
      */
-
     public  function checkAuth() {
         if (self::$zaAuth->hasIdentity()) {
             return true;
