@@ -192,13 +192,13 @@ class api_routing_route implements api_Irouting {
      *    - Asterisk (*) - Same as plus, but optional.
      *    - Others       - Has to match literally in the path.
      *
-     * If the dynamicview route configuration is set, then variables in
-     * the view configuration are replaced by the extracted parameters.
+     * If the `substitute' route configuration is set, then variables in
+     * the configuration are replaced by the extracted parameters.
      * An example route:
      *
      * \code
      * $m = new api_routing();
-     * $m->route('/:foo/:command/:method', array("dynamicview"=>true))
+     * $m->route('/:foo/:command/:method', array("substitute"=>true))
      *     ->config(array('view' => array('xsl' => '{foo}.xsl')));
      * \endcode
      *
@@ -272,13 +272,11 @@ class api_routing_route implements api_Irouting {
             }
         }
         
-        if (isset($this->routeConfig['dynamicview']) && $this->routeConfig['dynamicview']) {
+        // Parses the route to replace placeholders like {command} if `substitute' is set
+        if (isset($this->routeConfig['substitute']) && $this->routeConfig['substitute']) {
             foreach ($this->params['view'] as &$setting) {
                 $setting = preg_replace("/\{([\w\d]+)\}/e", 'api_helpers_string::clean($params[\'$1\'])', $setting);
             }
-        }
-        
-        if (isset($this->routeConfig['rewrite']) && $this->routeConfig['rewrite']) {
             foreach ($this->params as $param => $val) {
                 if (!is_array($val)) {
                     $repl = 0;
