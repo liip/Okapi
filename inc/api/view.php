@@ -10,7 +10,12 @@ class api_view {
     /** Prefix for view class names. */
     private static $classNameBase    = "_views_";    
     
-    /* FIXME: make this somehow global/config option */
+    /**
+     * The default namespace
+     *
+     * @var String
+     * @todo this would be nice in the config file with a default value
+     */
     private static $defaultNamespace = API_NAMESPACE;
     
     /** Protected constructor. Use api_view::factory(). */
@@ -59,7 +64,23 @@ class api_view {
         return false;
     }
     
-    
+    /**
+     * Returns a view object according to the namespace. The default namespace
+     * is `api'. If you set your namespace to `foo' then the views named
+     * foo_views_bar_baz will be searched first.
+     * The order in which the views are searched is the following:
+     * {namespace}_views_{name}_{ext} , {namespace}_views_{ext} , {namespace}_
+     * views_default, api_views_{name}_{ext}, api_views_{ext} , api_views default.
+     * 
+     * 
+     *
+     * @param $ns String: Namespace of the view
+     * @param $ext String: Extension String (like xml, json..) 
+     * @param $name String: View name to instantiate
+     * @param $route hash: Route which matched the current request. 
+     * @param $response api_response: Response object.
+     * @return api_view|false
+     */
     private static function getViewWithNamespace($ns, $ext, $name, $route, $response) {
         $omitExt = (!empty($route['view']['omitextension']) && $route['view']['omitextension']) ? true : false;
         $className = $ns.api_view::$classNameBase.strtolower($name);

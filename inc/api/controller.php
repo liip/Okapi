@@ -120,8 +120,9 @@ class api_controller {
     /**
      * Load command based on routing configuration. Uses
      * api_routing::getRoute() to get the command name for the current
-     * request. The prefix "api_commands_" is added to the command name
+     * request. The prefix "{namespace}_commands_" is added to the command name
      * to get a class name and that class is initialized.
+     * Namespace is also defined in the routing
      *
      * The instance variables command and route are set to the command
      * object and the route returned by api_routing respectively.
@@ -130,7 +131,7 @@ class api_controller {
      *            current request or if the command class doesn't exist.
      *
      * \deprecated The naming of commands has been renamed on 2008-02-25
-     *             from api_commands_* to api_command_*. The old behaviour
+     *             from {namespace}_commands_* to {namespace}_command_*. The old behaviour
      *             is currently supported but will be removed in a future
      *             release.
      */
