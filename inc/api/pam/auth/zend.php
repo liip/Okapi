@@ -9,10 +9,10 @@ require_once('Zend/Auth.php');
 class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
     /** Zend_Auth instance which is proxied through this class. */
     protected static $zaAuth = null;
-    
+
     /** Zend_Auth_Adapter: Active adapter which handles the user lookups. */
     private static $zaAdapter;
-    
+
     /**
      * Constructor.
      */
@@ -21,7 +21,7 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
         self::$zaAuth = Zend_Auth::getInstance();
         self::$zaAuth->setStorage(new Zend_Auth_Storage_Session('Okapi_Auth'));
     }
-    
+
     /**
      * Check if the user is currently logged in.
      * @return boolean true if authenticated successfuly
@@ -33,8 +33,9 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
         } else if (isset(self::$zaAdapter)) {
             $zaResult = self::$zaAuth->authenticate(self::$zaAdapter);
             $msg = $zaResult->getMessages();
+            var_dump(self::$zaAdapter);
             if($zaResult->getCode() !== 1){
-                throw new api_exception_Auth(api_exception::THROW_FATAL, array(), 0, $msg[1]);
+                throw new api_exception_Auth(api_exception::THROW_FATAL, array(), 0, $msg[0]);
             }
             return $zaResult->isValid();
         }
@@ -68,7 +69,7 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
      */
     public  function getUserName() {
         return self::$zaAuth->getIdentity();
-        
+
     }
 
     /**
@@ -83,6 +84,7 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
         self::$zaAuth->clearIdentity();
         $rgOpts = $this->opts['container'];
         $strAdapter = $rgOpts['driver'];
+
         switch($strAdapter) {
             case "ldap":
                 // TODO: Omg this is very ugly
@@ -92,13 +94,18 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
                     }
                 }
                 break;
+
+            case "dbtable":
+                $this->setZendDbTableAdapter($rgOpts, $user, $pass);
+                break;
             default:
                 error_log("OKAPI: Zend_Auth_Adapter_".$strAdapter." not yet usable in Okapi");
                 return false;
         }
+
         return $this->checkAuth();
     }
-    
+
     /**
      * Clears the identity from persistent storage
      *
@@ -107,4 +114,50 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
     public  function logout() {
         self::$zaAuth->clearIdentity();
     }
+
+    /**
+    * Authenticate agains a database-table
+    *
+    * Example for the YAML-File: 
+	* 
+    * \code
+    * pam:
+    *   auth:
+    *       class: zend
+    *       options:
+    *           container: 
+    *               driver: dbtable
+    *               adapter: Pdo_Mysql
+    *               host: localhost
+    *               dbname: modmon
+    *               username: dbuser
+    *               password: dbpass
+	* \endcode
+    *
+    * @param array $rgOpts
+    * @param string $user
+    * @param string $pass
+    * @see http://framework.zend.com/manual/en/zend.auth.adapter.dbtable.html
+	*
+    */
+    private function setZendDbTableAdapter($rgOpts, $user, $pass){
+        unset($rgOpts['driver']);
+        $adapter = 'Zend_Db_Adapter_'.$rgOpts['adapter'];
+        if(!class_exists($adapter)){
+            throw new api_exception_Auth(1, $rgOpts, null, 'No such thing as ' . $adapter. '. Please check config.xml');
+        }
+        $dbAdapter = new $adapter($rgOpts);
+
+        $authAdapter = new Zend_Auth_Adapter_DbTable($dbAdapter);
+        $authAdapter->setTableName($rgOpts['table'])
+        ->setIdentityColumn($rgOpts['usercol'])
+        ->setCredentialColumn($rgOpts['passcol'])
+        ->setCredentialTreatment($rgOpts['passtreatment'])
+        ->setIdentity($user)
+        ->setCredential($pass);
+
+        self::$zaAdapter = $authAdapter;
+
+    }
+
 }
