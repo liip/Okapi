@@ -220,6 +220,7 @@ class api_routing_route implements api_Irouting {
             return null;
         }
         
+        
         // Fill in params from URL
         $params = array();
         foreach ($routeParts as $idx => $part) {
@@ -285,6 +286,18 @@ class api_routing_route implements api_Irouting {
                         $params[$param] = $val;
                     }
                 }
+            }
+        }
+        
+        /*
+         * This filters out calls to functions in api_command which is definately not intended at this point 
+         */        
+        // TODO: This is just a workaround, we should find a clean naming-convention or wait for php to introduce the notion of friends or anything
+        if (isset($params['method']) && (!strncmp($params['method'], "__", 2) || in_array($params['method'],get_class_methods("api_command")))) {
+            if (isset($this->params['method'])) {
+                $params['method'] = $this->params['method'];
+            } else {
+                $params['method'] = "";
             }
         }
         
