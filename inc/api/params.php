@@ -45,9 +45,10 @@ class api_params extends ArrayObject {
      */
     public function post($param = null) {
         if (isset($param)) {
-            if (empty($this->post[$param])) {
-                return false;
+            if (!isset($this->post[$param])) {
+                return null;
             }
+            
             return $this->post[$param];
         }
         return $this->post;
@@ -61,8 +62,8 @@ class api_params extends ArrayObject {
      */
     public function get($param = null) {
         if (isset($param)) {
-            if (empty($this->get[$param])) {
-                return FALSE;
+            if (!isset($this->get[$param])) {
+                return null;
             }
             return $this->get[$param];
         }
