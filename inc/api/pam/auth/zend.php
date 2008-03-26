@@ -33,7 +33,6 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
         } else if (isset(self::$zaAdapter)) {
             $zaResult = self::$zaAuth->authenticate(self::$zaAdapter);
             $msg = $zaResult->getMessages();
-            var_dump(self::$zaAdapter);
             if($zaResult->getCode() !== 1){
                 throw new api_exception_Auth(api_exception::THROW_FATAL, array(), 0, $msg[0]);
             }
