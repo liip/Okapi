@@ -103,10 +103,10 @@ class api_init {
                 }
             }
             if ($lib) {                    
-                $incPath = $lib . PATH_SEPARATOR . $incPath;
+                $incPath = $lib . $incPath;
             }
             if ($inc) {
-                $incPath = $inc . PATH_SEPARATOR . $incPath;
+                $incPath = $inc . $incPath;
             } 
         }
 
