@@ -15,6 +15,11 @@ abstract class api_command {
     protected $request = null;
     
     /**
+     * api_response: Response object used to send output to the client.
+     */
+    protected $response = null;
+    
+    /**
      * array: Route definition of the current request. This is the return
      * value of api_routing::getRoute().
      */
