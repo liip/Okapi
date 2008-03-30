@@ -110,10 +110,25 @@ class api_request {
         
         $matches = array();
         if ($this->filename != '') {
+            /* if you set an extension: [xml, foo, rss, html] node in your 
+             * config file, only these extensions are valid extensions.
+             * the rest is not parsed as an extension
+             * If no node is defined, then everything from 3-4 characters after
+             * a . is an extension */
             preg_match("#\.([a-z]{3,4})$#", $this->filename, $matches);
+            $aExtensions = api_config::getInstance()->extensions;
             if (isset($matches[1]) && !empty($matches[1])) {
-                $this->extension = $matches[1];
-            }
+                if (isset($aExtensions) && is_array($aExtensions)) {
+                    if (in_array($matches[1], $aExtensions)) {
+                        $this->extension = $matches[1];
+                    }
+                } else {
+                    $this->extension = $matches[1];
+                }
+            }            
+            
+            
+            
         }
     }
     
