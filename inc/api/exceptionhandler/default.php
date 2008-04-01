@@ -1,0 +1,67 @@
+<?php
+/**
+ * Default exception handler. Includes a very detailled backtrace in the
+ * collected data including source file information.
+ */
+class api_exceptionhandler_default extends api_exceptionhandler_base {
+    /** Number of code lines included before and after the relevant code line
+      * in the back trace.
+      */
+    const BACKTRACE_CONTEXT = 8;
+    
+    /**
+     * Process the exception. Calls the Exception::getTrace() method to
+     * get the backtrace. Gets the relevant lines of code for each step
+     * in the backtrace. Calls api_exceptionhandler_base::dispatch()
+     * with the collected data.
+     * @param $e Exception: The exception to handle.
+     */
+    public function handle(Exception $e) {
+        $trace = $e->getTrace();
+        foreach($trace as $i => &$entry) {
+            if (isset($entry['class'])) {
+                $refl = new ReflectionMethod($entry['class'], $entry['function']);
+                if ($refl instanceof ReflectionMethod) {
+                    if (isset($trace[$i -1])) {
+                        $entry['caller'] = (int) $trace[$i -1]['line'] -1;
+                    } else if ($i === 0) {
+                        $entry['caller'] = (int) $e->getLine() -1;
+                    }
+                    
+                    $start = $entry['caller'] - self::BACKTRACE_CONTEXT;
+                    if ($start < $refl->getStartLine()) { $start = $refl->getStartLine() - 1; }
+                    $end = $entry['caller'] + self::BACKTRACE_CONTEXT;
+                    if ($end > $refl->getEndLine()) { $end = $refl->getEndLine(); }
+                    $entry['source'] = $this->getSourceFromFile($refl->getFileName(), $start, $end);
+                }
+            }
+            
+            if (isset($entry['args'])) {
+                foreach($entry['args'] as $i => $arg) {
+                    $entry['args'][$i] = gettype($arg);
+                }
+            }
+        }
+        
+        $exceptionParams = array();
+        if (method_exists($e, 'getParams')) {
+            $exceptionParams = $e->getParams();
+        }
+        
+        $d = array('backtrace'  => $trace,
+                   'message'    => $e->getMessage(),
+                   'code'       => $e->getCode(),
+                   'file'       => $e->getFile(),
+                   'line'       => $e->getLine(),
+                   'name'       => api_helpers_class::getBaseName($e),
+                   'params'     => $exceptionParams,
+                   );
+        
+        if(!empty($e->userInfo)) {
+            $d['userInfo'] = $e->userInfo;
+        }
+        $this->data['exception'] = $d;
+        $this->dispatch($this->data);
+        return true;
+    }
+}
