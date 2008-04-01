@@ -232,8 +232,8 @@ class api_routing_route implements api_Irouting {
                                         "%/:([\w\d_-]+)%", // Named parameter in the middle of the route, not optional 
                                         "%/\*([\w\d_-]*)%", // Wildcard parameter anywhere, will be optional
                                         "%/\+([\w\d_-]+)%"), // Wildcard parameter anywhere, will be mandatory
-                                 Array ("(/[\w\d.'_-]*)?", 
-                                        "(/[\w\d.'_-]+)",
+                                 Array ("(/[^/]*)?", 
+                                        "(/[^/]+)",
                                         "(/.*?)?", 
                                         "(/.+?)"), $route);
         
