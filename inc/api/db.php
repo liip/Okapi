@@ -48,10 +48,8 @@ class api_db {
      *         getDBConnection() method is used to retrieve that connection.
      */
     public static function factory($name = "default") {
-        static $instances;
-        
-        if (isset($instances[$name])) {
-            return $instances[$name];
+        if (isset(self::$instances[$name])) {
+            return self::$instances[$name];
         }
         
         $db = api_config::getInstance()->db;
@@ -59,8 +57,8 @@ class api_db {
             return false;
         }
         
-        $instances[$name] = self::get($db[$name]);
-        return $instances[$name];
+        self::$instances[$name] = self::get($db[$name]);
+        return self::$instances[$name];
     }
     
     /**
