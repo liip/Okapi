@@ -37,6 +37,13 @@ default: &demo-shared
             path: /0
             cities:
                 path: /cities.xml
+    
+    db:
+        testdb:
+            driver: dummy
+            dsn: dummydsn
+        testdb_nodsn:
+            driver: dummy
 
 
 # =======================
