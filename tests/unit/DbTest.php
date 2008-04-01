@@ -8,6 +8,17 @@ class DbTest extends OkapiTestCase {
         $this->assertIsA($db, "api_db_dummy");
     }
     
+    public function testReset() {
+        $db = api_db::factory('testdb');
+        $this->assertIdentical($db->tainted, false);
+        $db->tainted = true;
+        
+        // Reset and get new connection
+        api_db::reset();
+        $db = api_db::factory('testdb');
+        $this->assertIdentical($db->tainted, false, "Got old testdb instance again.");
+    }
+    
     public function testGetWithoutDSN() {
         $db = api_db::factory('testdb_nodsn');
         $this->assertIdentical($db, false);
