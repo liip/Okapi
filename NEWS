@@ -1,0 +1,14 @@
+Release history of Okapi.
+
+2008-04-01 :: Version 1.0.1
+
+  - Add DB exception class (marc)
+  - Avoid empty include paths (chregu)
+  - Avoid double calls to getDOM (marc)
+  - Add api_db::clear() method to improve testability (pneff)
+  - Avoid calling getParams() on non-Okapi exceptions (pneff)
+
+
+2008-03-14 :: Version 1.0.0
+
+  - First public release.
