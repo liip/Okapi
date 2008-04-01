@@ -43,13 +43,18 @@ class api_exceptionhandler_default extends api_exceptionhandler_base {
             }
         }
         
+        $exceptionParams = array();
+        if (method_exists($e, 'getParams')) {
+            $exceptionParams = $e->getParams();
+        }
+        
         $d = array('backtrace'  => $trace,
                    'message'    => $e->getMessage(),
                    'code'       => $e->getCode(),
                    'file'       => $e->getFile(),
                    'line'       => $e->getLine(),
                    'name'       => api_helpers_class::getBaseName($e),
-                   'params'     => $e->getParams(),
+                   'params'     => $exceptionParams,
                    );
         
         if(!empty($e->userInfo)) {
