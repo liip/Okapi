@@ -37,7 +37,7 @@
  */
 class api_db {
     /** All instances loaded so far by api_db::factory(). */
-    private static $instances = array();
+    protected static $instances = array();
     
     /**
      * Returns the database connection specified by $name.
@@ -61,6 +61,14 @@ class api_db {
         
         $instances[$name] = self::get($db[$name]);
         return $instances[$name];
+    }
+    
+    /**
+     * Clear all loaded database connections. Useful for enforce new
+     * connections in testing scenarios.
+     */
+    public static function reset() {
+        self::$instances = array();
     }
     
     /**
