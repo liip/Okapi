@@ -209,70 +209,62 @@ class api_routing_route implements api_Irouting {
             return null;
         }
         
+        // Get clean path and route
         $path = $this->getPath($request);
-        $uriParts = explode('/', $path);
-        $routeParts = explode('/', $this->route);
+        $route = rtrim($this->route,"/");
         
-        // If there is a wildcard match at the end, URI may have
-        // more components than the route.
-        $last = $routeParts[count($routeParts)-1];
-        if (strlen($last) && $last[0] != '*' && count($uriParts) > count($routeParts)) {
+        // Get all parameter-names
+        $aParam = Array();
+        preg_match_all("%(:|\*|\+)([\w\d_-]+)%", $route, $aParam);
+
+        /*
+         * We replace the user-defined route with one regex here:
+         * 
+         * When the user enters /:foo/bar, then :foo is a required parameter, which spans until the next slash, that said, /bar or /foo/boo/bar will not match
+         * When the user enters /bar/:foo then :foo is an optional parameter, which still spans until the next slash. /bar/boo and /bar will match, but not /bar/boo/bii
+         * When the user enters /*foogly/muh then *foogly is an optional parameter, which just eats up, what is there, as long as it ends with /muh. /blah/blubb/blih/muh will match as well as /muh. but not /foo/.
+         * When the user enters /+foogly/muh then +foogly is a required paramter, which eats one or more path-parts. /blah/blubb/blih/muh will match. but not /muh nor /foo/bar
+         * When the user enters /*foogly/+mooh/:id then *foogly and :id are optional. /blah will match with `mooh' set to `blah'. /blah1/blah2 will match with `foogly' set to `blah1'
+         * and `mooh' to `blah2'. /test/123/woo/sa will also match with `foogly' set to `test', `mooh' set to `123/woo' and `id' set to `sa'. As you can see, the right most wildcard parameter
+         * eats up everything, if every wanted-parameter is set. This is due to lazy evaluation of the route.                      
+         */
+        $rtarrexp = preg_replace(Array ("%/:([\w\d_-]+)$%",  // Named parameter at end of the route, which is optional, if a default value exists (check later)
+                                        "%/:([\w\d_-]+)%", // Named parameter in the middle of the route, not optional 
+                                        "%/\*([\w\d_-]*)%", // Wildcard parameter anywhere, will be optional
+                                        "%/\+([\w\d_-]+)%"), // Wildcard parameter anywhere, will be mandatory
+                                 Array ("(/[\w\d.'_-]*)?", 
+                                        "(/[\w\d.'_-]+)",
+                                        "(/.*?)?", 
+                                        "(/.+?)"), $route);
+        
+        // Match the whole regex against the path
+        $matches = Array();
+        $cnt = preg_match_all("%^".$rtarrexp."$%", $path, $matches);
+        
+        // If no match - nothing to do here
+        if (!$cnt) {
             return null;
         }
-        
-        
-        // Fill in params from URL
-        $params = array();
-        foreach ($routeParts as $idx => $part) {
-            $partKey = substr($part, 1);
-            
-            if ($part != '' && $part[0] == ':') {
-                // Named param
-                if (count($uriParts) > 0) {
-                    // Param can be filled from the URI
-                    $param = array_shift($uriParts);
-                    if (empty($param)) {
-                        return null;
-                    }
-                    $params[$partKey] = $param;
-                } else if (isset($this->params[$partKey])) {
-                    // Last param(s), use default
-                    $params[$partKey] = $this->params[$partKey];
-                } else {
-                    // Param has no match in URL
-                    return null;
-                }
-            
-            } else if ($part != '' && $part[0] == '*') {
-                // Wildcard, 0 or more hits
-                $param = implode('/', array_slice($uriParts, 0));
-                $params[$partKey] = $param;
-                $uriParts = array();
-                break;
-                
-            } else if ($part != '' && $part[0] == '+') {
-                // Wildcard, eat up all the rest and return
-                // 1 or more hits
-                $param = implode('/', array_slice($uriParts, 0));
-                if (empty($param)) {
-                    return null;
-                }
-                $params[$partKey] = $param;
-                $uriParts = array();
-                break;
-                
-            } else if (count($uriParts) > 0 && $part == $uriParts[0]) {
-                // URI part - matches exatly
-                array_shift($uriParts);
-            } else if (count($uriParts) == 0 && $part == "") {
-                break;
+    
+        // Fill in all the missing parameters from the default-array
+        $params = Array();
+        foreach ($aParam[2] as $key => $val) {
+            if (($match = $matches[$key+1][0]) != false) {
+                $params[$val] = substr($match,1);
+            } elseif (isset($this->params[$val])) {
+                $params[$val] = $this->params[$val];
             } else {
-            
-                // URI part doesn't match
                 return null;
             }
         }
         
+        // If we got a match but no params, just add it (for pure wildcard matches)
+        if (count($aParam[2]) == 0 && isset($matches[1][0])) {
+            $params[] = substr($matches[1][0],1);
+        }
+
+                
+      
         // Parses the route to replace placeholders like {command} if `substitute' is set
         if (isset($this->routeConfig['substitute']) && $this->routeConfig['substitute']) {
             foreach ($this->params['view'] as &$setting) {
@@ -281,7 +273,7 @@ class api_routing_route implements api_Irouting {
             foreach ($this->params as $param => $val) {
                 if (!is_array($val)) {
                     $repl = 0;
-                    $val = preg_replace("/\{([\w\d]+)\}/e", 'api_helpers_string::clean($params[\'$1\'])', $val, -1, $repl);
+                    $val = preg_replace("/\{([\w\d]+?)\}/e", 'api_helpers_string::clean($params[\'$1\'])', $val, -1, $repl);
                     if ($repl > 0) {
                         $params[$param] = $val;
                     }
