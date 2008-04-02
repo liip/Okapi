@@ -166,7 +166,7 @@ class api_response {
         }
         
         foreach ($this->getCookies() as $cookie => $value) {
-            header("Set-Cookie: $cookie=$value");
+            header("Set-Cookie: $cookie=$value", false);
         }
         
         ob_end_flush();

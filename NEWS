@@ -1,5 +1,10 @@
 Release history of Okapi.
 
+2008-04-02 :: Version 1.0.3
+
+  - Bugfix for setCookie so it also works with more than one cookie (lejoe)
+
+
 2008-04-02 :: Version 1.0.2
 
   - Add setCookie method to the api_response class. This improves
