@@ -1,0 +1,25 @@
+Release history of Okapi.
+
+2008-04-02 :: Version 1.0.3
+
+  - Bugfix for setCookie so it also works with more than one cookie (lejoe)
+
+
+2008-04-02 :: Version 1.0.2
+
+  - Add setCookie method to the api_response class. This improves
+    testability (lejoe)
+
+
+2008-04-01 :: Version 1.0.1
+
+  - Add DB exception class (marc)
+  - Avoid empty include paths (chregu)
+  - Avoid double calls to getDOM (marc)
+  - Add api_db::clear() method to improve testability (pneff)
+  - Avoid calling getParams() on non-Okapi exceptions (pneff)
+
+
+2008-03-14 :: Version 1.0.0
+
+  - First public release.
