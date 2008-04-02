@@ -8,6 +8,8 @@
 class api_response {
     /** Headers to send to the client. */
     protected $headers = array();
+    /** Cookies to set. */
+    protected $cookies = array();
     /** Content type to send to the client as header. */
     protected $contenttype = null;
     /** Character set of the response, sent together with the response type. */
@@ -61,6 +63,36 @@ class api_response {
         }
         
         return $headers;
+    }
+    
+    /**
+     * Sets a cookie with the given value. 
+     * Overwrites an existing Cookie if it's the same name
+     *
+     * @param string Name of the cookie
+     * @param string Value of the cookie
+     * @param int Maxage of the cookie
+     * @param string Path where the cookie can be used
+     * @param string Domain which can read the cookie
+     * @param bool Secure mode?
+     * @param bool Only allow HTTP usage?
+     */
+    public function setCookie($name, $value = '', $maxage = 0, $path = '', $domain = '', 
+                              $secure = false, $HTTPOnly = false) {
+        $this->cookies[rawurlencode($name)] = rawurlencode($value)
+                                              . (empty($domain) ? '' : '; Domain='.$domain)
+                                              . (empty($maxage) ? '' : '; Max-Age='.$maxage)
+                                              . (empty($path) ? '' : '; Path='.$path)
+                                              . (!$secure ? '' : '; Secure')
+                                              . (!$HTTPOnly ? '' : '; HttpOnly');
+    }
+    
+    /**
+     * Returns an associative array of all set cookies.
+     * @return hash: All Cookies which have been set.
+     */
+    public function getCookies() {
+        return $this->cookies;
     }
     
     /**
@@ -131,6 +163,10 @@ class api_response {
         
         foreach ($this->getHeaders() as $header => $value) {
             header("$header: $value");
+        }
+        
+        foreach ($this->getCookies() as $cookie => $value) {
+            header("Set-Cookie: $cookie=$value");
         }
         
         ob_end_flush();
