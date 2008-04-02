@@ -33,6 +33,19 @@ class ResponseTest extends UnitTestCase {
     }
     
     /**
+     * Add a cookie and expect to get it back again.
+     */
+    function testCookies() {
+        
+        $r = new api_response();
+        
+        $this->assertEqual(array(), $r->getCookies());
+        $r->setCookie('cookieName', 'cookieValue', 0, '/', '.domain.com', false, true);
+        $this->assertEqual(array('cookieName' => 'cookieValue; Domain=.domain.com; Path=/; HttpOnly'),
+            $r->getCookies());
+    }
+    
+    /**
      * Add content type header.
      */
     function testContentType() {
