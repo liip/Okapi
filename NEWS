@@ -1,5 +1,11 @@
 Release history of Okapi.
 
+2008-04-02 :: Version 1.0.2
+
+  - Add setCookie method to the api_response class. This improves
+    testability (lejoe)
+
+
 2008-04-01 :: Version 1.0.1
 
   - Add DB exception class (marc)
