@@ -142,7 +142,7 @@ class api_controller {
             throw new api_exception_NoCommandFound();
         }
         if (isset($route['namespace'])) {
-            $route['namespace'] = api_helpers_string::clean($route['namespace']);
+            $route['namespace'] = api_helpers_string::stripToCharInteger($route['namespace']);
         } else {
             $route['namespace'] = API_NAMESPACE;
         }

@@ -212,11 +212,14 @@ class api_routing_route implements api_Irouting {
         // Get clean path and route
         $path = $this->getPath($request);
         $route = rtrim($this->route,"/");
+        // --
         
         // Get all parameter-names
-        $aParam = Array();
-        preg_match_all("%(:|\*|\+)([\w\d_-]+)%", $route, $aParam);
-
+        $paramKeys = Array();
+        preg_match_all("%(:|\*|\+)([\w\d_-]+)%", $route, $paramKeys);
+        $paramKeys = $paramKeys[2]; // Just that we can add brackets and don't have to change them anywhere else
+        // --
+        
         /*
          * We replace the user-defined route with one regex here:
          * 
@@ -228,7 +231,8 @@ class api_routing_route implements api_Irouting {
          * and `mooh' to `blah2'. /test/123/woo/sa will also match with `foogly' set to `test', `mooh' set to `123/woo' and `id' set to `sa'. As you can see, the right most wildcard parameter
          * eats up everything, if every wanted-parameter is set. This is due to lazy evaluation of the route.                      
          */
-        $rtarrexp = preg_replace(Array ("%/:([\w\d_-]+)$%",  // Named parameter at end of the route, which is optional, if a default value exists (check later)
+        // TODO: Cache this
+        $routeRegex = preg_replace(Array ("%/:([\w\d_-]+)$%",  // Named parameter at end of the route, which is optional, if a default value exists (check later)
                                         "%/:([\w\d_-]+)%", // Named parameter in the middle of the route, not optional 
                                         "%/\*([\w\d_-]*)%", // Wildcard parameter anywhere, will be optional
                                         "%/\+([\w\d_-]+)%"), // Wildcard parameter anywhere, will be mandatory
@@ -238,63 +242,73 @@ class api_routing_route implements api_Irouting {
                                         "(/.+?)"), $route);
         
         // Match the whole regex against the path
-        $matches = Array();
-        $cnt = preg_match_all("%^".$rtarrexp."$%", $path, $matches);
-        
+        $paramMatches = Array();
+        $cnt = preg_match_all("%^".$routeRegex."$%", $path, $paramMatches);
         // If no match - nothing to do here
         if (!$cnt) {
             return null;
         }
-    
+        // --
+            
         // Fill in all the missing parameters from the default-array
         $params = Array();
-        foreach ($aParam[2] as $key => $val) {
-            if (($match = $matches[$key+1][0]) != false) {
+        foreach ($paramKeys as $key => $val) { // $key is used for lookup in the match array, $value is the name of the key
+            if (($match = $paramMatches[$key+1][0]) != false) { // We have a match in the uri
                 $params[$val] = substr($match,1);
-            } elseif (isset($this->params[$val])) {
-                $params[$val] = $this->params[$val];
-            } else {
+            } elseif (isset($this->params[$val])) {             // No match, but in defaults
+                if (is_array($this->params[$val])) {
+                    $params[$val] = $this->params[$val][0];
+                } else {
+                    $params[$val] = $this->params[$val];
+                }
+            } else {                                            // No match, return null
                 return null;
             }
         }
+        // --
         
-        // If we got a match but no params, just add it (for pure wildcard matches)
-        if (count($aParam[2]) == 0 && isset($matches[1][0])) {
-            $params[] = substr($matches[1][0],1);
-        }
-
-                
-      
-        // Parses the route to replace placeholders like {command} if `substitute' is set
-        if (isset($this->routeConfig['substitute']) && $this->routeConfig['substitute']) {
-            foreach ($this->params['view'] as &$setting) {
-                $setting = preg_replace("/\{([\w\d]+)\}/e", 'api_helpers_string::clean($params[\'$1\'])', $setting);
-            }
-            foreach ($this->params as $param => $val) {
-                if (!is_array($val)) {
-                    $repl = 0;
-                    $val = preg_replace("/\{([\w\d]+?)\}/e", 'api_helpers_string::clean($params[\'$1\'])', $val, -1, $repl);
-                    if ($repl > 0) {
-                        $params[$param] = $val;
+        // Substitute the placeholders in the route here. (the {foo} thing)
+        $replacedParams = Array();
+        if ( isset($this->routeConfig['substitute']) && $this->routeConfig['substitute']) {
+            foreach ($this->params as $key => &$item) {
+                if ($key != "view") {
+                    $replacedParams[$key] = $this->fetchParam($item, $key, $params); // We store this temporary, so that no already replaced value is being replaced into another
+                } else { // This is a bit ugly since `view' is kinda special in the routing
+                    foreach($item as $k => &$v) {
+                        $params["view"][$k] = $this->fetchParam($v, $k, $params);                  
                     }
                 }
             }
         }
+        $params = array_merge($params, $replacedParams);
+        // --
         
-        /*
-         * This filters out calls to functions in api_command which is definately not intended at this point 
-         */        
-        // TODO: This is just a workaround, we should find a clean naming-convention or wait for php to introduce the notion of friends or anything
-        if (isset($params['method']) && (!strncmp($params['method'], "__", 2) || in_array($params['method'],get_class_methods("api_command")))) {
-            if (isset($this->params['method'])) {
-                $params['method'] = $this->params['method'];
-            } else {
-                $params['method'] = "";
-            }
+        // There might be a pure wildcard match with asterisk in the route
+        if (count($paramKeys) == 0 && isset($paramMatches[1][0])) {
+            $params[] = substr($paramMatches[1][0],1);
         }
+        // --
+        
         
         return $params;
     }
+
+    /**
+     * Returns the replaced parameter stripped down to char/integer
+     *
+     * @param Array|String $item An item of a parameter in api_routing
+     * @param String $key
+     * @param The params array as parsed so far $parsedParams
+     * @return String The replaced parameter
+     */
+    private function fetchParam(&$item, &$key, $parsedParams) {
+        if (is_array($item)) {
+            return preg_replace("/\{([\w\d]+?)\}/e", 'api_helpers_string::stripToCharInteger($parsedParams[\'$1\'])', $item[1], -1, $repl);
+        } else {
+            return $parsedParams[$key];
+        }
+    }
+    
     
     /**
      * Returns the path of the current request to be used for routing.

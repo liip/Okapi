@@ -29,25 +29,37 @@ class api_helpers_xml {
      * @param $fragmNodes array: An array of node names. Every node with
      *        those names is added verbatim as XML document fragments to the
      *        document.
+     * @param $keys array: An array of key names. This is usefull to replace
+     *        the `entry' nodes with a customized name. The array structure
+     *        is 'parentkey' => 'nodekeyname'. I.e. for a node "Foobars" with a
+     *        non associative array you'd set: $keys = Array("Foobars"=>"foobar");
+     * @param $parentKey: The key of the parent node. Enter the name of your root
+     *        node here
      * @return void
      */
-    public static function array2dom($array, &$domdoc, &$domnode, $cdataNodes = array(), $fragmNodes = array()) {
+    public static function array2dom($array, &$domdoc, &$domnode, $cdataNodes = array(), $fragmNodes = array(), $keys = array(), $parentKey = null) {
         if (! is_array($array)) {
             return;
         }
 
         foreach ($array as $n => $node) {
             $v = $n;
-            $n = (is_numeric($n)) ? "entry":$n;
+            if (isset($keys[$parentKey])) {
+                $key = $keys[$parentKey];
+            } else {
+                $key = "entry";
+            }
+            
+            $n = (is_numeric($n)) ? $key:$n;
 
             $elem = $domdoc->createElement($n);
             if ($elem instanceof DOMNode) {
-                if ($n === "entry") {
+                if ($n === $key) {
                     $elem->setAttribute('key', $v);
                 }
 
                 if (is_array($node)) {
-                    self::array2dom($node, $domdoc, $elem, $cdataNodes, $fragmNodes);
+                    self::array2dom($node, $domdoc, $elem, $cdataNodes, $fragmNodes, $keys, $v);
                 } else {
                     if (is_array($cdataNodes) && in_array($elem->nodeName, $cdataNodes)) {
 

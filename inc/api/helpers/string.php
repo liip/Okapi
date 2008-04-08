@@ -77,7 +77,7 @@ class api_helpers_string {
      * @param $str string: String to clean.
      * @return string: Cleaned input string.
      */
-    static function clean($str) {
+    static function stripToCharInteger($str) {
         return preg_replace("/[^\w^\d^_^-]*/", "", $str);
     }
     
