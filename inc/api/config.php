@@ -111,6 +111,9 @@ class api_config {
         if (file_exists($configfile)) {
             $this->init($configfile);
         } else {
+            // TODO: since we append all the files together we can by default
+            // not provide an error message that contains the file name
+            // that caused the error.
             $yaml = '';
             foreach (glob($configdir . '/*.yml') as $file) {
                 $yaml .= file_get_contents($file) . "\n";
