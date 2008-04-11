@@ -1,9 +1,9 @@
 <?php
-require_once(dirname(__FILE__) . '/vendor/spyc.php');
- 
+require_once(dirname(__FILE__) . '/vendor/sfYaml/sfYaml.php');
+
 /**
  * Generic config file class.
- * 
+ *
  * Reads a YAML configuration file or config directory and provides the
  * values.
  *
@@ -24,7 +24,7 @@ require_once(dirname(__FILE__) . '/vendor/spyc.php');
  * trunk:
  *     example: 2
  * \endcode
- * 
+ *
  * The environment variable OKAPI_ENV can be used to specify which
  * profile should be loaded. In Apache httpd mod_env can be used to
  * specify the environment. Example: <tt>SetEnv OKAPI_ENV trunk</tt>
@@ -47,22 +47,22 @@ class api_config {
     /** The default environment. This is used if no OKAPI_ENV environment
       * variable is defined. */
     static private $DEFAULT_ENV = 'default';
-    
+
     /** Directory where the cache file is written to. */
     private $cacheDir = '/tmp/okapi-cache/';
-    
+
     /** The loaded configuration array for the current profile. */
     private $configArray = array();
-    
+
     /** The currently active environment. */
     private $env;
-    
+
     /** api_config instance */
     private static $instance = null;
-    
+
     /** Custom loader. See setLoader() */
     private static $loader = null;
-    
+
     /**
      * Gets an instance of api_config.
      * @param $forceReload bool: If true, forces instantiation of a
@@ -72,24 +72,24 @@ class api_config {
         if (! self::$instance instanceof api_config || $forceReload) {
             self::$instance = new api_config();
         }
-        
+
         return self::$instance;
     }
-    
+
     /**
      * Set a custom loader.
-     * 
+     *
      * The loader is an object used to load the configuration. The object
      * must implement a method load($env) which returns a full configuration
      * array. The parameter $env is the environment to load. Used to
      * implement custom loading strategies which don't necessarily use YAML.
-     * 
+     *
      * @param $loader object: Custom loader object.
      */
     public static function setLoader($loader) {
         self::$loader = $loader;
     }
-    
+
     /**
      * Constructor. Loads the configuration file into memory.
      */
@@ -99,12 +99,12 @@ class api_config {
         } else {
             $this->env = self::$DEFAULT_ENV;
         }
-        
+
         if (!is_null(self::$loader)) {
             $this->configArray = self::$loader->load($this->env);
             return;
         }
-        
+
         $base = API_PROJECT_DIR . 'conf/config';
         $configfile = $base . '.yml';
         $configdir = $base . '.d';
@@ -118,13 +118,13 @@ class api_config {
             $this->init($yaml);
         }
     }
-    
+
     /**
      * Destructor. Dump the loaded configuration file into a PHP file.
      * On loading the configuration that PHP file is then used instead of
      * the YAML file. Loading is then faster as the YAML parsing can be
      * slow.
-     * 
+     *
      * This behaviour must be turned explicitly by setting
      * the configCache configuration value to true.
      */
@@ -133,40 +133,40 @@ class api_config {
         if (! $this->configCache) {
             return;
         }
-        
+
         self::$instance = null;
-        
+
         // write cache
         $cachedata = var_export($this->configArray, true);
         $cache = '<?php $configCache='.$cachedata."; ?>";
         $cachefile = $this->getConfigCachefile();
-         
+
         try {
             file_put_contents($cachefile, $cache);
         } catch(Exception $e) {
             echo "Writing cache failed ...\n";
         }
     }
-    
+
     /**
      * Reads the YAML configuration. Also calls replaceAllConsts on the
      * resulting YAML document to replace constants.
-     * 
+     *
      * @param $yaml string: File name or complete YAML document as a string.
      */
     private function init($yaml) {
         // read cache
         if (! $this->readCache()) {
-            $cfg = Spyc::YAMLLoad($yaml);
+            $cfg = sfYaml::load($yaml);
             if (!isset($cfg[$this->env])) {
                 $this->env = self::$DEFAULT_ENV;
             }
             $this->configArray = $cfg[$this->env];
-            
+
             $this->replaceAllConsts($this->configArray);
         }
     }
-    
+
     /**
      * Magic function to get config values. Returns the value of the
      * configuration value from the currently active profile.
@@ -185,21 +185,21 @@ class api_config {
         if (empty($name)) {
             return null;
         }
-        
+
         if (isset($this->configArray[$name])) {
             return $this->configArray[$name];
         }
-        
+
         return null;
     }
-    
+
     /**
      * Checks availability of a cachefile and assigns the cached content
      * to the private object variable $configCache.
      */
     private function readCache() {
         $cachefile = $this->getConfigCachefile();
-        
+
         if (file_exists($cachefile) && is_readable($cachefile)) {
             include $cachefile;
             if (isset($configCache) && is_array($configCache)) {
@@ -207,17 +207,17 @@ class api_config {
                 return true;
             }
         }
-        
+
         return false;
     }
-    
+
     /**
      * Returns the filename of the configuration cache file to be used.
      */
     private function getConfigCachefile() {
         $project = API_PROJECT_DIR;
         $env = $this->env;
-        
+
         if (!file_exists($this->cacheDir)) {
             mkdir($this->cacheDir, 0700, true);
         }
@@ -225,7 +225,7 @@ class api_config {
         $cachefile = $this->cacheDir . $fname;
         return $cachefile;
     }
-    
+
     /**
      * Replaces all constants in the configuration file. Uses the
      * method replaceConst for the actual replacement. Calls itself
@@ -237,7 +237,7 @@ class api_config {
         if (!is_array($arr)) {
             return;
         }
-        
+
         foreach ($arr as $key => &$value) {
             if (is_array($value)) {
                 $this->replaceAllConsts($value);
@@ -246,7 +246,7 @@ class api_config {
             }
         }
     }
-    
+
     /**
      * Replace constants in a value. Constants can be used in the
      * configuration with the {CONSTANT} syntax. For each such
@@ -263,10 +263,10 @@ class api_config {
                         $constVal = constant($constName);
                         $value = str_replace($repl, $constVal, $value);
                     }
-                }  
+                }
             }
         }
-        
+
         return $value;
     }
 }
