@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__) . '/vendor/sfYaml/sfYaml.php');
+require_once(dirname(__FILE__) . '/vendor/sfYaml/sfYaml.class.php');
 
 /**
  * Generic config file class.
