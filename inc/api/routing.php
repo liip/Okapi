@@ -304,8 +304,10 @@ class api_routing_route implements api_Irouting {
     private function fetchParam(&$item, &$key, $parsedParams) {
         if (is_array($item)) {
             return preg_replace("/\{([\w\d]+?)\}/e", 'api_helpers_string::stripToCharInteger($parsedParams[\'$1\'])', $item[1], -1, $repl);
-        } else {
+        } elseif (isset($parsedParams[$key])) {
             return $parsedParams[$key];
+        } else {
+            return $item;
         }
     }
     
