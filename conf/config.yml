@@ -3,10 +3,10 @@
 # =======================
 default: &demo-shared
     configCache: false
-    tmpdir: {API_PROJECT_DIR}tmp/
+    tmpdir: "{API_PROJECT_DIR}tmp/"
     
     lang:
-        dir: {API_PROJECT_DIR}lang/
+        dir: "{API_PROJECT_DIR}lang/"
         fileprefix: lang
         i18ntransform: true
         default: en
@@ -49,9 +49,11 @@ default: &demo-shared
 # =======================
 # = Debug configuration =
 # =======================
-debug: *demo-shared
+debug: 
+    <<: *demo-shared
     config_test: debug
     backend:
-        extapi: *extapi
+        extapi: 
+            <<: *extapi
             host: extapi.trunk.local.ch
         blafasel: somethingelse
