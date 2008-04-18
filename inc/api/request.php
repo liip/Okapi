@@ -294,7 +294,7 @@ class api_request {
 
         // lang is in ACCEPT_LANGUAGE
         $config = api_config::getInstance();
-        if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) && $config->acceptLanguage !== 'false') {
+        if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) && $config->acceptLanguage !== false) {
             $accls = explode(",", $_SERVER['HTTP_ACCEPT_LANGUAGE']);
             if (is_array($accls)) {
                 foreach($accls as $accl) {
