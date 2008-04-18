@@ -1,7 +1,7 @@
 #Preserve "white" spaces on empty lines.
 default: &default
     configCache: false
-    tmpdir: {API_PROJECT_DIR}tmp/
+    tmpdir: "{API_PROJECT_DIR}tmp/"
     
     hosts:
         example.org:
@@ -10,7 +10,7 @@ default: &default
         "*": default
     
     lang:
-        dir: {API_PROJECT_DIR}lang
+        dir: "{API_PROJECT_DIR}lang"
         fileprefix: lang
         default: en
         languages: [en]
