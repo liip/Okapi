@@ -127,7 +127,7 @@ class api_init {
         // Construct URL for Web home (root of current host)
         $hostname = (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '');
         $hostinfo = self::getHostConfig($hostname);
-        $schema = (isset($_SERVER['HTTP_PORT']) && $_SERVER['SERVER_PORT'] == '443') ? 'https' : 'http'; 
+        $schema = (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == '443') ? 'https' : 'http'; 
         $reqHostPath = '/';
         if ($hostname != '') {
             $reqHostPath = $schema.'://'.$hostname;
