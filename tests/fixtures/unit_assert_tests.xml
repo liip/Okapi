@@ -1,0 +1,6 @@
+<dummyXML>
+    <singleText>This is a test</singleText>
+    <multiText>Those are tests!</multiText>
+    <multiText>Those are more tests!</multiText>
+    <attributeNode attr="Friendly Attribute" />
+</dummyXML>
