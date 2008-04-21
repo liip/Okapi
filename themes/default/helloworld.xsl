@@ -10,5 +10,8 @@
     
     <xsl:template name="content">
         <h1 attr="Hulla World">Hello World!</h1>
+        <p>
+            <xsl:value-of select="/command" />
+        </p>
     </xsl:template>
 </xsl:stylesheet>
