@@ -26,7 +26,7 @@ class api_model_factory {
      *
      * @return object api_model_givenname object with the called params.
      */
-    public static function get($name, $params) {
+    public static function get($name, $params = array()) {
         $model = self::getFixture($name, $params);
         if (!is_null($model)) {
             return $model;

@@ -7,7 +7,7 @@
  * The result will be an object of api_model with the given name nad params.
  */
 class api_model_factory {
-    public static function get($name, $params) {
+    public static function get($name, $params = array()) {
         $name = 'api_model_' . $name;
         if (count($params) == 0) {
             return new $name;
