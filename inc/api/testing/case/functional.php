@@ -7,10 +7,11 @@ class api_testing_case_functional extends UnitTestCase {
     
     function setUp() {
         api_init::start();
-        
+
         // Set include path to include mock objects.
         $this->includepathOriginal = get_include_path();
         set_include_path(dirname(__FILE__).'/../mocks/functional/:' . get_include_path());
+        api_model_factory::reset();
         
         parent::setUp();
     }
