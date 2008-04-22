@@ -37,6 +37,8 @@ default: &demo-shared
             path: /0
             cities:
                 path: /cities.xml
+            testparams:
+                path: "/{myparam}/index.xml"
     
     db:
         testdb:

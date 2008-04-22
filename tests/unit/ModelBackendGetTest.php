@@ -41,5 +41,24 @@ class ModelBackendGetTest extends OkapiTestCase {
         $this->assertXPath($dom, '/response/@test', 'abc');
         $this->assertXPath($dom, '/response/cities/city[1]/@name', 'Olten');
     }
+    
+    function testParams() {
+        $model = new api_model_backend_get('extapi', 'testparams', array('myparam' => 'foo'));
+        $this->assertBackendModelUrl($model, 'http://extapi.trunk.local.ch/0/foo/index.xml');
+    }
+    
+    function testParamsAdditionalToQuerystring() {
+        $model = new api_model_backend_get('extapi', 'testparams',
+            array('myparam' => 'testing', 'another' => 'bar'));
+        $this->assertBackendModelUrl($model, 'http://extapi.trunk.local.ch/0/testing/index.xml?another=bar');
+    }
+    
+    /**
+     * Asserts that the URL of the model's curl object is equal to $url.
+     */
+    protected function assertBackendModelUrl($model, $url) {
+        $modelUrl = curl_getinfo($model->getCurlObject(), CURLINFO_EFFECTIVE_URL);
+        $this->assertEqual($modelUrl, $url);
+    }
 }
 ?>
