@@ -3,7 +3,7 @@
  * Dom model object. Represents an XML DOM and returns an XML DOM
  * for that DOM in getDOM().
  */
-class api_model_dom {
+class api_model_dom extends api_model {
     /** DOMDocument: The dom-object */
     private $dom = NULL;
     
