@@ -14,4 +14,17 @@ $m->route('/namespacetest/:namespace/:command/:method')
     ->config(array(
         'command' => 'nocommand',
         'view' => array('xsl' => 'command.xsl')));
+
+$m->route('/noviewtest/')
+    ->config(array(
+        'command' => 'nocommand',
+        'view' => array('class' => 'notexisting',
+        'xsl' => 'command.xsl')));
+
+$m->route('/noxslttest/')
+    ->config(array(
+        'command' => 'nocommand'
+      ));
+
+    
 ?>
