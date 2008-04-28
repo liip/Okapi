@@ -63,6 +63,34 @@ class ControllerTest extends UnitTestCase {
     }
     
     /**
+     * Check that process method throws a correct exception when wrong 
+     * view is defined
+     */
+    function testProcessWithoutView() {
+        $_SERVER["REQUEST_URI"] = '/noviewtest/';
+        api_request::getInstance(true);
+        $this->controller = new api_controller();
+        $this->response = new testResponse();
+        $this->controller->setResponse($this->response);
+        $this->expectException(new api_exception_NoViewFound('View notexisting not found'));
+        $this->controller->process();
+    }
+
+    /**
+     * Check that process method throws a correct exception when wrong 
+     * xslt is defined
+     */
+    function testProcessWithoutXslt() {
+        $_SERVER["REQUEST_URI"] = '/noxslttest/';
+        api_request::getInstance(true);
+        $this->controller = new api_controller();
+        $this->response = new testResponse();
+        $this->controller->setResponse($this->response);
+        $this->expectException(new api_exception_NoXsltFound('No XSLT stylesheet was specified for this route.'));
+        $this->controller->process();
+    }
+    
+    /**
      * Check that the command is set right when we use namespaces
      *
      */
@@ -115,7 +143,7 @@ class ControllerTest extends UnitTestCase {
         $this->assertEqual($this->controller->getFinalViewName(), 'api_views_default');
         
     }
-    
+
     /**
      * Check that the headers are set correctly.
      */
