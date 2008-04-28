@@ -114,7 +114,7 @@ class api_views_default extends api_views_common {
         $attrib = array_merge($defaults, $attrib);
         
         if (!isset($attrib['xsl'])) {
-            die("No XSLT stylesheet was specified for this route.");
+            throw new api_exception_NoXsltFound("No XSLT stylesheet was specified for this route.");
         }
         
         if (isset($attrib['contenttype']) && !empty($attrib['contenttype'])) {

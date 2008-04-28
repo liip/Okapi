@@ -209,6 +209,8 @@ class api_controller {
         
         if ($this->view instanceof api_views_common) {
             $this->view->prepare();
+        } else {
+            throw new api_exception_NoViewFound("View " . $this->getViewName() . " not found");
         }
     }
     
