@@ -112,7 +112,6 @@ class api_init {
                 $incPath = $inc . $incPath;
             } 
         }
-        print API_VENDOR_DIR;
         if (file_exists(API_LOCAL_VENDOR_DIR)) {
             $incPath = API_LOCAL_INCLUDE_DIR . PATH_SEPARATOR . API_LOCAL_VENDOR_DIR . PATH_SEPARATOR . $incPath;
         } else {
