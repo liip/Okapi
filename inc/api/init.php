@@ -89,8 +89,11 @@ class api_init {
           
         // Set PHP include path (localinc - localinc/lib - ext - ext/lib - inc - inc/lib - include_path)
         
-        $incPath = API_INCLUDE_DIR . PATH_SEPARATOR . API_VENDOR_DIR;
-        $incPath.= PATH_SEPARATOR.ini_get("include_path");
+        $incPath = API_INCLUDE_DIR;
+        if (file_exists(API_VENDOR_DIR)){
+            $incPath .= PATH_SEPARATOR . API_VENDOR_DIR;
+        }
+        $incPath .= PATH_SEPARATOR.ini_get("include_path");
         
         // Prepend extension directories to include path
         if (is_dir(API_PROJECT_DIR . 'ext/')) {
@@ -109,8 +112,12 @@ class api_init {
                 $incPath = $inc . $incPath;
             } 
         }
-
-        $incPath = API_LOCAL_INCLUDE_DIR . PATH_SEPARATOR . API_LOCAL_VENDOR_DIR . PATH_SEPARATOR . $incPath;
+        print API_VENDOR_DIR;
+        if (file_exists(API_LOCAL_VENDOR_DIR)) {
+            $incPath = API_LOCAL_INCLUDE_DIR . PATH_SEPARATOR . API_LOCAL_VENDOR_DIR . PATH_SEPARATOR . $incPath;
+        } else {
+            $incPath = API_LOCAL_INCLUDE_DIR . PATH_SEPARATOR . $incPath;
+        }
         
         ini_set("include_path", $incPath);
         
