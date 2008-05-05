@@ -67,6 +67,7 @@ class api_config {
      * Gets an instance of api_config.
      * @param $forceReload bool: If true, forces instantiation of a
      *        new instance. Used for testing.
+     * @return api_config an api_config instance;
      */
     public static function getInstance($forceReload = FALSE) {
         if (! self::$instance instanceof api_config || $forceReload) {
