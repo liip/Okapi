@@ -216,7 +216,7 @@ class api_routing_route implements api_Irouting {
         // If there is a wildcard match at the end, URI may have
         // more components than the route.
         $last = $routeParts[count($routeParts)-1];
-        if (strlen($last) && $last[0] != '*' && count($uriParts) > count($routeParts)) {
+        if (strlen($last) && $last[0] != '*' && $last[0] != '+' && count($uriParts) > count($routeParts)) {
             return null;
         }
         
