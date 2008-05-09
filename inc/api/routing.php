@@ -168,7 +168,9 @@ class api_routing_route implements api_Irouting {
     public function match($request) {
         $uri = $request->getPath();
         
-        if ($this->route == $uri) {
+        if (isset($this->conditions['verb']) && $this->conditions['verb'] != $request->getVerb()) {
+            return null;
+        } else if ($this->route == $uri) {
             return $this->params;
         } else if (($params = $this->parseRoute($request)) !== null) {
             return array_merge($this->params, $params);
@@ -205,10 +207,6 @@ class api_routing_route implements api_Irouting {
      * @param $request api_request: Request object.
      */
     protected function parseRoute($request) {
-        if (isset($this->conditions['verb']) && $this->conditions['verb'] != $request->getVerb()) {
-            return null;
-        }
-        
         $path = $this->getPath($request);
         $uriParts = explode('/', $path);
         $routeParts = explode('/', $this->route);
