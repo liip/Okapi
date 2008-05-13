@@ -8,7 +8,7 @@ class api_helpers_xpath {
      * @param $dom DOMDocument: DOM to search in
      * @param $xpath string: XPath expression to search in DOM
      */
-    public static function getNode($dom, $xpath) {
+    public static function getNode(DOMDocument $dom, $xpath) {
         $xp = new DOMXPath($dom);
         $xp->registerNamespace('x', 'http://www.w3.org/1999/xhtml');
         $xp->registerNamespace('xhtml', 'http://www.w3.org/1999/xhtml');

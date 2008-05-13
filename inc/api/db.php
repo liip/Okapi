@@ -47,8 +47,8 @@ class api_db {
      *         database connection doesn't exist. The driver's
      *         getDBConnection() method is used to retrieve that connection.
      */
-    public static function factory($name = "default") {
-        if (isset(self::$instances[$name])) {
+    public static function factory($name = "default", $force = false) {
+        if (isset(self::$instances[$name]) && $force == false) {
             return self::$instances[$name];
         }
         

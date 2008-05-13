@@ -7,6 +7,13 @@
  * The result will be an object of api_model with the given name nad params.
  */
 class api_model_factory {
+    /**
+     * Model Factory
+     *
+     * @param String $name: Model Name
+     * @param Array $params: Array of params in order of their appearance in the constructor
+     * @return api_model_common
+     */
     public static function get($name, $params = array()) {
         $name = 'api_model_' . $name;
         if (count($params) == 0) {
