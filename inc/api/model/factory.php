@@ -4,14 +4,14 @@
  * replaceable with dummies for the unit and functional testing.
  * It should be used in the commands like that:
  * api_modeL::factory('backend_get', array(...));
- * The result will be an object of api_model with the given name nad params.
+ * The result will be an object of api_model with the given named params.
  */
 class api_model_factory {
     /**
      * Model Factory
      *
-     * @param String $name: Model Name
-     * @param Array $params: Array of params in order of their appearance in the constructor
+     * @param $name string: Model name.
+     * @param $params array: Parameters in order of their appearance in the constructor.
      * @return api_model_common
      */
     public static function get($name, $params = array()) {

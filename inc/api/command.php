@@ -9,13 +9,13 @@
  */
 abstract class api_command {
     /**
-     * @var api_request Request object containing information about
-     * the current request.
+     * api_request: Request object containing information about the current
+     * request.
      */
     protected $request = null;
     
     /**
-     * @var api_response Response object used to send output to the client.
+     * api_response: Response object used to send output to the client.
      */
     protected $response = null;
     

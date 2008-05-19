@@ -115,10 +115,10 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
     }
 
     /**
-    * Authenticate agains a database-table
+    * Authenticate against a database-table
     *
     * Example for the YAML-File: 
-	* 
+    * 
     * \code
     * pam:
     *   auth:
@@ -131,13 +131,12 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
     *               dbname: modmon
     *               username: dbuser
     *               password: dbpass
-	* \endcode
+    * \endcode
     *
-    * @param array $rgOpts
-    * @param string $user
-    * @param string $pass
+    * @param $rgOpts array: Container options.
+    * @param $user string: Database username.
+    * @param $pass string: Database password.
     * @see http://framework.zend.com/manual/en/zend.auth.adapter.dbtable.html
-	*
     */
     private function setZendDbTableAdapter($rgOpts, $user, $pass){
         unset($rgOpts['driver']);
@@ -149,11 +148,11 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
 
         $authAdapter = new Zend_Auth_Adapter_DbTable($dbAdapter);
         $authAdapter->setTableName($rgOpts['table'])
-        ->setIdentityColumn($rgOpts['usercol'])
-        ->setCredentialColumn($rgOpts['passcol'])
-        ->setCredentialTreatment($rgOpts['passtreatment'])
-        ->setIdentity($user)
-        ->setCredential($pass);
+                    ->setIdentityColumn($rgOpts['usercol'])
+                    ->setCredentialColumn($rgOpts['passcol'])
+                    ->setCredentialTreatment($rgOpts['passtreatment'])
+                    ->setIdentity($user)
+                    ->setCredential($pass);
 
         self::$zaAdapter = $authAdapter;
 

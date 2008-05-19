@@ -6,7 +6,7 @@
  *
  * \code
  * exceptionhandler:
- *     lcl_testing_exception: rethrow
+ *     api_testing_exception: rethrow
  *     404: '404'
  *     NoCommandFound: '404'
  *     "*": local

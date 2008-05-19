@@ -1,6 +1,6 @@
 <?php
 /**
- * Base test case class for unit tests..
+ * Base test case class for unit tests.
  */
 class api_testing_case_unit extends UnitTestCase {
     

@@ -15,6 +15,9 @@ class api_response {
     /** HTTP response code sent to the client. */
     protected $code = null;
     
+    /**
+     * Re-implements send of api_response with a no-op.
+     */
     public function send() {
         // NOOP
     }
