@@ -217,28 +217,39 @@ class api_init {
      */
     public static function getHostConfig($hostname) {
         $hosts = array();
+        $host = null;
         
         // Read config
         $cfg = api_config::getInstance();
         if ($cfg->hosts) {
             $hosts = $cfg->hosts;
-            foreach($hosts as $key => &$host) {
+            foreach($hosts as $key => &$hostconfig) {
                 $lookupName = $key;
-                if (isset($host['host'])) {
-                    $lookupName = $host['host'];
-                } else if (isset($host['sld'])) {
-                    $lookupName = $host['sld'];
+                if (isset($hostconfig['host'])) {
+                    $lookupName = $hostconfig['host'];
+                } else if (isset($hostconfig['sld'])) {
+                    $lookupName = $hostconfig['sld'];
                 }
-                $host['host'] = $lookupName;
+                $hostconfig['host'] = $lookupName;
+                
+                if ($key == $hostname) {
+                    $host = $hostconfig;
+                    break;
+                } else if (self::matchHostnameWildcard($key, $hostname)) {
+                    $host = $hostconfig;
+                    if ($lookupName == $key) {
+                        // Replace host with current hostname
+                        $host['host'] = $hostname;
+                    }
+                    break;
+                }
             }
         }
         
         // Host not found
-        if (!isset($hosts[$hostname])) {
+        if (is_null($host)) {
             return null;
         }
-        
-        $host = $hosts[$hostname];
         
         // Calculate tld from hostname if sld is set.
         if (isset($host['sld']) && !isset($host['tld'])) {
@@ -254,5 +265,24 @@ class api_init {
                      'tld'  => @$host['tld'],
                      'sld'  => @$host['sld'],
                      'path' => $path);
+    }
+
+    /**
+     * Compares an input hostname with one from the configuration and
+     * returns true if they match.
+     *
+     * The configuration hostname can contain wildcards (*).
+     *
+     * @param $cfg   string:  Hostname from the configuration.
+     * @param $input string: Input hostname to compare against $cfg.
+     */
+    protected static function matchHostnameWildcard($cfg, $input) {
+        if (strpos($cfg, '*') !== false) {
+            // Wildcard match
+            $pattern = str_replace('\\*', '.*', preg_quote($cfg));
+            return (preg_match('/' . $pattern . '/', $input) > 0);
+        } else {
+            return false;
+        }
     }
 }
