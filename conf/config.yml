@@ -25,6 +25,8 @@ default: &demo-shared
         notld.okapi.org:
             # Used for the tests. tld should automatically be "okapi.org"
             sld: notld
+        "ssoa*":
+            path: /ssoa/
     
     exceptionhandler:
         "*": rethrow

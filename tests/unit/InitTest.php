@@ -142,6 +142,16 @@ class InitTest extends UnitTestCase {
                   'sld' => 'pathdemo', 'tld' => 'okapi.org',
                   'path' => '/xyz'));
     }
+    
+    /**
+     * Test host parsing for a host with a wildcard.
+     */
+    function testParseWildcardHostSimple() {
+        $this->assertEqual(api_init::getHostConfig('ssoa'),
+            array('host' => 'ssoa',
+                  'tld' => null, 'sld' => null,
+                  'path' => '/ssoa/'));
+    }
 
     /**
      * Helper to test if a constant is defined.
