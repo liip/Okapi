@@ -24,7 +24,7 @@ define('API_STATE_FALSE',   0);
 /**
  * Main controller to handle whole request. Should be used in your
  * application's index.php like this:
- * 
+ *
  * \code
  * $ctrl = new api_controller();
  * $ctrl->process();
@@ -38,7 +38,7 @@ class api_controller {
      * the current request.
      */
     private $request = null;
-    
+
     /**
      * api_response: Response object - passed to the command and view to
      * handle response headers.
@@ -49,23 +49,23 @@ class api_controller {
      * api_views_common: View object which handles the output.
      */
     private $view = null;
-    
+
     /**
      * array: Route which matched the current request.
      * Return value of api_routing::getRoute().
      */
     private $route = null;
-    
+
     /**
      * api_command: Command to process the current request.
      */
     private $command = array();
-    
+
     /**
      * array: All non-fatal exceptions which have been caught.
      */
     private $exceptions = array();
-    
+
     /**
      * Constructor. Gets instances of api_request and api_response
      * but doesn't yet do anything else.
@@ -80,7 +80,7 @@ class api_controller {
             $this->catchFinalException($e);
         }
     }
-    
+
     /**
      * Set a custom api_response object. Must be called before the
      * process method to be of use.
@@ -93,7 +93,7 @@ class api_controller {
     public function setResponse($response) {
         $this->response = $response;
     }
-    
+
     /**
      * Process the current request. This loads the correct command,
      * processes it and then uses the view to display the result.
@@ -113,10 +113,10 @@ class api_controller {
         } catch(Exception $e) {
             $this->catchFinalException($e);
         }
-        
+
         return true;
     }
-    
+
     /**
      * Load command based on routing configuration. Uses
      * api_routing::getRoute() to get the command name for the current
@@ -126,7 +126,7 @@ class api_controller {
      *
      * The instance variables command and route are set to the command
      * object and the route returned by api_routing respectively.
-     * 
+     *
      * @exception api_exception_NoCommandFound if no route matched the
      *            current request or if the command class doesn't exist.
      *
@@ -146,10 +146,10 @@ class api_controller {
         } else {
             $route['namespace'] = API_NAMESPACE;
         }
-        
-        
+
+
         $cmd = $route['namespace'].'_command_' . $route['command'];
-        
+
         if (!class_exists($cmd)) {
             $cmd_old = $cmd;
             // Try old naming (NAMESPACE_commands_*)
@@ -161,11 +161,11 @@ class api_controller {
                 throw new api_exception_NoCommandFound("Command $cmd or $cmd_old not found.");
             }
         }
-        
+
         $this->command = new $cmd($route);
         $this->route = &$route;
     }
-    
+
     /**
      * Calls the api_command::isAllowed() method to check if the command
      * can be executed. Then api_command::process() is called.
@@ -194,10 +194,10 @@ class api_controller {
         if (is_null($data) && $this->command instanceof api_command) {
             $data = $this->command->getData();
         }
-        
+
         $this->view->dispatch($data, $this->exceptions);
     }
-    
+
     /**
      * Loads the view and initializes it.
      *
@@ -206,14 +206,14 @@ class api_controller {
      */
     public function prepare() {
         $this->view = api_view::factory($this->getViewName(), $this->request, $this->route, $this->response);
-        
+
         if ($this->view instanceof api_views_common) {
             $this->view->prepare();
         } else {
             throw new api_exception_NoViewFound("View " . $this->getViewName() . " not found");
         }
     }
-    
+
     /**
      * Loads the view and uses it to display the response for the
      * current request.
@@ -228,7 +228,7 @@ class api_controller {
         $this->prepare();
         $this->dispatch();
     }
-    
+
     /**
      * Adds Exception to exceptions array. The catchException() method
      * calls this method for any non-fatal exception. The array of
@@ -248,10 +248,10 @@ class api_controller {
                 }
             }
         }
-        
+
         array_push($this->exceptions, $e);
     }
-    
+
     /**
      * Catches any exception which has either been rethrown by the
      * catchException() method or was thrown outside of it's scope.
@@ -263,7 +263,7 @@ class api_controller {
     private function catchFinalException(Exception $e) {
         return api_exceptionhandler::handle($e, $this);
     }
-    
+
     /**
      * Catches an exception. Non-fatal and fatal exceptions are handled
      * differently:
@@ -287,7 +287,7 @@ class api_controller {
             throw $e;
         }
     }
-    
+
     /**
      * Get the name of the view to load. This is defined by the route using
      * the view['class'] parameter. If that parameter is not defined, then
@@ -302,7 +302,7 @@ class api_controller {
             return 'default';
         }
     }
-    
+
     /**
      * Override the XSLT style sheet to load. Currently used by the
      * exception handler to load another view.
@@ -312,7 +312,7 @@ class api_controller {
     public function setXsl($xsl) {
         $this->route['view']['xsl'] = $xsl;
     }
-    
+
     /**
      * Uses api_command::getXslParams() method to overwrite the
      * view parameters. All parameters returned by the command
@@ -322,7 +322,7 @@ class api_controller {
         $this->route['view'] = array_merge($this->route['view'],
                 $this->command->getXslParams());
     }
-    
+
     /**
      * Returns the command name, needed by tests
      *
@@ -330,7 +330,7 @@ class api_controller {
     public function getCommandName() {
         return get_class($this->command);
     }
-    
+
     /**
      * Returns the final, dispatched view  name, needed by tests
      *
