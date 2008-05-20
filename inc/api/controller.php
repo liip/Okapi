@@ -172,7 +172,9 @@ class api_controller {
      */
     protected function processCommand() {
         try {
-            $this->command->isAllowed();
+            if (!$this->command->isAllowed()) {
+                throw new api_exception_CommandNotAllowed("Command access not allowed: ".getclass($this->command));
+            }
             $this->command->process();
         } catch(Exception $e) {
             $this->catchException($e, array('command' => $this->route['command']));
