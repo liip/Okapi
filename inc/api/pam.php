@@ -179,7 +179,8 @@ class api_pam {
      *        if the user has access or not.
      * @param $acValue string: Access control value. Used in the same way as
      *        the $acObject param.
-     * @return bool: True if the user is allowed to access the object
+     * @return bool: True if the user is allowed to access the object or no
+     *        perm container has been defined in the configuration
      * @see api_pam_Iperm::isAllowed()
      */
     public function isAllowed($acObject, $acValue) {
@@ -187,7 +188,7 @@ class api_pam {
             $uid = $this->getUserId();
             return $po->isAllowed($uid, $acObject, $acValue);
         }
-        return false;
+        return true;
     }
 
     /**
@@ -347,7 +348,7 @@ class api_pam {
     private function pamLoadComponentConfig($compArr) {
         $cfg = array();
 
-        
+
         if (isset($compArr[0]) && is_array($compArr[0])) {
             foreach($compArr as $conf) {
                 $confName = (isset($conf['name'])) ? $conf['name'] : $this->confDefaultName;
@@ -357,8 +358,8 @@ class api_pam {
             $confName = (isset($compArr['name'])) ? $compArr['name'] : $this->confDefaultName;
             $cfg[$confName] = $compArr;
         }
-        
-        
+
+
         return $cfg;
     }
 }
