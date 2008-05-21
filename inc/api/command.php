@@ -107,10 +107,14 @@ abstract class api_command {
     /**
      * Checks permission. To prevent a user from accessing a command, the
      * command has to redirect the user somewhere else in this method.
-     * The return value is discarded.
-     * @return void
+     * 
+     * When this method returns false the controller throws a
+     * api_exception_CommandNotAllowed exception.
+     * 
+     * @return bool
      */
     public function isAllowed() {
+        return true;
     }
     
     /**
