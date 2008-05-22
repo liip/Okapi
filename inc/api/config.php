@@ -107,7 +107,7 @@ class api_config {
             $this->configArray = self::$loader->load($this->env);
         }
 
-        $this->saveCache($env);
+        $this->saveCache($this->env);
     }
     
     /**
