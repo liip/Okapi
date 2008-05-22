@@ -47,9 +47,6 @@ class api_config {
     /** The default environment. This is used if no OKAPI_ENV environment
       * variable is defined. */
     static protected $DEFAULT_ENV = 'default';
-
-    /** Directory where the cache file is written to. */
-    protected $cacheDir = '/tmp/okapi-cache/';
     
     /** The loaded configuration array for the current profile. */
     protected $configArray = array();
@@ -100,12 +97,23 @@ class api_config {
         } else {
             $this->env = self::$DEFAULT_ENV;
         }
-
-        if (!is_null(self::$loader)) {
-            $this->configArray = self::$loader->load($this->env);
+        if ($this->readFromCache($this->env)) {
             return;
         }
 
+        if (is_null(self::$loader)) {
+            $this->loadYaml($this->env);
+        } else {
+            $this->configArray = self::$loader->load($this->env);
+        }
+
+        $this->saveCache($env);
+    }
+    
+    /**
+     * Load the configuration using the default YAML loader.
+     */
+    protected function loadYaml($env) {
         $base = API_PROJECT_DIR . 'conf/config';
         $configfile = $base . '.yml';
         $configdir = $base . '.d';
@@ -122,36 +130,7 @@ class api_config {
             $this->init($yaml);
         }
     }
-
-    /**
-     * Destructor. Dump the loaded configuration file into a PHP file.
-     * On loading the configuration that PHP file is then used instead of
-     * the YAML file. Loading is then faster as the YAML parsing can be
-     * slow.
-     *
-     * This behaviour must be turned explicitly by setting
-     * the configCache configuration value to true.
-     */
-    public function __destruct() {
-        // config-caching can be disabled via config (for testing purposes)
-        if (! $this->configCache) {
-            return;
-        }
-
-        self::$instance = null;
-
-        // write cache
-        $cachedata = var_export($this->configArray, true);
-        $cache = '<?php $configCache='.$cachedata."; ?>";
-        $cachefile = $this->getConfigCachefile();
-
-        try {
-            file_put_contents($cachefile, $cache);
-        } catch(Exception $e) {
-            echo "Writing cache failed ...\n";
-        }
-    }
-
+    
     /**
      * Reads the YAML configuration. Also calls replaceAllConsts on the
      * resulting YAML document to replace constants.
@@ -159,16 +138,12 @@ class api_config {
      * @param $yaml string: File name or complete YAML document as a string.
      */
     protected function init($yaml) {
-        // read cache
-        if (! $this->readCache()) {
-            $cfg = sfYaml::load($yaml);
-            if (!isset($cfg[$this->env])) {
-                $this->env = self::$DEFAULT_ENV;
-            }
-            $this->configArray = $cfg[$this->env];
-
-            $this->replaceAllConsts($this->configArray);
+        $cfg = sfYaml::load($yaml);
+        if (!isset($cfg[$this->env])) {
+            $this->env = self::$DEFAULT_ENV;
         }
+        $this->configArray = $cfg[$this->env];
+        $this->replaceAllConsts($this->configArray);
     }
 
     /**
@@ -201,13 +176,14 @@ class api_config {
      * Checks availability of a cachefile and assigns the cached content
      * to the protected object variable $configCache.
      */
-    protected function readCache() {
-        $cachefile = $this->getConfigCachefile();
+    protected function readFromCache($env) {
+        $cachefile = $this->getConfigCachefile($env);
 
-        if (file_exists($cachefile) && is_readable($cachefile)) {
-            include $cachefile;
-            if (isset($configCache) && is_array($configCache)) {
-                $this->configArray = $configCache;
+        if (!is_null($cachefile) && file_exists($cachefile) && is_readable($cachefile)) {
+            $configString = file_get_contents($file);
+            $configArray = unserialize($configString);
+            if (isset($configArray) && is_array($configArray)) {
+                $this->configArray = $configArray;
                 return true;
             }
         }
@@ -215,21 +191,41 @@ class api_config {
         return false;
     }
 
+
+    /**
+     * Dump the loaded configuration file into a PHP file. On loading the
+     * configuration that PHP file is then used instead of the YAML file.
+     * Loading is then faster as the YAML parsing can be slow.
+     *
+     * This behaviour must be turned on explicitly by setting the
+     * configCache configuration value to true.
+     */
+    protected function saveCache($env) {
+        if (!isset($this->configArray['configArray']) || $this->configArray['configCache'] !== true) {
+            return;
+        }
+        
+        $file = $this->getConfigCachefile($env);
+        if (is_null($file)) {
+            return;
+        }
+        
+        $configString = serialize($this->configArray);
+        file_put_contents($file, $configString);
+        return true;
+    }
+    
     /**
      * Returns the filename of the configuration cache file to be used.
      */
-    protected function getConfigCachefile() {
-        $project = API_PROJECT_DIR;
-        $env = $this->env;
-
-        if (!file_exists($this->cacheDir)) {
-            mkdir($this->cacheDir, 0700, true);
+    protected function getConfigCachefile($env) {
+        $tmpdir = API_PROJECT_DIR . '/tmp/';
+        if (!is_writable($tmpdir)) {
+            return null;
         }
-        $fname = $env . '-' . md5($project) . '-cache.php';
-        $cachefile = $this->cacheDir . $fname;
-        return $cachefile;
+        return $tmpdir . 'config-cache_' . $env . '.php';
     }
-
+    
     /**
      * Replaces all constants in the configuration file. Uses the
      * method replaceConst for the actual replacement. Calls itself
