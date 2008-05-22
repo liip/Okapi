@@ -46,22 +46,22 @@ require_once(dirname(__FILE__) . '/vendor/sfYaml/sfYaml.class.php');
 class api_config {
     /** The default environment. This is used if no OKAPI_ENV environment
       * variable is defined. */
-    static private $DEFAULT_ENV = 'default';
+    static protected $DEFAULT_ENV = 'default';
 
     /** Directory where the cache file is written to. */
-    private $cacheDir = '/tmp/okapi-cache/';
-
+    protected $cacheDir = '/tmp/okapi-cache/';
+    
     /** The loaded configuration array for the current profile. */
-    private $configArray = array();
+    protected $configArray = array();
 
     /** The currently active environment. */
-    private $env;
+    protected $env;
 
     /** api_config instance */
-    private static $instance = null;
+    protected static $instance = null;
 
     /** Custom loader. See setLoader() */
-    private static $loader = null;
+    protected static $loader = null;
 
     /**
      * Gets an instance of api_config.
@@ -94,7 +94,7 @@ class api_config {
     /**
      * Constructor. Loads the configuration file into memory.
      */
-    private function __construct() {
+    protected function __construct() {
         if (isset($_SERVER['OKAPI_ENV'])) {
             $this->env = $_SERVER['OKAPI_ENV'];
         } else {
@@ -158,7 +158,7 @@ class api_config {
      *
      * @param $yaml string: File name or complete YAML document as a string.
      */
-    private function init($yaml) {
+    protected function init($yaml) {
         // read cache
         if (! $this->readCache()) {
             $cfg = sfYaml::load($yaml);
@@ -199,9 +199,9 @@ class api_config {
 
     /**
      * Checks availability of a cachefile and assigns the cached content
-     * to the private object variable $configCache.
+     * to the protected object variable $configCache.
      */
-    private function readCache() {
+    protected function readCache() {
         $cachefile = $this->getConfigCachefile();
 
         if (file_exists($cachefile) && is_readable($cachefile)) {
@@ -218,7 +218,7 @@ class api_config {
     /**
      * Returns the filename of the configuration cache file to be used.
      */
-    private function getConfigCachefile() {
+    protected function getConfigCachefile() {
         $project = API_PROJECT_DIR;
         $env = $this->env;
 
@@ -237,7 +237,7 @@ class api_config {
      *
      * @param $arr array: Configuration array.
      */
-    private function replaceAllConsts(&$arr) {
+    protected function replaceAllConsts(&$arr) {
         if (!is_array($arr)) {
             return;
         }
@@ -257,7 +257,7 @@ class api_config {
      * occurrence in the value of the constant is substituted if
      * such a constant exists.
      */
-    private function replaceConst($value) {
+    protected function replaceConst($value) {
         if (!empty($value)) {
             preg_match_all("#\{.[^\}]+\}#", $value, $matches);
             if (isset($matches[0]) && count($matches[0]) > 0) {
