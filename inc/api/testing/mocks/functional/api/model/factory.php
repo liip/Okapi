@@ -44,7 +44,9 @@ class api_model_factory {
         
         if (self::$defaultFallback || in_array($name, self::$DEFAULTS)) {
             // Default: load model normal
-            $name = 'api_model_' . $name;
+            if (class_exists('api_model_' . $name)) {
+                $name = 'api_model_' . $name;
+            }
             if (count($params) == 0) {
                 return new $name;
             } else {

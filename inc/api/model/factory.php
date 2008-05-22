@@ -15,13 +15,14 @@ class api_model_factory {
      * @return api_model_common
      */
     public static function get($name, $params = array()) {
-        $name = 'api_model_' . $name;
+        if (class_exists('api_model_' . $name)) {
+            $name = 'api_model_' . $name;
+        }
         if (count($params) == 0) {
             return new $name;
         } else {
             $class = new ReflectionClass($name);
             return $class->newInstanceArgs($params);
         }
-
     }
 }
