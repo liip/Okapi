@@ -131,6 +131,10 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
     *               dbname: modmon
     *               username: dbuser
     *               password: dbpass
+    *               table: usertable
+    *               usercol: usernamecolumn
+    *               passcol: passwordcolumn
+    *               passtreatment: MD5(?)
     * \endcode
     *
     * @param $rgOpts array: Container options.
