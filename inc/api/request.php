@@ -102,7 +102,7 @@ class api_request {
             $this->lang = $lang['lang'];
             $path = $lang['path'];
         }
-        $this->url = API_HOST . $this->lang . '/' . API_MOUNTPATH . substr($path, 1);
+        $this->url = API_HOST . $this->lang . API_MOUNTPATH . substr($path, 1);
         $this->path = api_helpers_string::removeDoubleSlashes($path);
 
         // Path

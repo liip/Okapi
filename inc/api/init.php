@@ -261,6 +261,10 @@ class api_init {
         
         // Return values
         $path = (!empty($host['path'])) ? $host['path'] : '/';
+        if ($path[strlen($path)-1] !== '/') {
+            $path .= '/';
+        }
+        
         return array('host' => $host['host'],
                      'tld'  => @$host['tld'],
                      'sld'  => @$host['sld'],
