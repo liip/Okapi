@@ -133,6 +133,9 @@ class api_i18n {
             foreach($attrs as $attr) {
                 $lookupKey = trim($attr->parentNode->getAttribute($attr->nodeValue));
                 $value = $this->i18nGetMessage($lookupKey);
+                if($value == '') {
+                    $value = $lookupKey;
+                }
                 
                 $attr->parentNode->setAttribute($attr->nodeValue, $value);
                 $attrNodes[] = $attr->parentNode;
