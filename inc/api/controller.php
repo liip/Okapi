@@ -230,8 +230,13 @@ class api_controller {
      */
     protected function prepareAndDispatch() {
         $this->updateViewParams();
-        $this->prepare();
-        $this->dispatch();
+        if (isset($this->route['view']) && isset($this->route['view']['ignore'])
+                                        && $this->route['view']['ignore'] === true) {
+            // Ignore view
+        } else {
+            $this->prepare();
+            $this->dispatch();
+        }
     }
 
     /**
