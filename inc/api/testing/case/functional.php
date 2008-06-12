@@ -83,7 +83,7 @@ class api_testing_case_functional extends UnitTestCase {
     private function request($path, $params) {
         $_SERVER["REQUEST_URI"] = $path;
         $components = parse_url($path);
-        $_GET = $_POST = $_REQUEST = array();
+        $_GET = $_POST = $_REQUEST = $_FILES = array();
         
         if (isset($components['query'])) {
             $query = array();
@@ -91,6 +91,7 @@ class api_testing_case_functional extends UnitTestCase {
             $_GET = $query;
         }
         $_POST = $params;
+        $this->uploadFiles($_POST, $_FILES);
         $_REQUEST = array_merge($_GET, $_POST);
         
         api_request::getInstance(true);
@@ -98,6 +99,7 @@ class api_testing_case_functional extends UnitTestCase {
         $this->controller = new api_controller();
         $this->controller->process();
         $this->loadResponse();
+        $this->removeUploadedFiles();
     }
     
     /**
@@ -109,6 +111,65 @@ class api_testing_case_functional extends UnitTestCase {
         $response = api_response::getInstance();
         $resp = $response->getContents();
         $this->responseDom = DOMDocument::loadXML($resp);
+    }
+    
+    /**
+     * Takes all paramaters form the POST array whose value's
+     * start with an `@' and interprets those as file uploads.
+     * This is compatible with the way curl handles uploads.
+     *
+     * Example usage with file uploads:
+     * \code
+     * $this->post('/test', array(
+     *     'Type' => 'IMAGE',
+     *     'File' => '@vw_golf.jpg',
+     * ));
+     * \endcode
+     *
+     * This passes a normal POST parameter "Type" and additionally
+     * uploads the picture vw_golf.jpg (which has to exist in the
+     * current working directory for that example).
+     */
+    private function uploadFiles(&$post, &$files) {
+        foreach ($post as $key => $value) {
+            if ($value[0] == '@') {
+                $orig_file = substr($value, 1);
+                $upload_file = tempnam(sys_get_temp_dir(), 'upload');
+                copy($orig_file, $upload_file);
+                
+                // Get MIME type
+                if (function_exists('finfo_open')) {
+                    $finfo = finfo_open(FILEINFO_MIME);
+                    $type = finfo_file($finfo, $orig_file);
+                    finfo_close($finfo);
+                } else if (function_exists('mime_content_type')) {
+                    $type = mime_content_type($orig_file);
+                } else {
+                    $type = '';
+                }
+                
+                // File upload
+                $files[$key] = array(
+                    'name' => basename($orig_file),
+                    'type' => $type,
+                    'size' => filesize($orig_file),
+                    'tmp_name' => $upload_file,
+                    'error' => 0,
+                );
+                unset($_POST[$key]);
+            }
+        }
+    }
+    
+    /**
+     * Remove all uploaded files from the current request.
+     */
+    private function removeUploadedFiles() {
+        foreach ($_FILES as $key => $arr) {
+            if (is_file($arr['tmp_name'])) {
+                unlink($arr['tmp_name']);
+            }
+        }
     }
     
     /**
