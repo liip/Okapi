@@ -186,5 +186,25 @@ class RequestTest extends UnitTestCase {
             'path' => 'mypath',
             'question' => 'does it work?'));
     }
+    
+    /**
+     * Tests if a normal URL is returned correctly
+     */
+    function testRequestURL() {
+        $_SERVER['REQUEST_URI'] = '/the/foobar';
+        $r = api_request::getInstance(true);
+        $this->assertEqual($r->getUrl(), 'http://demo.okapi.org/en/the/foobar');
+    }
+    
+    /**
+     * Tests if a HTTPS URL is returned correctly
+     */
+    // function testRequestURLWithSSL() {
+    //     $_SERVER['REQUEST_URI'] = '/the/foobar';
+    //     $_SERVER['HTTPS'] = 'on';
+    //     $_SERVER['SERVER_PORT'] = 443;
+    //     $r = api_request::getInstance(true);
+    //     $this->assertEqual($r->getUrl(), 'https://demo.okapi.org/en/the/foobar');
+    // }
 }
 ?>
