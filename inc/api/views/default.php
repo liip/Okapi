@@ -56,19 +56,26 @@ class api_views_default extends api_views_common {
         $xslt_errors = libxml_get_errors();
         if (count($xslt_errors) == 0 && $xml instanceof DOMDocument) {
             $this->transformI18n($this->request->getLang(), $xml);
-            
-            $xmlstr = $xml->saveXML();
-            if ($this->omitXmlDecl) {
-                $xmlstr = $this->cleanXml($xmlstr);
-            }
-            
             $this->setHeaders();
-            echo $xmlstr;
+            echo $this->getOuputFromDom($xml);
             $this->sendResponse();
             return;
         } else {
             throw new api_exception_XsltParseError(api_exception::THROW_FATAL, $this->xslfile);
         }
+    }
+    
+    /**
+     * Return the string to output for the given DOM. By default cleans the
+     * XML a bit.
+     * @param $dom DOMDocument: DOM to output.
+     */
+    protected function getOuputFromDom($dom) {
+        $xmlstr = $dom->saveXML();
+        if ($this->omitXmlDecl) {
+            $xmlstr = $this->cleanXml($xmlstr);
+        }
+        return $xmlstr;
     }
     
     /**
@@ -114,7 +121,7 @@ class api_views_default extends api_views_common {
         $attrib = array_merge($defaults, $attrib);
         
         if (!isset($attrib['xsl'])) {
-            die("No XSLT stylesheet was specified for this route.");
+            throw new api_exception_NoXsltFound("No XSLT stylesheet was specified for this route.");
         }
         
         if (isset($attrib['contenttype']) && !empty($attrib['contenttype'])) {

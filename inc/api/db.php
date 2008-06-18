@@ -43,6 +43,8 @@ class api_db {
      * Returns the database connection specified by $name.
      * 
      * @param $name string: Database connection name
+     * @param $force bool: Force a new connection even if the connection
+     *                     has already been opened.
      * @return DatabaseConnection: Database connection or false if the
      *         database connection doesn't exist. The driver's
      *         getDBConnection() method is used to retrieve that connection.

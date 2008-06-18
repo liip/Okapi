@@ -11,7 +11,7 @@ class api_exception_FileNotFound extends api_exception {
      * @param $filename string: Name of the file that couldn't be found.
      *        Put into the message string.
      */
-    public function __construct($severity = self::THROW_NONE, $filename) {
+    public function __construct($severity = self::THROW_NONE, $filename = '') {
         parent::__construct($severity);
         $this->message = "File not found: {$filename}";
     }

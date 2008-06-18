@@ -9,8 +9,8 @@
  */
 abstract class api_command {
     /**
-     * api_request: Request object containing information about
-     * the current request.
+     * api_request: Request object containing information about the current
+     * request.
      */
     protected $request = null;
     

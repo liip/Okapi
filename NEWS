@@ -1,5 +1,19 @@
 Release history of Okapi.
 
+2008-06-18 :: Version 1.0.4
+  - Correct SSL Checking (alain)
+  - api_model_dom extends api_model (pneff)
+  - proper exception for non existing views and xslts (chregu)
+  - Various Docblocks (chregu) + fixes for doxygen (pneff)
+  - Extract getOuputFromDom from default view (pneff)
+  - Treat + params also as wildcard (pneff)
+  - Correct slashes in urls (pneff)
+  - Add cookie handling to mock api_response (pneff)
+  - Improved config caching (pneff)
+  - Use orginal attribute if no value found (philipp)
+  - Allow view to be ignored (pneff)
+  - Splitting the exception handle function to use getTrace seperately (ebi)
+
 2008-04-02 :: Version 1.0.3
 
   - Bugfix for setCookie so it also works with more than one cookie (lejoe)

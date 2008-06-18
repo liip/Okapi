@@ -69,22 +69,22 @@ class api_response {
      * Sets a cookie with the given value. 
      * Overwrites an existing Cookie if it's the same name
      *
-     * @param string Name of the cookie
-     * @param string Value of the cookie
-     * @param int Maxage of the cookie
-     * @param string Path where the cookie can be used
-     * @param string Domain which can read the cookie
-     * @param bool Secure mode?
-     * @param bool Only allow HTTP usage?
+     * @param $name string: Name of the cookie
+     * @param $value string: Value of the cookie
+     * @param $maxage int: Maxage of the cookie
+     * @param $path string: Path where the cookie can be used
+     * @param $domain: string: Domain which can read the cookie
+     * @param $secure bool: Secure mode?
+     * @param $httponly bool: Only allow HTTP usage?
      */
     public function setCookie($name, $value = '', $maxage = 0, $path = '', $domain = '', 
-                              $secure = false, $HTTPOnly = false) {
+                              $secure = false, $httponly = false) {
         $this->cookies[rawurlencode($name)] = rawurlencode($value)
                                               . (empty($domain) ? '' : '; Domain='.$domain)
                                               . (empty($maxage) ? '' : '; Max-Age='.$maxage)
                                               . (empty($path) ? '' : '; Path='.$path)
                                               . (!$secure ? '' : '; Secure')
-                                              . (!$HTTPOnly ? '' : '; HttpOnly');
+                                              . (!$httponly ? '' : '; HttpOnly');
     }
     
     /**

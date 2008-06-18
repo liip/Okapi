@@ -26,7 +26,7 @@ class api_request {
     protected $filename = '';
     /** Extension extracted from the path. */
     protected $extension = false;
-    
+
     /**
      * Gets an instance of api_request.
      * @param $forceReload bool: If true, forces instantiation of a
@@ -34,21 +34,21 @@ class api_request {
      */
     public static function getInstance($forceReload = false) {
         static $instance;
-        
+
         if  ($forceReload || !isset($instance) || !($instance instanceof api_request)) {
             $instance = new api_request;
         }
-        
+
         return $instance;
     }
-    
+
     /**
      * Constructor. Parses the request and fills in all the
      * values it can.
      */
     protected function __construct() {
         $this->host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
-        
+
         $config = api_config::getInstance();
         $this->outputLangs = $config->lang['languages'];
         $this->defaultLang = $config->lang['default'];
@@ -58,26 +58,26 @@ class api_request {
         if (is_null($this->defaultLang)) {
             $this->defaultLang = 'en';
         }
-        
+
         // Parse host, get SLD / TLD
         $hostinfo = api_init::getHostConfig($this->host);
         if ($hostinfo) {
             $this->sld = $hostinfo['sld'];
             $this->tld = $hostinfo['tld'];
         }
-        
+
         $path = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
         if (strpos($path, '?') !== FALSE) {
             $path = substr($path, 0, strpos($path, '?'));
         }
-        
+
         // Get language from the beginning of the URL
         $lang = $this->getLanguageFromPath($path);
         if ($lang !== null) {
             $this->lang = $lang['lang'];
             $path = $lang['path'];
         }
-        
+
         // Strip out path prefix from path
         if (isset($hostinfo['path'])) {
             if (strpos($path, $hostinfo['path']) === 0) {
@@ -90,13 +90,13 @@ class api_request {
 
         // HTTP verb - assume GET as default
         $this->verb = isset($_SERVER['REQUEST_METHOD']) ? strtoupper($_SERVER['REQUEST_METHOD']) : 'GET';
-        
+
         $this->params = new api_params();
         $this->params->setGet($_GET);
         if ($this->verb == 'POST') {
             $this->params->setPost($_POST);
         }
-        
+
         if ($this->lang === '') {
             $lang = $this->parseLanguage($path);
             $this->lang = $lang['lang'];
@@ -104,10 +104,10 @@ class api_request {
         }
         $this->url = API_HOST . $this->lang . API_MOUNTPATH . substr($path, 1);
         $this->path = api_helpers_string::removeDoubleSlashes($path);
-        
+
         // Path
         $this->filename = $this->parseFilename($this->path);
-        
+
         $matches = array();
         if ($this->filename != '') {
             preg_match("#\.([a-z]{3,4})$#", $this->filename, $matches);
@@ -116,7 +116,7 @@ class api_request {
             }
         }
     }
-    
+
     /**
      * Returns the hostname of the current request.
      */
@@ -139,7 +139,7 @@ class api_request {
     public function getTld() {
         return $this->tld;
     }
-    
+
     /**
      * Returns the path of the current request. Language and path prefix
      * are removed.
@@ -147,7 +147,7 @@ class api_request {
     public function getPath() {
         return $this->path;
     }
-    
+
     /**
      * Returns the full URL of the current request. (not
      * including query parameters)
@@ -155,7 +155,7 @@ class api_request {
     public function getUrl() {
         return $this->url;
     }
-    
+
     /**
      * Returns the verb / request method of the current request.
      * The verb is always upper case.
@@ -163,35 +163,35 @@ class api_request {
     public function getVerb() {
         return $this->verb;
     }
-    
+
     /**
      * Returns the detected language of the current request.
      */
     public function getLang() {
         return $this->lang;
     }
-    
+
     /**
      * Returns a list of all configured languages.
      */
     public function getLanguages() {
         return $this->outputLangs;
     }
-    
+
     /**
      * Returns the configured default language.
      */
     public function getDefaultLanguage() {
         return $this->defaultLang;
     }
-    
+
     /**
      * Returns the file name of the current request.
      */
     public function getFilename() {
         return $this->filename;
     }
-    
+
     /**
      * Returns the extension of the file name. This consists of three or
      * four letters.
@@ -199,14 +199,14 @@ class api_request {
     public function getExtension() {
         return $this->extension;
     }
-    
+
     /**
      * Returns the request parameters.
      */
     public function getParameters() {
         return $this->params;
     }
-    
+
     /**
      * Returns a single request parameter.
      * You can pass in a default value which is returned in case the
@@ -223,7 +223,7 @@ class api_request {
             return $default;
         }
     }
-    
+
     /**
      * Parses out a file name from the current path.
      * The last path component is returned if it contains an extension
@@ -238,7 +238,7 @@ class api_request {
         }
         return '';
     }
-    
+
     /**
      * Gets the language from the given path.
      * On finding a language, an associative array is returned
@@ -256,23 +256,23 @@ class api_request {
             return array('path' => $newpath,
                          'lang' => $lang);
         }
-        
+
         return null;
     }
-    
+
     /**
      * Gets a language from the current request. The following
      * positions are checked for a language:
      *   - Path (beginning of path).
      *   - HTTP Accept headers.
      *   - Default.
-     * 
+     *
      * @param $path string: Path to parse.
      * @return hash: Parsed path.
      */
     private function parseLanguage($path) {
         $newpath = $path;
-        
+
         if ($retval = $this->getLanguageFromPath($path)) {
             return $retval;
         }
@@ -292,7 +292,7 @@ class api_request {
                 }
             }
         }
-        
+
         return array('path' => $newpath,
                      'lang' => $this->defaultLang);
     }

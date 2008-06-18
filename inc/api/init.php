@@ -89,8 +89,11 @@ class api_init {
           
         // Set PHP include path (localinc - localinc/lib - ext - ext/lib - inc - inc/lib - include_path)
         
-        $incPath = API_INCLUDE_DIR . PATH_SEPARATOR . API_VENDOR_DIR;
-        $incPath.= PATH_SEPARATOR.ini_get("include_path");
+        $incPath = API_INCLUDE_DIR;
+        if (file_exists(API_VENDOR_DIR)){
+            $incPath .= PATH_SEPARATOR . API_VENDOR_DIR;
+        }
+        $incPath .= PATH_SEPARATOR.ini_get("include_path");
         
         // Prepend extension directories to include path
         if (is_dir(API_PROJECT_DIR . 'ext/')) {
@@ -109,8 +112,11 @@ class api_init {
                 $incPath = $inc . $incPath;
             } 
         }
-
-        $incPath = API_LOCAL_INCLUDE_DIR . PATH_SEPARATOR . API_LOCAL_VENDOR_DIR . PATH_SEPARATOR . $incPath;
+        if (file_exists(API_LOCAL_VENDOR_DIR)) {
+            $incPath = API_LOCAL_INCLUDE_DIR . PATH_SEPARATOR . API_LOCAL_VENDOR_DIR . PATH_SEPARATOR . $incPath;
+        } else {
+            $incPath = API_LOCAL_INCLUDE_DIR . PATH_SEPARATOR . $incPath;
+        }
         
         ini_set("include_path", $incPath);
         
@@ -127,7 +133,7 @@ class api_init {
         // Construct URL for Web home (root of current host)
         $hostname = (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '');
         $hostinfo = self::getHostConfig($hostname);
-        $schema = (isset($_SERVER['HTTP_PORT']) && $_SERVER['SERVER_PORT'] == '443') ? 'https' : 'http'; 
+        $schema = (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == '443') ? 'https' : 'http'; 
         $reqHostPath = '/';
         if ($hostname != '') {
             $reqHostPath = $schema.'://'.$hostname;
@@ -211,28 +217,39 @@ class api_init {
      */
     public static function getHostConfig($hostname) {
         $hosts = array();
+        $host = null;
         
         // Read config
         $cfg = api_config::getInstance();
         if ($cfg->hosts) {
             $hosts = $cfg->hosts;
-            foreach($hosts as $key => &$host) {
+            foreach($hosts as $key => &$hostconfig) {
                 $lookupName = $key;
-                if (isset($host['host'])) {
-                    $lookupName = $host['host'];
-                } else if (isset($host['sld'])) {
-                    $lookupName = $host['sld'];
+                if (isset($hostconfig['host'])) {
+                    $lookupName = $hostconfig['host'];
+                } else if (isset($hostconfig['sld'])) {
+                    $lookupName = $hostconfig['sld'];
                 }
-                $host['host'] = $lookupName;
+                $hostconfig['host'] = $lookupName;
+                
+                if ($key == $hostname) {
+                    $host = $hostconfig;
+                    break;
+                } else if (self::matchHostnameWildcard($key, $hostname)) {
+                    $host = $hostconfig;
+                    if ($lookupName == $key) {
+                        // Replace host with current hostname
+                        $host['host'] = $hostname;
+                    }
+                    break;
+                }
             }
         }
         
         // Host not found
-        if (!isset($hosts[$hostname])) {
+        if (is_null($host)) {
             return null;
         }
-        
-        $host = $hosts[$hostname];
         
         // Calculate tld from hostname if sld is set.
         if (isset($host['sld']) && !isset($host['tld'])) {
@@ -244,9 +261,32 @@ class api_init {
         
         // Return values
         $path = (!empty($host['path'])) ? $host['path'] : '/';
+        if ($path[0] !== '/') {
+            $path = '/' . $path;
+        }
+        
         return array('host' => $host['host'],
                      'tld'  => @$host['tld'],
                      'sld'  => @$host['sld'],
                      'path' => $path);
+    }
+
+    /**
+     * Compares an input hostname with one from the configuration and
+     * returns true if they match.
+     *
+     * The configuration hostname can contain wildcards (*).
+     *
+     * @param $cfg   string:  Hostname from the configuration.
+     * @param $input string: Input hostname to compare against $cfg.
+     */
+    protected static function matchHostnameWildcard($cfg, $input) {
+        if (strpos($cfg, '*') !== false) {
+            // Wildcard match
+            $pattern = str_replace('\\*', '.*', preg_quote($cfg));
+            return (preg_match('/' . $pattern . '/', $input) > 0);
+        } else {
+            return false;
+        }
     }
 }
