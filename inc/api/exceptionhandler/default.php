@@ -10,13 +10,22 @@ class api_exceptionhandler_default extends api_exceptionhandler_base {
     const BACKTRACE_CONTEXT = 8;
     
     /**
-     * Process the exception. Calls the Exception::getTrace() method to
-     * get the backtrace. Gets the relevant lines of code for each step
-     * in the backtrace. Calls api_exceptionhandler_base::dispatch()
+     * Calls getTrace and does api_exceptionhandler_base::dispatch()
      * with the collected data.
      * @param $e Exception: The exception to handle.
      */
     public function handle(Exception $e) {
+        $this->data['exception'] = $this->getTrace($e);;
+        $this->dispatch($this->data);
+        return true;
+    }
+    
+    /**
+     * Process the exception. Calls the Exception::getTrace() method to
+     * get the backtrace. Gets the relevant lines of code for each step
+     * in the backtrace.
+     */
+    public function getTrace($e) {
         $trace = $e->getTrace();
         foreach($trace as $i => &$entry) {
             if (isset($entry['class'])) {
@@ -60,8 +69,6 @@ class api_exceptionhandler_default extends api_exceptionhandler_base {
         if(!empty($e->userInfo)) {
             $d['userInfo'] = $e->userInfo;
         }
-        $this->data['exception'] = $d;
-        $this->dispatch($this->data);
-        return true;
+        return $d;
     }
 }
