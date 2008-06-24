@@ -154,9 +154,13 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
         $authAdapter->setTableName($rgOpts['table'])
                     ->setIdentityColumn($rgOpts['usercol'])
                     ->setCredentialColumn($rgOpts['passcol'])
-                    ->setCredentialTreatment($rgOpts['passtreatment'])
                     ->setIdentity($user)
                     ->setCredential($pass);
+
+        // passtreatment id optional:            
+        if(array_key_exists('passtreatment', $rgOpts)){
+           $authAdapter->setCredentialTreatment($rgOpts['passtreatment']);
+        }
 
         self::$zaAdapter = $authAdapter;
 
