@@ -50,6 +50,17 @@ class api_testing_case_functional extends UnitTestCase {
     }
 
     /**
+     * Executes the given request internally using the HEAD method.
+     * @param $path string: Path relative to the application root to
+     *                      request. This path is passed to the routing
+     *                      engine. Path can include query string parameters.
+     */
+    protected function head($path) {
+        $_SERVER['REQUEST_METHOD'] = 'HEAD';
+        $this->request($path, array());
+    }
+
+    /**
      * Executes the given request internally using the POST method.
      * @param $path string: Path relative to the application root to
      *                      request. This path is passed to the routing
@@ -71,6 +82,18 @@ class api_testing_case_functional extends UnitTestCase {
     protected function put($path, $params) {
         $_SERVER['REQUEST_METHOD'] = 'PUT';
         $this->request($path, $params);
+    }
+    
+    /**
+     * Executes the given request internally using the DELETE method.
+     * @param $path string: Path relative to the application root to
+     *                      request. This path is passed to the routing
+     *                      engine. Path can include query string parameters.
+     * @param $params array: POST parameters to pass to the request.
+     */
+    protected function delete($path) {
+        $_SERVER['REQUEST_METHOD'] = 'DELETE';
+        $this->request($path, array());
     }
     
     /**
