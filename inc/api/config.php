@@ -47,7 +47,7 @@ class api_config {
     /** The default environment. This is used if no OKAPI_ENV environment
       * variable is defined. */
     static protected $DEFAULT_ENV = 'default';
-    
+
     /** The loaded configuration array for the current profile. */
     protected $configArray = array();
 
@@ -109,7 +109,7 @@ class api_config {
 
         $this->saveCache($this->env);
     }
-    
+
     /**
      * Load the configuration using the default YAML loader.
      */
@@ -130,7 +130,7 @@ class api_config {
             $this->init($yaml);
         }
     }
-    
+
     /**
      * Reads the YAML configuration. Also calls replaceAllConsts on the
      * resulting YAML document to replace constants.
@@ -180,7 +180,7 @@ class api_config {
         $cachefile = $this->getConfigCachefile($env);
 
         if (!is_null($cachefile) && file_exists($cachefile) && is_readable($cachefile)) {
-            $configString = file_get_contents($file);
+            $configString = file_get_contents($cachefile);
             $configArray = unserialize($configString);
             if (isset($configArray) && is_array($configArray)) {
                 $this->configArray = $configArray;
@@ -201,20 +201,23 @@ class api_config {
      * configCache configuration value to true.
      */
     protected function saveCache($env) {
-        if (!isset($this->configArray['configArray']) || $this->configArray['configCache'] !== true) {
+        if (!isset($this->configArray['configCache']) || $this->configArray['configCache'] !== true) {
             return;
         }
-        
+
         $file = $this->getConfigCachefile($env);
         if (is_null($file)) {
             return;
         }
-        
+
         $configString = serialize($this->configArray);
         file_put_contents($file, $configString);
+        if (isset($this->configArray['umask'])) {
+            chmod($file, $this->configArray['umask']);
+        }
         return true;
     }
-    
+
     /**
      * Returns the filename of the configuration cache file to be used.
      */
@@ -225,7 +228,7 @@ class api_config {
         }
         return $tmpdir . 'config-cache_' . $env . '.php';
     }
-    
+
     /**
      * Replaces all constants in the configuration file. Uses the
      * method replaceConst for the actual replacement. Calls itself
