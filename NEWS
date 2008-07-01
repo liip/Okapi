@@ -1,5 +1,10 @@
 Release history of Okapi.
 
+2008-07-01 :: Version 1.0.5
+  - Fixed config cache handling (lukas.smith)
+  - Added support for "umask" config option to force a specific chmod
+    setting for the cache file (lukas.smith)
+
 2008-06-18 :: Version 1.0.4
   - Correct SSL Checking (alain)
   - api_model_dom extends api_model (pneff)
@@ -15,25 +20,18 @@ Release history of Okapi.
   - Splitting the exception handle function to use getTrace seperately (ebi)
 
 2008-04-02 :: Version 1.0.3
-
   - Bugfix for setCookie so it also works with more than one cookie (lejoe)
 
-
 2008-04-02 :: Version 1.0.2
-
   - Add setCookie method to the api_response class. This improves
     testability (lejoe)
 
-
 2008-04-01 :: Version 1.0.1
-
   - Add DB exception class (marc)
   - Avoid empty include paths (chregu)
   - Avoid double calls to getDOM (marc)
   - Add api_db::clear() method to improve testability (pneff)
   - Avoid calling getParams() on non-Okapi exceptions (pneff)
 
-
 2008-03-14 :: Version 1.0.0
-
   - First public release.
