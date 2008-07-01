@@ -1,8 +1,6 @@
 Release history of Okapi.
 
 2008-07-01 :: Version 1.0.5
-  - Add functional test methods for HEAD and DELETE HTTP methods. (pneff)
-  - Check optional passtreatment to avoid notices if not set. (alain)
   - Fixed config cache handling (lukas.smith)
   - Added support for "umask" config option to force a specific chmod
     setting for the cache file (lukas.smith)
