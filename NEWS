@@ -1,7 +1,7 @@
 Release history of Okapi.
 
 2008-07-08 :: Version 1.1.0
-  - IMPORTANT: This release which breaks API compatibility to 1.0.*
+  - IMPORTANT: This release breaks API compatibility to 1.0.*
   - Added Zend_Auth_Adapter_DbTable as authentication-adapter (alain)
   - Added the functionality to define an extension node in the config
     for the allowed extensions. syntax is documented and is like:
