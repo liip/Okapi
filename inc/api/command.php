@@ -135,7 +135,7 @@ abstract class api_command {
         
         foreach ($this->data as $d) {
             $dataDom = $d->getDOM();
-            if (!is_null($dataDom)) {
+            if (!is_null($dataDom) && $dataDom->documentElement) {
                 $node = $dom->importNode($dataDom->documentElement, true);
                 $dom->documentElement->appendChild($node);
             }
