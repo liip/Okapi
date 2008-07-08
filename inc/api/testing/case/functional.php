@@ -155,10 +155,13 @@ class api_testing_case_functional extends UnitTestCase {
      */
     private function uploadFiles(&$post, &$files) {
         foreach ($post as $key => $value) {
-            if (strlen($value) > 1 && $value[0] == '@') {
+            if (strlen($value) >= 1 && $value[0] == '@') {
                 $orig_file = substr($value, 1);
-                $upload_file = tempnam(sys_get_temp_dir(), 'upload');
-                copy($orig_file, $upload_file);
+                $upload_file = '';
+                if (file_exists($orig_file)) {
+                    $upload_file = sys_get_temp_dir() . '/_file_' . count($files);
+                    copy($orig_file, $upload_file);
+                }
                 
                 // Get MIME type
                 if (function_exists('finfo_open')) {
