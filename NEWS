@@ -1,5 +1,19 @@
 Release history of Okapi.
 
+2008-07-08 :: Version 1.1.0
+  - IMPORTANT: This release which breaks API compatibility to 1.0.*
+  - Added Zend_Auth_Adapter_DbTable as authentication-adapter (alain)
+  - Added the functionality to define an extension node in the config
+    for the allowed extensions. syntax is documented and is like:
+    "extensions: [xml, rss, html]" only these extensions are then parsed
+    as extensions. (marc)
+  - Added the possibility to overwrite the "entry" values of
+    api_helpers_xml::array2dom (marc)
+  - Use sfYaml class for parsing YAML instead of Spyc (lukas.smith)
+  - Unit and functional testing framework (ebi, pneff)
+  - Handle return from isAllowed() call. Now throws CommandNotAllowed
+    exception if false is returned. (lukas.smith)
+
 2008-07-01 :: Version 1.0.5
   - Fixed config cache handling (lukas.smith)
   - Added support for "umask" config option to force a specific chmod
