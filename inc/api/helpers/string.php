@@ -89,4 +89,22 @@ class api_helpers_string {
     static function removeDoubleSlashes($str) {
         return preg_replace('#/{2,}#', '/', $str);
     }
+
+    /**
+     * Compares a wildcard string with an input string and returns returns
+     * true if they match.
+     *
+     * @param $pattern string: Pattern to match against. May contain *
+     *        wildcards.
+     * @param $input string: Input to compare against the pattern.
+     */
+    public static function matchWildcard($pattern, $input) {
+        if (strpos($pattern, '*') !== false) {
+            // Wildcard match
+            $pattern = str_replace('\\*', '.*', preg_quote($pattern));
+            return (preg_match('/' . $pattern . '/', $input) > 0);
+        } else {
+            return ($pattern == $input);
+        }
+    }
 }
