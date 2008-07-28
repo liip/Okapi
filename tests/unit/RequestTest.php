@@ -197,6 +197,25 @@ class RequestTest extends UnitTestCase {
     }
     
     /**
+     * Tests if a normal client IP is returned correctly.
+     */
+    function testClientIp() {
+        $_SERVER['REMOTE_ADDR'] = '172.10.12.15';
+        $r = api_request::getInstance(true);
+        $this->assertEqual($r->getClientIp(), '172.10.12.15');
+    }
+    
+    /**
+     * Tests if a cluster client IP is returned correctly.
+     */
+    function testClientIpClutster() {
+        $_SERVER['REMOTE_ADDR'] = '195.210.10.20';
+        $_SERVER['HTTP_X_CLUSTER_CLIENT_IP'] = '172.19.10.130';
+        $r = api_request::getInstance(true);
+        $this->assertEqual($r->getClientIp(), '172.19.10.130');
+    }
+    
+    /**
      * Tests if a HTTPS URL is returned correctly
      */
     // function testRequestURLWithSSL() {
