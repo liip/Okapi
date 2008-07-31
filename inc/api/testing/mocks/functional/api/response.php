@@ -165,4 +165,20 @@ class api_response {
     public function getCode() {
         return $this->code;
     }
+
+    /**
+     * Returns whether the content length will be specified in the response
+     * header.
+     */
+    public function isContentLengthOutput() {
+        return $this->setContentLengthOutput;
+    }
+    
+    /**
+     * Output the content length in the output.
+     * @param $cl boolean: True if the content length should be set.
+     */
+    public function setContentLengthOutput($cl) {
+        $this->setContentLengthOutput = $cl;
+    }
 }
