@@ -16,6 +16,10 @@ class api_response {
     protected $charset = 'utf-8';
     /** HTTP response code sent to the client. */
     protected $code = null;
+    /** Whether to specify the content length in the response header. This is
+        off by default. If this is turned on, it will turn off HTTP chunked
+        encoding. */
+    protected $setContentLengthOutput = false;
     
     /**
      * Gets an instance of api_response.
@@ -125,6 +129,22 @@ class api_response {
     }
     
     /**
+     * Returns whether the content length will be specified in the response
+     * header.
+     */
+    public function isContentLengthOutput() {
+        return $this->setContentLengthOutput;
+    }
+    
+    /**
+     * Output the content length in the output.
+     * @param $cl boolean: True if the content length should be set.
+     */
+    public function setContentLengthOutput($cl) {
+        $this->setContentLengthOutput = $cl;
+    }
+    
+    /**
      * Redirects the user to another location. The location can be
      * relative or absolute, but this methods always converts it into
      * an absolute location before sending it to the client.
@@ -167,6 +187,10 @@ class api_response {
         
         foreach ($this->getCookies() as $cookie => $value) {
             header("Set-Cookie: $cookie=$value", false);
+        }
+        
+        if ($this->setContentLengthOutput) {
+            header("Content-Length: " . ob_get_length());
         }
         
         ob_end_flush();

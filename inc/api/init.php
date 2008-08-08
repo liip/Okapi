@@ -235,7 +235,7 @@ class api_init {
                 if ($key == $hostname) {
                     $host = $hostconfig;
                     break;
-                } else if (self::matchHostnameWildcard($key, $hostname)) {
+                } else if (api_helpers_string::matchWildcard($key, $hostname)) {
                     $host = $hostconfig;
                     if ($lookupName == $key) {
                         // Replace host with current hostname
@@ -269,24 +269,5 @@ class api_init {
                      'tld'  => @$host['tld'],
                      'sld'  => @$host['sld'],
                      'path' => $path);
-    }
-
-    /**
-     * Compares an input hostname with one from the configuration and
-     * returns true if they match.
-     *
-     * The configuration hostname can contain wildcards (*).
-     *
-     * @param $cfg   string:  Hostname from the configuration.
-     * @param $input string: Input hostname to compare against $cfg.
-     */
-    protected static function matchHostnameWildcard($cfg, $input) {
-        if (strpos($cfg, '*') !== false) {
-            // Wildcard match
-            $pattern = str_replace('\\*', '.*', preg_quote($cfg));
-            return (preg_match('/' . $pattern . '/', $input) > 0);
-        } else {
-            return false;
-        }
     }
 }

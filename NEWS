@@ -1,5 +1,15 @@
 Release history of Okapi.
 
+2008-08-08 :: Version 1.1.1
+  - api_response has support for outputting a content length header. (pneff)
+  - api_request: New method getClientIp. This returns the real client IP,
+    using any request headers that proxies and load balancers set to pass
+    through to communicate the original client IP address. (pneff)
+  - Disable DOM dumping (XML=1 hack) by default and provide the config option
+    allowDomDump to enable it. (pneff)
+  - Switch to a patched copy of Symfony YAML. This is only a temporary
+    solution until Symfony has a stable branch with their YAML parser. (pneff)
+
 2008-07-08 :: Version 1.1.0
   - IMPORTANT: This release breaks API compatibility to 1.0.* due to the
     YAML parser switch and the change in the isAllowed() behaviour.

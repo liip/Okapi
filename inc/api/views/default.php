@@ -2,6 +2,11 @@
 /**
  * Default view class. Does XSLT transformations and dispatches output.
  *
+ * @config <b>allowDomDump</b> (mixed): True if you want to allow the
+ *         DOM to be output to the browser with the XML=1 URL parameter.
+ *         This can also be an array of client IP address wildcards to
+ *         allow dumping for. Defaults to false.
+ *
  * @author   Silvan Zurbruegg
  */
 class api_views_default extends api_views_common {
@@ -11,6 +16,10 @@ class api_views_default extends api_views_common {
     /** XsltProcessor: Instantiated XSLT processor. */
     protected $xslproc = null;
     
+    /** boolean: True if the XML DOM should be dumped to the browser
+        instead of the view transformation result. */
+    protected $dumpDom = false;
+    
     /**
      * bool: If set to true, XML data which gives problem in HTML output
      * is stripped from output using api_views_default::cleanXml().
@@ -19,6 +28,31 @@ class api_views_default extends api_views_common {
     
     /** string: XSLT file used for transforming the output. */
     protected $xslfile = '';
+    
+    public function __construct($route) {
+        parent::__construct($route);
+        $this->dumpDom = $this->parseDumpDomConfig();
+    }
+    
+    protected function parseDumpDomConfig() {
+        if ($this->request->getParam('XML') != '1') {
+            return false;
+        }
+        
+        $cfg = api_config::getInstance()->allowDomDump;
+        if ($cfg === true) {
+            return true;
+        } else if (is_array($cfg)) {
+            $ip = $this->request->getClientIp();
+            foreach ($cfg as $pattern) {
+                if (api_helpers_string::matchWildcard($pattern, $ip)) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
     
     /**
      * Outputs the responses by transforming it using the loaded XSLT.
@@ -38,7 +72,7 @@ class api_views_default extends api_views_common {
         $xmldom = $this->getDom($data, $exceptions);
         
         // ?XML=1 trick
-        if ($this->request->getParam('XML') == '1') {
+        if ($this->dumpDom) {
             $this->setXMLHeaders();
             /* Ported from popoon: mozilla does not display the XML
                neatly, if there's a xhtml namespace in it, so we spoof it
@@ -142,7 +176,7 @@ class api_views_default extends api_views_common {
         if (isset($attrib['theme'])) {
             $this->xslfile = API_THEMES_DIR.$attrib['theme']."/".$attrib['xsl'];
         } 
-        if ($this->request->getParam('XML') == '1') {
+        if ($this->dumpDom) {
             $this->setXMLHeaders();
             $this->state = API_STATE_READY;
             return true;
