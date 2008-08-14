@@ -40,6 +40,20 @@ class RoutingTest extends UnitTestCase {
         $route = $m->getRoute($request);
         $this->assertNull($route);
     }
+
+    /**
+     * Mapping with one request param which is '0'.
+     */
+    function testWithOneRequestParamZero() {
+        $m = new api_routing();
+        $m->route('/test/:param1')->config(array('command' => 'test'));
+        
+        $request = new mock_request(array('path' => '/test/0'));
+        $route = $m->getRoute($request);
+        $this->assertEqual($route, array('command' => 'test',
+            'method' => 'process', 'param1' => '0',
+            'view' => array()));
+    }
     
     /**
      * Generic mapping plus a specific one.
@@ -276,6 +290,23 @@ class RoutingTest extends UnitTestCase {
             'method' => 'process',
             'userid' => '123',
             'path'   => 'something',
+            'view' => array()));
+    }
+    
+    /**
+     * Test the plus wildcard, ensuring it allows a value of '0'.
+     */
+    function testWildcardOneElementZero() {
+        $m = new api_routing();
+        $m->route('/test/:userid/+data')
+          ->config(array('command' => 'test'));
+        
+        $request = new mock_request(array('path' => '/test/123/0'));
+        $route = $m->getRoute($request);
+        $this->assertEqual($route, array('command' => 'test',
+            'method' => 'process',
+            'userid' => '123',
+            'data'   => '0',
             'view' => array()));
     }
     
