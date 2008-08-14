@@ -229,7 +229,7 @@ class api_routing_route implements api_Irouting {
                 if (count($uriParts) > 0) {
                     // Param can be filled from the URI
                     $param = array_shift($uriParts);
-                    if (empty($param)) {
+                    if ($param === null || $param === '') {
                         return null;
                     }
                     $params[$partKey] = $param;
@@ -252,7 +252,7 @@ class api_routing_route implements api_Irouting {
                 // Wildcard, eat up all the rest and return
                 // 1 or more hits
                 $param = implode('/', array_slice($uriParts, 0));
-                if (empty($param)) {
+                if ($param === null || $param === '') {
                     return null;
                 }
                 $params[$partKey] = $param;
