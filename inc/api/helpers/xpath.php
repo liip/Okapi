@@ -32,7 +32,7 @@ class api_helpers_xpath {
         if ($node) {
             $text = $node->nodeValue;
             // Strip multiple whitespaces
-            $text = preg_replace("#[ \t\xC2\xA0]+#u", ' ', $text);
+            $text = trim(preg_replace("#[ \t\xC2\xA0]+#u", ' ', $text));
             return $text;
         }
         return null;
