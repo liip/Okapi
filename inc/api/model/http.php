@@ -12,6 +12,9 @@ class api_model_http extends api_model {
     /** string: URL loaded by this object. */
     protected $url = '';
     
+    /** string: Headers to be set to the curl. */
+    protected $headers = array();
+    
     /**
      * Create a new data object which returns a HTTP response as DOM.
      * 
@@ -99,8 +102,9 @@ class api_model_http extends api_model {
         curl_setopt($curl, CURLOPT_DNS_USE_GLOBAL_CACHE, FALSE);
         curl_setopt($curl, CURLOPT_FILETIME, TRUE);
         
-        $headers = array('Accept-Language: en');
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        $this->headers[] = 'Accept-Language: en';
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $this->headers);
+        
         return $curl;
     }
 }
