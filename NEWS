@@ -1,5 +1,22 @@
 Release history of Okapi.
 
+2008-08-29 :: Version 1.1.2
+  - api_cache: Fix del() method. A timeout of 0 (the default value) caused
+    problems (ebi, pneff)
+  - api_cache: Fixes to add() for prefix key handling. (pneff)
+  - api_cache: Unify key handling by moving the logic into a method. (pneff)
+  - api_model_http: Move headers to set on the CURL object into an object
+    variable. This allows for easy overwriting of the headers to set in
+    subclasses. (lejoe)
+  - api_helpers_string: escapeJSValue also escapes \r. (pneff)
+  - api_model_queryinfo: Modified to nicely handle "Array" parameters and use
+    the PHP function http_build_query to create the reqestURI parameters.
+    (ebi)
+  - api_helpers_xpath: Trim the return value of getText() method. (pierre)
+  - api_routing: Allow 0 as a URL parameter. This was ignored so far because
+    we used empty() to test the value and empty() returns true for '0'.
+    (pneff)
+
 2008-08-08 :: Version 1.1.1
   - api_response has support for outputting a content length header. (pneff)
   - api_request: New method getClientIp. This returns the real client IP,
