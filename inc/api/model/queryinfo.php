@@ -66,8 +66,11 @@ class api_model_queryinfo extends api_model {
         $root->appendChild($self);
 
         $queryP = $dom->createElement('requestURI');
-        $requestUri = $this->path."?";
-        $requestUri .= http_build_query($this->params);
+        $requestUri = $this->path;
+        $queryString = http_build_query($this->params);
+        if ($queryString !== '') {
+            $requestUri .= '?' . $queryString;
+        }
         $queryP->nodeValue = str_replace("&","&amp;", substr($requestUri, 1));
         $root->appendChild($queryP);
         
