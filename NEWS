@@ -1,5 +1,10 @@
 Release history of Okapi.
 
+2008-08-29 :: Version 1.1.3
+  - api_cache: Fix get() method. Major fuckup by me. (pneff)
+  - api_model_queryinfo: Make sure ? is only included in the URL if there are
+    parameters. (pneff)
+
 2008-08-29 :: Version 1.1.2
   - api_cache: Fix del() method. A timeout of 0 (the default value) caused
     problems (ebi, pneff)
