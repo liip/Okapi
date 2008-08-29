@@ -119,7 +119,7 @@ class api_cache {
      * @see http://www.php.net/manual/en/function.Memcache-add.php
      */
     public function add($key, $val, $compressed = false, $expire = 0) {
-        $key = str_replace(' ', '_', $key);
+        $key = $this->normalizeKey($key);
         return $this->cache->add($this->prefix.$key, $val, $compressed, $expire);
     }
 
@@ -133,7 +133,7 @@ class api_cache {
      * @see http://www.php.net/manual/en/function.Memcache-delete.php
      */
     public function del($key, $timeout = 0) {
-        $key = str_replace(' ', '_', $key);
+        $key = $this->normalizeKey($key);
         if ($timeout > 0) {
             return $this->cache->delete($this->prefix.$key, $timeout);
         } else {
@@ -154,13 +154,14 @@ class api_cache {
      * Get an item from memcache. Returns the value which was stored.
      * Returns false if the item can't be found. If the passed keys was an
      * array, the return value with all found key-value pairs.
-     * @param $keys string|array: Key of item to find or an array of all
-     *                            keys to return.
+     * @param $keys string: Key of item to find or an array of all
+     *                      keys to return.
      * @return mixed|array: Value(s) retrieved from memcached.
      * @see http://www.php.net/manual/en/function.Memcache-get.php
      */
-    public function get($keys) {
-        return $this->cache->get($this->prefix.$keys);
+    public function get($key) {
+        $key = $this->normalizeKey($key);
+        return $this->cache->get($this->prefix.$key);
     }
 
     /**
@@ -176,7 +177,7 @@ class api_cache {
      * @see http://www.php.net/manual/en/function.Memcache-replace.php
      */
     public function replace($key, $val, $compressed = false, $expire = 0) {
-        $key = str_replace(' ', '_', $key);
+        $key = $this->normalizeKey($key);
         return $this->cache->replace($this->prefix.$key, $val, $compressed, $expire);
     }
 
@@ -192,7 +193,7 @@ class api_cache {
      * @see http://www.php.net/manual/en/function.Memcache-set.php
      */
     public function set($key, $val, $compressed = false, $expire = 0) {
-        $key = str_replace(' ', '_', $key);
+        $key = $this->normalizeKey($key);
         return $this->cache->set($this->prefix.$key, $val, $compressed, $expire);
     }
 
@@ -213,7 +214,7 @@ class api_cache {
      * @see http://ch2.php.net/manual/en/function.Memcache-increment.php
      */
     public function increment($key) {
-        $key = str_replace(' ', '_', $key);
+        $key = $this->normalizeKey($key);
         $value = $this->cache->increment($this->prefix.$key);
         if (intval($value) > 0) {
             return $value;
@@ -221,5 +222,9 @@ class api_cache {
             $this->set($key, 1);
             return 1;
         }
+    }
+    
+    protected function normalizeKey($key) {
+        return str_replace(' ', '_', $key);
     }
 }
