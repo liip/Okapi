@@ -163,7 +163,7 @@ class api_cache {
         if (is_array($keys)) {
             return $this->getWithArray($keys);
         } else {
-            $keys = $this->prefix . $this->normalizeKey($key);
+            $keys = $this->prefix . $this->normalizeKey($keys);
             return $this->cache->get($keys);
         }
     }
