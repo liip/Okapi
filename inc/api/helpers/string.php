@@ -11,8 +11,8 @@ class api_helpers_string {
      */
     static function escapeJSValue($str) {
         return str_replace(
-                array("'", "\n"),
-                array("\\'", "\\n"),
+                array("'", "\n", "\r"),
+                array("\\'", "\\n", "\\r"),
                 $str);
     }
     

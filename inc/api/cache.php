@@ -99,7 +99,7 @@ class api_cache {
      *                    permanently, .i.e. over more than one PHP request.
      * @param $weight int: Probability of this server to be selected.
      * @return bool: True on success
-     * @see http://www.php.net/manual/en/function.Memcache-addServer.php
+     * @see http://www.php.net/manual/en/function.memcache-addserver.php
      */
     public function connect($server, $port = 11211, $per = true, $weight = 1) {
         return $this->cache->addServer($server, $port, $per, $weight, $this->timeout, 15);
@@ -116,10 +116,10 @@ class api_cache {
      *                     the item doesn't expire. Otherwise use a Unix timestamp
      *                     or number of seconds starting from the current time.
      * @return bool: True on success, false on failure or if the key already exists.
-     * @see http://www.php.net/manual/en/function.Memcache-add.php
+     * @see http://www.php.net/manual/en/function.memcache-add.php
      */
     public function add($key, $val, $compressed = false, $expire = 0) {
-        $key = str_replace(' ', '_', $key);
+        $key = $this->normalizeKey($key);
         return $this->cache->add($this->prefix.$key, $val, $compressed, $expire);
     }
 
@@ -130,17 +130,21 @@ class api_cache {
      * @param $timeout int: If specified, the item will expire after
      *                      $timeout seconds.
      * @return bool: True on success.
-     * @see http://www.php.net/manual/en/function.Memcache-delete.php
+     * @see http://www.php.net/manual/en/function.memcache-delete.php
      */
     public function del($key, $timeout = 0) {
-        $key = str_replace(' ', '_', $key);
-        return $this->cache->delete($this->prefix.$key, $timeout);
+        $key = $this->normalizeKey($key);
+        if ($timeout > 0) {
+            return $this->cache->delete($this->prefix.$key, $timeout);
+        } else {
+            return $this->cache->delete($this->prefix.$key);
+        }
     }
 
     /**
      * Delete all items in memcache.
      * @return bool: True on success.
-     * @see http://www.php.net/manual/en/function.Memcache-flush.php
+     * @see http://www.php.net/manual/en/function.memcache-flush.php
      */
     public function flush() {
         return $this->cache->flush();
@@ -153,10 +157,35 @@ class api_cache {
      * @param $keys string|array: Key of item to find or an array of all
      *                            keys to return.
      * @return mixed|array: Value(s) retrieved from memcached.
-     * @see http://www.php.net/manual/en/function.Memcache-get.php
+     * @see http://www.php.net/manual/en/function.memcache-get.php
      */
     public function get($keys) {
-        return $this->cache->get($this->prefix.$keys);
+        if (is_array($keys)) {
+            return $this->getWithArray($keys);
+        } else {
+            $keys = $this->prefix . $this->normalizeKey($key);
+            return $this->cache->get($keys);
+        }
+    }
+    
+    /**
+     * get() submethod when requested with an array of keys.
+     * All keys need to have the prefix added and that prefix
+     * needs to be removed again from the returned keys.
+     */
+    protected function getWithArray($keys) {
+        foreach ($keys as $key => $value) {
+            $keys[$key] = $this->prefix . $this->normalizeKey($value);
+        }
+        
+        $retval = $this->cache->get($keys);
+        
+        $prefixLen = strlen($this->prefix);
+        $newretval = array();
+        foreach ($retval as $key => $value) {
+            $newretval[substr($key, $prefixLen)] = $value;
+        }
+        return $newretval;
     }
 
     /**
@@ -169,10 +198,10 @@ class api_cache {
      *                     the item doesn't expire. Otherwise use a Unix timestamp
      *                     or number of seconds starting from the current time.
      * @return bool: True when item existed and was replaced.
-     * @see http://www.php.net/manual/en/function.Memcache-replace.php
+     * @see http://www.php.net/manual/en/function.memcache-replace.php
      */
     public function replace($key, $val, $compressed = false, $expire = 0) {
-        $key = str_replace(' ', '_', $key);
+        $key = $this->normalizeKey($key);
         return $this->cache->replace($this->prefix.$key, $val, $compressed, $expire);
     }
 
@@ -185,10 +214,10 @@ class api_cache {
      *                     the item doesn't expire. Otherwise use a Unix timestamp
      *                     or number of seconds starting from the current time.
      * @return bool: True on success.
-     * @see http://www.php.net/manual/en/function.Memcache-set.php
+     * @see http://www.php.net/manual/en/function.memcache-set.php
      */
     public function set($key, $val, $compressed = false, $expire = 0) {
-        $key = str_replace(' ', '_', $key);
+        $key = $this->normalizeKey($key);
         return $this->cache->set($this->prefix.$key, $val, $compressed, $expire);
     }
 
@@ -196,7 +225,7 @@ class api_cache {
      * Returns server statistics.
      * @return bool|array: A two-dimensional associative array of server
      *                     statistics or false in case of failure.
-     * @see http://www.php.net/manual/en/function.Memcache-getExtendedStats.php
+     * @see http://www.php.net/manual/en/function.memcache-getextendedstats.php
      */
     public function getExtendedStats() {
         return $this->cache->getExtendedStats();
@@ -206,10 +235,10 @@ class api_cache {
      * Increment a value by 1. Sets the value to 1 if it doesn't exist yet.
      * @param $key string: Key of item to increment.
      * @return int: New value of the item.
-     * @see http://ch2.php.net/manual/en/function.Memcache-increment.php
+     * @see http://ch2.php.net/manual/en/function.memcache-increment.php
      */
     public function increment($key) {
-        $key = str_replace(' ', '_', $key);
+        $key = $this->normalizeKey($key);
         $value = $this->cache->increment($this->prefix.$key);
         if (intval($value) > 0) {
             return $value;
@@ -217,5 +246,12 @@ class api_cache {
             $this->set($key, 1);
             return 1;
         }
+    }
+    
+    /**
+     * Normalize the memcache keys.
+     */
+    protected function normalizeKey($key) {
+        return str_replace(' ', '_', $key);
     }
 }
