@@ -8,6 +8,11 @@ class ModelQueryinfoTest extends OkapiTestCase {
         parent::setUp();
         $_SERVER['HTTP_HOST'] = 'demo.okapi.org';
         $_SERVER["REQUEST_URI"] = '/mycommand/foo';
+        $_GET = array();
+    }
+    
+    function tearDown() {
+        $_GET = array();
     }
     
     function testModel() {
@@ -33,5 +38,14 @@ class ModelQueryinfoTest extends OkapiTestCase {
         $model = new api_model_queryinfo($request, $route);
         $dom = $model->getDOM();
         $this->assertXPath($dom, '/queryinfo/requestURI', 'mycommand/foo?param1%5B0%5D=foo&param1%5B1%5D=bar');
+    }
+    
+    function testRequestUriWithoutParams() {
+        $request = api_request::getInstance(true);
+        $route = array('command' => 'mycommand', 'method' => 'foo');
+        
+        $model = new api_model_queryinfo($request, $route);
+        $dom = $model->getDOM();
+        $this->assertXPath($dom, '/queryinfo/requestURI', 'mycommand/foo');
     }
 }
