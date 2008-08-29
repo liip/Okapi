@@ -134,7 +134,11 @@ class api_cache {
      */
     public function del($key, $timeout = 0) {
         $key = str_replace(' ', '_', $key);
-        return $this->cache->delete($this->prefix.$key, $timeout);
+        if ($timeout > 0) {
+            return $this->cache->delete($this->prefix.$key, $timeout);
+        } else {
+            return $this->cache->delete($this->prefix.$key);
+        }
     }
 
     /**
