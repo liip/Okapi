@@ -154,14 +154,38 @@ class api_cache {
      * Get an item from memcache. Returns the value which was stored.
      * Returns false if the item can't be found. If the passed keys was an
      * array, the return value with all found key-value pairs.
-     * @param $keys string: Key of item to find or an array of all
-     *                      keys to return.
+     * @param $keys string|array: Key of item to find or an array of all
+     *                            keys to return.
      * @return mixed|array: Value(s) retrieved from memcached.
      * @see http://www.php.net/manual/en/function.memcache-get.php
      */
-    public function get($key) {
-        $key = $this->normalizeKey($key);
-        return $this->cache->get($this->prefix.$key);
+    public function get($keys) {
+        if (is_array($keys)) {
+            return $this->getWithArray($keys);
+        } else {
+            $keys = $this->prefix . $this->normalizeKey($key);
+            return $this->cache->get($keys);
+        }
+    }
+    
+    /**
+     * get() submethod when requested with an array of keys.
+     * All keys need to have the prefix added and that prefix
+     * needs to be removed again from the returned keys.
+     */
+    protected function getWithArray($keys) {
+        foreach ($keys as $key => $value) {
+            $keys[$key] = $this->prefix . $this->normalizeKey($value);
+        }
+        
+        $retval = $this->cache->get($keys);
+        
+        $prefixLen = strlen($this->prefix);
+        $newretval = array();
+        foreach ($retval as $key => $value) {
+            $newretval[substr($key, $prefixLen)] = $value;
+        }
+        return $newretval;
     }
 
     /**
