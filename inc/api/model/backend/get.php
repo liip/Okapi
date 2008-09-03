@@ -161,7 +161,12 @@ class api_model_backend_get extends api_model_http {
             return null;
         }
         
-        $url = 'http://' . $host;
+        $url = 'http://';
+        if (isset($cmd['protocol'])) {
+            $url = $cmd['protocol'];
+        }
+        
+        $url .= $host;
         if (!empty($port)) $url .= ':' . $port;
         if ($path[0] != '/') $url .= '/';
         $url .= $path;
