@@ -53,6 +53,11 @@ class ModelBackendGetTest extends OkapiTestCase {
         $this->assertBackendModelUrl($model, 'http://extapi.trunk.local.ch/0/testing/index.xml?another=bar');
     }
     
+    function testProtocolDefinition() {
+        $model = new api_model_backend_get('secure', 'secreturl');
+        $this->assertBackendModelUrl($model, 'http://secure.local.ch/test');
+    }
+    
     /**
      * Asserts that the URL of the model's curl object is equal to $url.
      */
