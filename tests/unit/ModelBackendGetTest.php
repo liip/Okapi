@@ -55,7 +55,7 @@ class ModelBackendGetTest extends OkapiTestCase {
     
     function testProtocolDefinition() {
         $model = new api_model_backend_get('secure', 'secreturl');
-        $this->assertBackendModelUrl($model, 'http://secure.local.ch/test');
+        $this->assertBackendModelUrl($model, 'https://secure.local.ch/test');
     }
     
     /**
