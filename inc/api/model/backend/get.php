@@ -161,9 +161,10 @@ class api_model_backend_get extends api_model_http {
             return null;
         }
         
-        $url = 'http://';
         if (isset($cmd['protocol'])) {
             $url = $cmd['protocol'];
+        } else {
+            $url = 'http://';
         }
         
         $url .= $host;
@@ -218,6 +219,9 @@ class api_model_backend_get extends api_model_http {
         }
         if (isset($cfg['port'])) {
             $values['port'] = $cfg['port'];
+        }
+        if (isset($cfg['protocol'])) {
+            $values['protocol'] = $cfg['protocol'];
         }
         if (isset($cfg['path'])) {
             $values['path'] .= $cfg['path'];
