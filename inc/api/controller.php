@@ -162,6 +162,8 @@ class api_controller {
             }
         }
 
+        $config = api_config::getInstance();
+        $config->load($route['command']);
         $this->command = new $cmd($route);
         $this->route = &$route;
     }
@@ -169,7 +171,7 @@ class api_controller {
     /**
      * Calls the api_command::isAllowed() method to check if the command
      * can be executed. Then api_command::process() is called.
-     * 
+     *
      * @exception api_exception_CommandNotAllowed if api_command::isAllowed()
      *            returns false.
      *
