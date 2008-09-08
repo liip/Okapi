@@ -46,7 +46,6 @@ class api_view {
 
         $rgNamespace[] = api_view::$defaultNamespace;
 
-
         foreach ($rgNamespace as $ns) {
             if (($obj = api_view::getViewWithNamespace($ns, $ext, $name, $route, $response)) != false) {
                 return $obj;
@@ -84,38 +83,24 @@ class api_view {
              **/
             $classNameExt = $className."_".$ext;
             if (class_exists($classNameExt)) {
-                $obj = new $classNameExt($route);
-                $obj->setResponse($response);
-                if ($obj instanceof $classNameExt) {
-                    return $obj;
-                }
+                $className = $classNameExt;
             } else {
-
                 /**
                  * Try with api_views_ext
                  * View is a standard view for ext
                  */
                 $classNameExt = $ns.api_view::$classNameBase.$ext;
                 if (class_exists($classNameExt)) {
-                    $obj = new $classNameExt($route);
-                    $obj->setResponse($response);
-                    if ($obj instanceof $classNameExt) {
-                        return $obj;
-                    }
+                    $className = $classNameExt;
                 }
-
             }
         }
 
         if (class_exists($className)) {
             $obj = new $className($route);
             $obj->setResponse($response);
-            if ($obj instanceof $className) {
-                return $obj;
-            }
+            return $obj;
         }
-
-
 
         return false;
     }
