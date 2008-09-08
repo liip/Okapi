@@ -8,18 +8,18 @@
  */
 class api_view {
     /** Prefix for view class names. */
-    private static $classNameBase    = "_views_";    
-    
+    private static $classNameBase    = "_views_";
+
     /**
      * String: The default namespace
      * @todo this would be nice in the config file with a default value
      */
     private static $defaultNamespace = API_NAMESPACE;
-    
+
     /** Protected constructor. Use api_view::factory(). */
     protected function __construct() {
     }
-    
+
     /**
      * Return view object according to name.
      *
@@ -45,23 +45,23 @@ class api_view {
                 $ext = $matches[1];
             }
         }
-        
+
         if (isset($route['namespace']) && $route['namespace'] != API_NAMESPACE) {
             $rgNamespace[] = $route['namespace'];
         }
-        
+
         $rgNamespace[] = api_view::$defaultNamespace;
-        
-        
+
+
         foreach ($rgNamespace as $ns) {
             if (($obj = api_view::getViewWithNamespace($ns, $ext, $name, $route, $response)) != false) {
                 return $obj;
             }
         }
-        
+
         return false;
     }
-    
+
     /**
      * Returns a view object according to the namespace. The default namespace
      * is `api'. If you set your namespace to `foo' then the views named
@@ -69,20 +69,20 @@ class api_view {
      * The order in which the views are searched is the following:
      * {namespace}_views_{name}_{ext} , {namespace}_views_{ext} , {namespace}_
      * views_default, api_views_{name}_{ext}, api_views_{ext} , api_views default.
-     * 
-     * 
+     *
+     *
      *
      * @param $ns String: Namespace of the view
-     * @param $ext String: Extension String (like xml, json..) 
+     * @param $ext String: Extension String (like xml, json..)
      * @param $name String: View name to instantiate
-     * @param $route hash: Route which matched the current request. 
+     * @param $route hash: Route which matched the current request.
      * @param $response api_response: Response object.
      * @return api_view|false
      */
     private static function getViewWithNamespace($ns, $ext, $name, $route, $response) {
         $omitExt = (!empty($route['view']['omitextension']) && $route['view']['omitextension']) ? true : false;
         $className = $ns.api_view::$classNameBase.strtolower($name);
-        
+
         if ($ext != null && $omitExt === false) {
             /**
              * Try with view api_views_viewname_ext.
@@ -96,10 +96,10 @@ class api_view {
                     return $obj;
                 }
             } else {
-                
+
                 /**
-                 * Try with api_views_ext 
-                 * View is a standard view for ext 
+                 * Try with api_views_ext
+                 * View is a standard view for ext
                  */
                 $classNameExt = $ns.api_view::$classNameBase.$ext;
                 if (class_exists($classNameExt)) {
@@ -107,12 +107,12 @@ class api_view {
                     $obj->setResponse($response);
                     if ($obj instanceof $classNameExt) {
                         return $obj;
-                    }           
+                    }
                 }
-            
+
             }
         }
-        
+
         if (class_exists($className)) {
             $obj = new $className($route);
             $obj->setResponse($response);
@@ -120,9 +120,9 @@ class api_view {
                 return $obj;
             }
         }
-        
-        
-        
+
+
+
         return false;
     }
 }
