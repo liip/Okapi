@@ -70,9 +70,11 @@ abstract class api_command {
         $route = $this->route;
         if (isset($route['method']) && $route['method'] != 'process') {
             // __call() may return false, then we go execute the default request
-            if ((!method_exists($this,$route['method']) || is_callable(array($this, $route['method']))) && $this->{$route['method']}()) {
+            if ((!method_exists($this, $route['method']) || is_callable(array($this, $route['method'])))
+                && $this->{$route['method']}()
+            ) {
                 return;
-            }   
+            }
         }
         $this->{$this->defaultMethod}();
         return;
