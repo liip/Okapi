@@ -38,13 +38,7 @@ class api_view {
      */
     public static function factory($name, $request, $route, $response) {
         $rgNamespace = Array();
-        $ext = null;
-        if ($request->getFilename() != '') {
-            preg_match("#\.([a-z]{3,4})$#", $request->getFilename(), $matches);
-            if (isset($matches[1]) && !empty($matches[1])) {
-                $ext = $matches[1];
-            }
-        }
+        $ext = $request->getExtension();
 
         if (isset($route['namespace']) && $route['namespace'] != API_NAMESPACE) {
             $rgNamespace[] = $route['namespace'];
