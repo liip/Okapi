@@ -124,9 +124,6 @@ class api_request {
                     $this->extension = $matches[1];
                 }
             }
-
-
-
         }
     }
 
