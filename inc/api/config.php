@@ -51,6 +51,9 @@ class api_config {
     /** The loaded configuration array for the current profile. */
     protected $configArray = array();
 
+    /** The loaded configuration array for the current command. */
+    protected $commandConfigArray = array();
+
     /** The currently active environment. */
     protected $env;
 
