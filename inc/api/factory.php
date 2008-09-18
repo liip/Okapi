@@ -12,8 +12,24 @@
  * This factory should get initialized by conf/classes.php.
  */
 class api_factory {
+    protected $config = array();
+    
+    public function __construct($config = array()) {
+        if (is_array($config)) {
+            $this->config = $config;
+        }
+    }
+    
     public function get($base) {
-        $class = 'api_' . $base;
+        $class = $this->resolveClassName($base);
         return new $class();
+    }
+    
+    protected function resolveClassName($base) {
+        if (isset($this->config[$base])) {
+            return $this->config[$base];
+        } else {
+            return 'api_' . $base;
+        }
     }
 }
