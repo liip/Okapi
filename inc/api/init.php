@@ -73,6 +73,7 @@ class api_init {
         if (self::$initialized) {
             return;
         }
+        
         if (!defined('DEVEL')) {
             define('DEVEL',0);
         }
@@ -86,7 +87,8 @@ class api_init {
         define('API_VENDOR_DIR', API_INCLUDE_DIR.'lib'.DIRECTORY_SEPARATOR);
         define('API_LOCAL_VENDOR_DIR', API_LOCAL_INCLUDE_DIR.'lib'.DIRECTORY_SEPARATOR);
         
-          
+        $GLOBALS['factory'] = self::getFactory();
+        
         // Set PHP include path (localinc - localinc/lib - ext - ext/lib - inc - inc/lib - include_path)
         
         $incPath = API_INCLUDE_DIR;
@@ -269,5 +271,15 @@ class api_init {
                      'tld'  => @$host['tld'],
                      'sld'  => @$host['sld'],
                      'path' => $path);
+    }
+    
+    public static function getFactory() {
+        $cfgFile = API_PROJECT_DIR . "conf/classes.php";
+        
+        if (file_exists($cfgFile)) {
+            return include($cfgFile);
+        } else {
+            return new api_factory();
+        }
     }
 }

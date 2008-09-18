@@ -79,7 +79,7 @@ class api_model_factory {
         $fullFile = API_PROJECT_DIR . "tests/fixtures/" . $file;
         $dom = new DOMDocument();
         $dom->load($fullFile);
-        $modelObj = new api_model_dom($dom);
+        $modelObj = $GLOBALS['factory']->create('model_dom', array($dom));
         
         array_push(self::$fixtures[$model], array(
             'file'   => $file,

@@ -136,7 +136,7 @@ class api_controller {
      *             release.
      */
     protected function loadCommand() {
-        $routing = new api_routing();
+        $routing = $GLOBALS['factory']->create('routing');
         $route = $routing->getRoute($this->request);
         if (is_null($route) || !is_array($route)) {
             throw new api_exception_NoCommandFound();

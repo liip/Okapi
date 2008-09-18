@@ -72,7 +72,7 @@ class api_pam {
     /**
      * Constructor. Loads the PAM configuration.
      */
-    private function __construct() {
+    public function __construct() {
         $pamConf = api_config::getInstance()->pam;
         $this->pamLoadConfig($pamConf);
     }
@@ -82,10 +82,7 @@ class api_pam {
      * @return api_pam: Instance.
      */
     public static function getInstance() {
-        if (!self::$instance instanceof api_pam) {
-            self::$instance = new api_pam();
-        }
-        return self::$instance;
+        return $GLOBALS['factory']->get('pam');
     }
 
     /**

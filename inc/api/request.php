@@ -28,25 +28,10 @@ class api_request {
     protected $extension = false;
 
     /**
-     * Gets an instance of api_request.
-     * @param $forceReload bool: If true, forces instantiation of a
-     *        new instance. Used for testing.
-     */
-    public static function getInstance($forceReload = false) {
-        static $instance;
-
-        if  ($forceReload || !isset($instance) || !($instance instanceof api_request)) {
-            $instance = new api_request;
-        }
-
-        return $instance;
-    }
-
-    /**
      * Constructor. Parses the request and fills in all the
      * values it can.
      */
-    protected function __construct() {
+    public function __construct() {
         $this->host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
 
         $config = api_config::getInstance();
@@ -91,7 +76,7 @@ class api_request {
         // HTTP verb - assume GET as default
         $this->verb = isset($_SERVER['REQUEST_METHOD']) ? strtoupper($_SERVER['REQUEST_METHOD']) : 'GET';
 
-        $this->params = new api_params();
+        $this->params = $GLOBALS['factory']->create('params');
         $this->params->setGet($_GET);
         if ($this->verb == 'POST') {
             $this->params->setPost($_POST);
@@ -125,6 +110,18 @@ class api_request {
                 }
             }
         }
+    }
+
+    /**
+     * Gets an instance of api_request.
+     * @param $forceReload bool: If true, forces instantiation of a
+     *        new instance. Used for testing.
+     */
+    public static function getInstance($forceReload = false) {
+        if ($forceReload) {
+            $GLOBALS['factory']->clearInstances();
+        }
+        return $GLOBALS['factory']->get('request');
     }
 
     /**

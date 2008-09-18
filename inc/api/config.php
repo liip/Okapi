@@ -64,17 +64,28 @@ class api_config {
     protected static $loader = null;
 
     /**
+     * Constructor. Loads the configuration file into memory.
+     */
+    public function __construct() {
+        if (isset($_SERVER['OKAPI_ENV'])) {
+            $this->env = $_SERVER['OKAPI_ENV'];
+        } else {
+            $this->env = self::$DEFAULT_ENV;
+        }
+        $this->load();
+    }
+    
+    /**
      * Gets an instance of api_config.
      * @param $forceReload bool: If true, forces instantiation of a
      *        new instance. Used for testing.
      * @return api_config an api_config instance;
      */
     public static function getInstance($forceReload = FALSE) {
-        if (! self::$instance instanceof api_config || $forceReload) {
-            self::$instance = new api_config();
+        if ($forceReload) {
+            $GLOBALS['factory']->clearInstances();
         }
-
-        return self::$instance;
+        return $GLOBALS['factory']->get('config');
     }
 
     /**
@@ -89,19 +100,6 @@ class api_config {
      */
     public static function setLoader($loader) {
         self::$loader = $loader;
-    }
-
-    /**
-     * Constructor. Loads the configuration file into memory.
-     */
-    protected function __construct() {
-        if (isset($_SERVER['OKAPI_ENV'])) {
-            $this->env = $_SERVER['OKAPI_ENV'];
-        } else {
-            $this->env = self::$DEFAULT_ENV;
-        }
-
-        $this->load();
     }
 
     public function load($command = false) {

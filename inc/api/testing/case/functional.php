@@ -119,7 +119,7 @@ class api_testing_case_functional extends UnitTestCase {
         
         api_request::getInstance(true);
         api_response::getInstance(true);
-        $this->controller = new api_controller();
+        $this->controller = $GLOBALS['factory']->create('controller');
         $this->controller->process();
         $this->loadResponse();
         $this->removeUploadedFiles();

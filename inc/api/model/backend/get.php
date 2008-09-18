@@ -139,6 +139,7 @@ class api_model_backend_get extends api_model_http {
         $defaultParams = array();
         
         $cfg = api_config::getInstance()->backend;
+        
         $cmd = $this->getBackendConfig($cfg[$server], $command);
         if (is_null($cmd)) {
             throw new api_exception_Backend(api_exception::THROW_FATAL,

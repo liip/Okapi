@@ -70,17 +70,17 @@ class api_routing implements api_Irouting {
     }
     
     public function route($route, $config = array()) {
-        $r = new api_routing_route();
+        $r = $GLOBALS['factory']->create('routing_route');
         return $this->add($r->route($route, $config));
     }
     
     public function config($params) {
-        $r = new api_routing_route();
+        $r = $GLOBALS['factory']->create('routing_route');
         return $this->add($r->config($params));
     }
     
     public function when($conditions) {
-        $r = new api_routing_route();
+        $r = $GLOBALS['factory']->create('routing_route');
         return $this->add($r->when($conditions));
     }
     

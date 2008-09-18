@@ -57,7 +57,7 @@ class api_i18n {
      *
      * @param $lang string: Language into which this object will translate.
      */ 
-    private function __construct($lang) {
+    public function __construct($lang) {
         $this->lang = $lang;
         $this->loadRetriever($lang);
     }
@@ -68,10 +68,7 @@ class api_i18n {
      * @param $lang string: Language into which the object will translate.
      */
     public static function getInstance($lang) {
-        if (!isset(self::$instances[$lang])) {
-            self::$instances[$lang] = new api_i18n($lang);
-        }
-        return self::$instances[$lang];
+        return $GLOBALS['factory']->get('i18n', array($lang), $lang);
     }
     
     /**

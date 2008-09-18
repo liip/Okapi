@@ -41,11 +41,24 @@ class api_factory {
      * Returns an instance of the given class.
      * Always returns the same instance.
      */
-    public function get($base, $init = array()) {
-        if (!isset(self::$instances[$base])) {
-            self::$instances[$base] = $this->create($base, $init);
+    public function get($base, $init = array(), $key = null) {
+        if ($key === null) {
+            $key = $base;
+        } else {
+            $key = $base . '_' . $key;
         }
-        return self::$instances[$base];
+        
+        if (!isset(self::$instances[$key])) {
+            self::$instances[$key] = $this->create($base, $init);
+        }
+        return self::$instances[$key];
+    }
+    
+    /**
+     * Removes all stored instances.
+     */
+    public function clearInstances() {
+        self::$instances = array();
     }
     
     protected function getClassConfig($base) {

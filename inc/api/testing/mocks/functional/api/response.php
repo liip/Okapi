@@ -44,11 +44,10 @@ class api_response {
      *        instance. Used for testing.
      */
     public static function getInstance($forceReload = false) {
-        static $instance;
-        if ((!isset($instance) || !($instance instanceof api_response)) || $forceReload) {
-            $instance = new api_response();
+        if ($forceReload) {
+            $GLOBALS['factory']->clearInstances();
         }
-        return $instance;
+        return $GLOBALS['factory']->get('response');
     }
     
     /**

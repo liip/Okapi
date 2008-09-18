@@ -53,7 +53,7 @@ class api_cache {
      * Constructor. Reads configuration values and connects to the
      * memcached daemons.
      */
-    private function __construct() {
+    public function __construct() {
         $this->cache = new Memcache();
 
         $this->prefix = api_config::getInstance()->revision;
@@ -82,9 +82,8 @@ class api_cache {
      */
     public static function getInstance() {
         if (!isset(self::$instance)) {
-            self::$instance = new api_cache;
+            self::$instance = $GLOBALS['factory']->get('cache');
         }
-
         return self::$instance;
     }
 
