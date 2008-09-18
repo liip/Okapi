@@ -13,6 +13,7 @@
  */
 class api_factory {
     protected $config = array();
+    protected static $instances = array();
     
     public function __construct($config = array()) {
         if (is_array($config)) {
@@ -20,7 +21,10 @@ class api_factory {
         }
     }
     
-    public function get($base, $init = array()) {
+    /**
+     * Returns a newly created object.
+     */
+    public function create($base, $init = array()) {
         $class = $this->getClassConfig($base);
         $name = $class['class'];
         $init = array_merge($class['init'], $init);
@@ -31,6 +35,17 @@ class api_factory {
             $classObj = new ReflectionClass($name);
             return $classObj->newInstanceArgs($init);
         }
+    }
+    
+    /**
+     * Returns an instance of the given class.
+     * Always returns the same instance.
+     */
+    public function get($base, $init = array()) {
+        if (!isset(self::$instances[$base])) {
+            self::$instances[$base] = $this->create($base, $init);
+        }
+        return self::$instances[$base];
     }
     
     protected function getClassConfig($base) {
