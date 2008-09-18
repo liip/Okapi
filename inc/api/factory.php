@@ -20,15 +20,16 @@ class api_factory {
         }
     }
     
-    public function get($base) {
+    public function get($base, $init = array()) {
         $class = $this->getClassConfig($base);
         $name = $class['class'];
+        $init = array_merge($class['init'], $init);
         
-        if (count($class['init']) == 0) {
+        if (count($init) == 0) {
             return new $name();
         } else {
             $classObj = new ReflectionClass($name);
-            return $classObj->newInstanceArgs($class['init']);
+            return $classObj->newInstanceArgs($init);
         }
     }
     
