@@ -12,5 +12,8 @@
  * This factory should get initialized by conf/classes.php.
  */
 class api_factory {
-    
+    public function get($base) {
+        $class = 'api_' . $base;
+        return new $class();
+    }
 }
