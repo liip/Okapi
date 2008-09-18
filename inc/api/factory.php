@@ -21,15 +21,33 @@ class api_factory {
     }
     
     public function get($base) {
-        $class = $this->resolveClassName($base);
-        return new $class();
+        $class = $this->getClassConfig($base);
+        $name = $class['class'];
+        
+        if (count($class['init']) == 0) {
+            return new $name();
+        } else {
+            $classObj = new ReflectionClass($name);
+            return $classObj->newInstanceArgs($class['init']);
+        }
     }
     
-    protected function resolveClassName($base) {
-        if (isset($this->config[$base])) {
-            return $this->config[$base];
-        } else {
-            return 'api_' . $base;
+    protected function getClassConfig($base) {
+        $cfg = array(
+            'class' => 'api_' . $base,
+            'init' => array());
+        
+        if (!isset($this->config[$base])) {
+            return $cfg;
         }
+        
+        $thisCfg = $this->config[$base];
+        if (is_array($thisCfg)) {
+            $cfg = array_merge($cfg, $thisCfg);
+        } else {
+            $cfg['class'] = $thisCfg;
+        }
+        
+        return $cfg;
     }
 }
