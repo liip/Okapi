@@ -29,8 +29,8 @@ class api_exceptionhandler_default extends api_exceptionhandler_base {
         $trace = $e->getTrace();
         foreach($trace as $i => &$entry) {
             if (isset($entry['class'])) {
-                $refl = new ReflectionMethod($entry['class'], $entry['function']);
-                if ($refl instanceof ReflectionMethod) {
+                try {
+                    $refl = new ReflectionMethod($entry['class'], $entry['function']);
                     if (isset($trace[$i -1])) {
                         $entry['caller'] = (int) $trace[$i -1]['line'] -1;
                     } else if ($i === 0) {
@@ -42,6 +42,9 @@ class api_exceptionhandler_default extends api_exceptionhandler_base {
                     $end = $entry['caller'] + self::BACKTRACE_CONTEXT;
                     if ($end > $refl->getEndLine()) { $end = $refl->getEndLine(); }
                     $entry['source'] = $this->getSourceFromFile($refl->getFileName(), $start, $end);
+                } catch (Exception $e) {
+                    $entry['caller'] = null;
+                    $entry['source'] = '';
                 }
             }
 
