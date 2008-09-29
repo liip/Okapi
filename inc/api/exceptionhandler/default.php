@@ -8,7 +8,7 @@ class api_exceptionhandler_default extends api_exceptionhandler_base {
       * in the back trace.
       */
     const BACKTRACE_CONTEXT = 8;
-    
+
     /**
      * Calls getTrace and does api_exceptionhandler_base::dispatch()
      * with the collected data.
@@ -19,7 +19,7 @@ class api_exceptionhandler_default extends api_exceptionhandler_base {
         $this->dispatch($this->data);
         return true;
     }
-    
+
     /**
      * Process the exception. Calls the Exception::getTrace() method to
      * get the backtrace. Gets the relevant lines of code for each step
@@ -36,7 +36,7 @@ class api_exceptionhandler_default extends api_exceptionhandler_base {
                     } else if ($i === 0) {
                         $entry['caller'] = (int) $e->getLine() -1;
                     }
-                    
+
                     $start = $entry['caller'] - self::BACKTRACE_CONTEXT;
                     if ($start < $refl->getStartLine()) { $start = $refl->getStartLine() - 1; }
                     $end = $entry['caller'] + self::BACKTRACE_CONTEXT;
@@ -44,19 +44,19 @@ class api_exceptionhandler_default extends api_exceptionhandler_base {
                     $entry['source'] = $this->getSourceFromFile($refl->getFileName(), $start, $end);
                 }
             }
-            
+
             if (isset($entry['args'])) {
                 foreach($entry['args'] as $i => $arg) {
                     $entry['args'][$i] = gettype($arg);
                 }
             }
         }
-        
+
         $exceptionParams = array();
         if (method_exists($e, 'getParams')) {
             $exceptionParams = $e->getParams();
         }
-        
+
         $d = array('backtrace'  => $trace,
                    'message'    => $e->getMessage(),
                    'code'       => $e->getCode(),
@@ -65,7 +65,7 @@ class api_exceptionhandler_default extends api_exceptionhandler_base {
                    'name'       => api_helpers_class::getBaseName($e),
                    'params'     => $exceptionParams,
                    );
-        
+
         if(!empty($e->userInfo)) {
             $d['userInfo'] = $e->userInfo;
         }
