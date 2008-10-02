@@ -23,6 +23,28 @@ class api_log {
     protected static $instance = null;
     
     /**
+     * Log a message if a logger is configured
+     */
+    public static function log($prio) {
+        if (self::$instance === false) {
+            return false;
+        }
+
+        if (self::$instance === null ) {
+            $config = api_config::getInstance()->log;
+            if (empty($config) || !(self::$instance = api_log::getInstance())) {
+                self::$instance = false;
+                return false;
+            }
+        }
+
+        $params = func_get_args();
+        array_shift($params);
+
+        return self::$instance->logMessage($params,$prio);
+    }
+    
+    /**
      * Initialize the logger.
      */
     public function __construct() {
@@ -32,8 +54,8 @@ class api_log {
         }
         
         $configs = api_config::getInstance()->log;
-        // Logging is not activated
         if (empty($configs[0]['class'])) {
+        // Logging is not activated
              self::$logger = false;
              return;
         }
@@ -62,12 +84,7 @@ class api_log {
     
     public function __call($method, $params) {
         $prio = self::getMaskFromLevel($method);
-        $message = array_shift($params);
-        if (!empty($params)) {
-            $message = vsprintf($message, $params);
-        }
-        
-        $this->log($message, $prio);
+        $this->logMessage($params, $prio);
     }
     
     protected function createLogObject($name, $config) {
@@ -102,13 +119,19 @@ class api_log {
         return $masks[strtoupper($level)];
     }
 
-    public function log($message,$prio = null) {
+    public function logMessage($params, $prio) {
         if (self::$logger === false) {
-            return;
+            return false;
         }
-        if (!$prio) {
+        $message = array_shift($params);
+        if (!empty($params)) {
+            $message = vsprintf($message, $params);
+        }
+
+        if (!is_int($prio)) {
             $prio = self::INFO;
         }
-        self::$logger->log($message,$prio);
+        
+        return self::$logger->log($message,$prio);
     }
 }
