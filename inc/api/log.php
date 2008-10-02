@@ -16,10 +16,8 @@ class api_log {
     const INFO    = 6;  // Informational: informational messages
     const DEBUG   = 7;  // Debug: debug messages
     
-    
     /** Log: Configured logger. */
     public static $logger = null;
-    
     
     /** api_log instance */
     protected static $instance = null;
@@ -27,7 +25,6 @@ class api_log {
     /**
      * Initialize the logger.
      */
-    
     public function __construct() {
         if (self::$logger !== null) {
             // Already initialized
@@ -35,7 +32,8 @@ class api_log {
         }
         
         $configs = api_config::getInstance()->log;
-        if (!$configs ||  count($configs) == 0 || !$configs[0]['class']) {
+        // Logging is not activated
+        if (empty($configs[0]['class'])) {
              self::$logger = false;
              return;
         }
@@ -49,7 +47,7 @@ class api_log {
     }
     
     /**
-     * Gets an instance of api_config.
+     * Gets an instance of api_log.
      * @param $forceReload bool: If true, forces instantiation of a
      *        new instance. Used for testing.
      * @return api_log an api_log instance;
@@ -62,11 +60,10 @@ class api_log {
         return self::$instance;
     }
     
-    
     public function __call($method, $params) {
         $prio = self::getMaskFromLevel($method);
         $message = array_shift($params);
-        if (count($params) > 0) {
+        if (!empty($params)) {
             $message = vsprintf($message, $params);
         }
         
@@ -76,11 +73,8 @@ class api_log {
     protected function createLogObject($name, $config) {
         $classname = 'Zend_Log_' . $name;
         $params = isset($config['cfg']) ? $config['cfg'] : array();
-        if (!is_array($params)) {
-            $params = array($params);
-        }
         $class = new ReflectionClass($classname);
-        $object = $class->newInstanceArgs($params);
+        $object = $class->newInstanceArgs((array)$params);
         
         if (isset($config['priority'])) {
             $object->addFilter(
