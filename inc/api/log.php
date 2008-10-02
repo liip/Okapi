@@ -43,7 +43,7 @@ class api_log {
 
         return self::$instance->logMessage($params,$prio);
     }
-    
+
     /**
      * Initialize the logger.
      */
@@ -55,7 +55,7 @@ class api_log {
         
         $configs = api_config::getInstance()->log;
         if (empty($configs[0]['class'])) {
-        // Logging is not activated
+            // Logging is not activated
              self::$logger = false;
              return;
         }
@@ -131,7 +131,7 @@ class api_log {
         if (!is_int($prio)) {
             $prio = self::INFO;
         }
-        
+
         return self::$logger->log($message,$prio);
     }
 }
