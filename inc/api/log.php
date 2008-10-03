@@ -22,6 +22,9 @@ class api_log {
     /** api_log instance */
     protected static $instance = null;
     
+    /** lowest priority **/
+    protected $priority = null;
+    
     /**
      * Log a message if a logger is configured
      */
@@ -43,7 +46,7 @@ class api_log {
 
         return self::$instance->logMessage($params,$prio);
     }
-
+    
     /**
      * Initialize the logger.
      */
@@ -87,6 +90,14 @@ class api_log {
         $this->logMessage($params, $prio);
     }
     
+    public function isLogging() {
+        return self::$instance !== false;
+    }
+
+    public function getPriority() {
+        return $this->priority;
+    }
+    
     protected function createLogObject($name, $config) {
         $classname = 'Zend_Log_' . $name;
         $params = isset($config['cfg']) ? $config['cfg'] : array();
@@ -94,9 +105,11 @@ class api_log {
         $object = $class->newInstanceArgs((array)$params);
         
         if (isset($config['priority'])) {
-            $object->addFilter(
-                new Zend_Log_Filter_Priority(
-                    $this->getMaskFromLevel($config['priority'])));
+            $prio = $this->getMaskFromLevel($config['priority']);
+            $object->addFilter(new Zend_Log_Filter_Priority($prio));
+            if ($prio > $this->priority || !$this->priority) {
+                $this->priority = $prio;   
+            }
         }
         
         return $object;
@@ -119,7 +132,7 @@ class api_log {
         return $masks[strtoupper($level)];
     }
 
-    public function logMessage($params, $prio) {
+    protected function logMessage($params, $prio) {
         if (self::$logger === false) {
             return false;
         }
