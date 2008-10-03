@@ -68,7 +68,7 @@ class api_log {
         }
         
         self::$logger = new Zend_Log();
-        
+
         foreach ($configs as $cfg) {
             $log = $this->createLogObject($cfg['class'], $cfg);
             if ($cfg['class'] == 'Writer_Mock') {
