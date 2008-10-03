@@ -21,8 +21,12 @@ switch ($argv[1]) {
     case 'unit':
         // Add test classes
         $test = &new TestSuite("Okapi Unit");
-        foreach (glob('unit/*.php') as $file) {
-            $test->addTestFile($file);
+        if (isset($argv[2])) {
+           $test->addTestFile($argv[2]);
+        } else {
+            foreach (glob('unit/*.php') as $file) {
+                $test->addTestFile($file);
+            }
         }
 
         // Set up environment
@@ -38,8 +42,12 @@ switch ($argv[1]) {
     case 'functional':
         $_SERVER['HTTP_HOST'] = 'demo.okapi.org';
         $test = &new TestSuite("Okapi Functional");
-        foreach (glob('functional/*.php') as $file) {
-            $test->addTestFile($file);
+        if (isset($argv[2])) {
+           $test->addTestFile($argv[2]);
+        } else {
+            foreach (glob('functional/*.php') as $file) {
+                $test->addTestFile($file);
+            }
         }
 
         // Run
