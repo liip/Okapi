@@ -97,7 +97,7 @@ class api_log {
         $prio = self::getMaskFromLevel($method);
         $this->logMessage($params, $prio);
     }
-    
+
     public function isLogging() {
         return self::$instance !== false && self::$logger !== false;
     }
