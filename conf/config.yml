@@ -67,3 +67,24 @@ debug:
             <<: *extapi
             host: extapi.trunk.local.ch
         secure: *secure
+
+# =======================
+# = Logging configuration =
+# =======================
+loggingAll: 
+    <<: *demo-shared
+    log:
+        -
+            class: Writer_Mock
+            priority: DEBUG       
+            
+# =======================
+# = Logging configuration =
+# =======================
+loggingAlert: 
+    <<: *demo-shared
+    log:
+        -
+            class: Writer_Mock
+            priority: ALERT      
+                           

@@ -7,6 +7,17 @@
  * This test will fail if you don't have internet access.
  */
 class ModelBackendGetTest extends OkapiTestCase {
+    function setUp() {
+        //set debug environment
+        $_SERVER['OKAPI_ENV'] = 'debug';
+        api_config::getInstance(TRUE);
+    }
+     function tearDown() {
+        unset($_SERVER['OKAPI_ENV'] );
+        api_config::getInstance(TRUE);
+    }
+    
+    
     function testModel() {
         // Get CURL object and execute it
         $model = new api_model_backend_get('extapi', 'cities', array('q' => 'Ol'));
