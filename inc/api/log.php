@@ -20,10 +20,13 @@ class api_log {
     public static $logger = null;
     
     /** api_log instance */
-    protected static $instance = null;
+    public static $instance = null;
     
     /** lowest priority **/
     protected $priority = null;
+    
+    /** MockWriter for testing */
+    public static $mockWriter = null;
     
     /**
      * Log a message if a logger is configured
@@ -57,6 +60,7 @@ class api_log {
         }
         
         $configs = api_config::getInstance()->log;
+        
         if (empty($configs[0]['class'])) {
             // Logging is not activated
              self::$logger = false;
@@ -67,6 +71,9 @@ class api_log {
         
         foreach ($configs as $cfg) {
             $log = $this->createLogObject($cfg['class'], $cfg);
+            if ($cfg['class'] == 'Writer_Mock') {
+                self::$mockWriter = $log;
+            }
             self::$logger->addWriter($log);
         }
     }
@@ -79,6 +86,7 @@ class api_log {
      */
     public static function getInstance($forceReload = FALSE) {
         if (! self::$instance instanceof api_log || $forceReload) {
+            self::$logger = null;
             self::$instance = new api_log();
         }
 
@@ -91,7 +99,7 @@ class api_log {
     }
     
     public function isLogging() {
-        return self::$instance !== false;
+        return self::$instance !== false && self::$logger !== false;
     }
 
     public function getPriority() {
@@ -100,9 +108,14 @@ class api_log {
     
     protected function createLogObject($name, $config) {
         $classname = 'Zend_Log_' . $name;
-        $params = isset($config['cfg']) ? $config['cfg'] : array();
+        $params = (array) (isset($config['cfg']) ? $config['cfg'] : array());
         $class = new ReflectionClass($classname);
-        $object = $class->newInstanceArgs((array)$params);
+        
+        if (empty($params)) {
+            $object = $class->newInstance();
+        } else {
+            $object = $class->newInstanceArgs($params);
+        }
         
         if (isset($config['priority'])) {
             $prio = $this->getMaskFromLevel($config['priority']);
