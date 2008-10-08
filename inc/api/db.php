@@ -64,6 +64,25 @@ class api_db {
     }
     
     /**
+     * Overwrites an adapter with another.
+     * This is especially helpful for testing, as you can set your 'write' and
+     * 'read' connection to use you 'test' environment.
+     *
+     * @param $name string: Database connection name to overwrite
+     * @param $name string: Database connection to use instead
+     * @return Boolean: True on success, False on error
+     */
+    public static function setAdapter($name, $newname) {
+        $db = api_config::getInstance()->db;
+        if (empty($db[$newname])) {
+            return false;
+        }
+        
+        self::$instances[$name] = self::get($db[$newname]);
+        return true;
+    }
+    
+    /**
      * Clear all loaded database connections. Useful for enforce new
      * connections in testing scenarios.
      */
