@@ -156,7 +156,7 @@ class LogTest extends UnitTestCase {
         $this->assertEqual(api_log::$mockWriter->events[1]['priority'], api_log::ALERT);
         $this->assertEqual(api_log::$mockWriter->events[1]['message'], "Test Alert");
 
-        $this->assertNull(api_log::$mockWriter->events[2]);
+        $this->assertEqual(count(api_log::$mockWriter->events),2);
 
     }
 
