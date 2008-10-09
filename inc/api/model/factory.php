@@ -12,6 +12,7 @@ class api_model_factory {
      *
      * @param $name string: Model name.
      * @param $params array: Parameters in order of their appearance in the constructor.
+     * @param $namespace string: Namespace, default "api"
      * @return api_model_common
      */
     public static function get($name, $params = array(), $namespace = "api") {
