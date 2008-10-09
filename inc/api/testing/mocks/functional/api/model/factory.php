@@ -26,7 +26,7 @@ class api_model_factory {
      *
      * @return object api_model_givenname object with the called params.
      */
-    public static function get($name, $params = array()) {
+    public static function get($name, $params = array(), $namespace = "api") {
         $model = self::getFixture($name, $params);
         if (!is_null($model)) {
             return $model;
@@ -45,7 +45,7 @@ class api_model_factory {
         if (self::$defaultFallback || in_array($name, self::$DEFAULTS)) {
             // Default: load model normal
             if (class_exists('api_model_' . $name)) {
-                $name = 'api_model_' . $name;
+                $name = $namespace . '_model_' . $name;
             }
             if (count($params) == 0) {
                 return new $name;

@@ -14,9 +14,9 @@ class api_model_factory {
      * @param $params array: Parameters in order of their appearance in the constructor.
      * @return api_model_common
      */
-    public static function get($name, $params = array()) {
+    public static function get($name, $params = array(), $namespace = "api") {
         if (class_exists('api_model_' . $name)) {
-            $name = 'api_model_' . $name;
+            $name = $namespace . '_model_' . $name;
         }
         if (count($params) == 0) {
             return new $name;
