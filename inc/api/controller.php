@@ -273,7 +273,12 @@ class api_controller {
      * @param   $e api_exception: Thrown exception, passed to the exceptionhandler.
      */
     private function catchFinalException(Exception $e) {
-        return api_exceptionhandler::handle($e, $this);
+        api_exceptionhandler::handle($e, $this);
+        if ($this->response !== null) {
+            $this->response->send();
+        } else {
+            die();
+        }
     }
 
     /**
