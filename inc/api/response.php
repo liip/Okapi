@@ -194,6 +194,7 @@ class api_response {
         }
         
         ob_end_flush();
+        die();
     }
     
     /**
