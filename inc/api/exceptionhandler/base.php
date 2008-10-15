@@ -95,6 +95,7 @@ abstract class api_exceptionhandler_base {
             $this->context->setXsl($this->getXsl());
             $this->context->prepare();
             $this->context->dispatch($data);
+            die();
         } catch (Exception $e) {
             $this->dump($e);
         }
