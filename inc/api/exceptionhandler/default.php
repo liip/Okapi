@@ -46,9 +46,12 @@ class api_exceptionhandler_default extends api_exceptionhandler_base {
             }
             
             if (isset($entry['args'])) {
+                // Duplicate so we don't overwrite by-reference variables
+                $args = array();
                 foreach($entry['args'] as $i => $arg) {
-                    $entry['args'][$i] = gettype($arg);
-                }
+                    $args[$i] = gettype($arg);
+                }                                                        
+                $entry['args'] = $args;
             }
         }
         
