@@ -81,7 +81,18 @@ class api_db {
         self::$instances[$name] = self::get($db[$newname]);
         return true;
     }
-       
+
+    /**
+     * Overwrites an instance for a certain config with a custom one
+     * This is helpful if you create your own mock db adapter
+     *
+     * @param String $name The name of the adapter
+     * @param Object $instance The instance to bet set
+     */
+    public static function setInstance($name, $instance) {
+        self::$instances[$name] = $instance;
+    }
+
     /**
      * Clear all loaded database connections. Useful for enforce new
      * connections in testing scenarios.
