@@ -86,6 +86,7 @@ class api_views_default extends api_views_common {
             return;
         }
         libxml_clear_errors();
+        
         $xml = @$this->xslproc->transformToDoc($xmldom);
         $xslt_errors = libxml_get_errors();
         if (count($xslt_errors) == 0 && $xml instanceof DOMDocument) {
@@ -95,7 +96,7 @@ class api_views_default extends api_views_common {
             $this->sendResponse();
             return;
         } else {
-            throw new api_exception_XsltParseError(api_exception::THROW_FATAL, $this->xslfile);
+            throw new api_exception_XsltParseError(api_exception::THROW_FATAL, $this->xslfile, $xslt_errors);
         }
     }
     

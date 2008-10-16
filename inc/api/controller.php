@@ -135,7 +135,7 @@ class api_controller {
      *             is currently supported but will be removed in a future
      *             release.
      */
-    protected function loadCommand() {
+    public function loadCommand() {
         $routing = new api_routing();
         $route = $routing->getRoute($this->request);
         if (is_null($route) || !is_array($route)) {
@@ -230,7 +230,7 @@ class api_controller {
      *    - api_controller::prepare()
      *    - api_controller::dispatch()
      */
-    protected function prepareAndDispatch() {
+    public function prepareAndDispatch() {
         $this->updateViewParams();
         if (isset($this->route['view']) && isset($this->route['view']['ignore'])
                                         && $this->route['view']['ignore'] === true) {
