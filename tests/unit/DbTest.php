@@ -23,4 +23,11 @@ class DbTest extends OkapiTestCase {
         $db = api_db::factory('testdb_nodsn');
         $this->assertIdentical($db, false);
     }
+
+    public function testOverwriteInstance() {
+    	$db = api_db::factory('testdb');
+	api_db::setInstance('othertestdb', $db);
+        $db2 = api_db::factory('othertestdb');
+        $this->assertIdentical($db, $db2);
+    }
 }
