@@ -109,11 +109,11 @@ class api_log {
     protected function createLogObject($name, $config) {
         $classname = 'Zend_Log_' . $name;
         $params = (array) (isset($config['cfg']) ? $config['cfg'] : array());
-        $class = new ReflectionClass($classname);
         
         if (empty($params)) {
-            $object = $class->newInstance();
+            $object = new $classname();
         } else {
+            $class = new ReflectionClass($classname);
             $object = $class->newInstanceArgs($params);
         }
         
