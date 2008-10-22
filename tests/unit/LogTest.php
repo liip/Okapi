@@ -139,8 +139,7 @@ class LogTest extends UnitTestCase {
 
     }
 
-    /** Test if not all log messa
-    ges are logged, when priority level is higher */
+    /** Test if not all log messages are logged, when priority level is higher */
     function testWithPriority() {
         $_SERVER['OKAPI_ENV'] = 'loggingAlert';
         api_config::getInstance(TRUE);
@@ -158,6 +157,22 @@ class LogTest extends UnitTestCase {
 
         $this->assertEqual(count(api_log::$mockWriter->events),2);
 
+    }
+
+    /** using api_log::log() */
+
+    function testWithStaticDump() {
+        $_SERVER['OKAPI_ENV'] = 'loggingAll';
+        api_config::getInstance(TRUE);
+        //set everything to null
+        api_log::$instance = null;
+        api_log::$logger = null;
+        api_log::$mockWriter = null;
+
+        api_log::dump("Test Dump");
+
+        $this->assertEqual(api_log::$mockWriter->events[0]['priority'], api_log::ERR);
+        $this->assertEqual(api_log::$mockWriter->events[0]['message'], "Test Dump");
     }
 
 }
