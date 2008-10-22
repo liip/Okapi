@@ -26,6 +26,9 @@ class api_log {
     /** lowest priority **/
     protected $priority = null;
 
+    /** default priority **/
+    protected static $defaultPriority = self::ERR;
+
     /** MockWriter for testing */
     public static $mockWriter = null;
 
@@ -51,6 +54,15 @@ class api_log {
         return self::$instance->logMessage($params, $prio);
     }
 
+    /**
+     * Log a message if a logger is configured without having to give a priority
+     * Only one parameter is supported, if you need more arguments, use api_log::log();
+     *
+     * @param $message The message to be logged
+     */
+    public static function dump($message) {
+        return self::log(self::$defaultPriority, $message);
+    }
     /**
      * Initialize the logger.
      */
@@ -155,7 +167,7 @@ class api_log {
         }
 
         if (!is_int($prio)) {
-            $prio = self::INFO;
+            $prio = self::$defaultPriority;
         }
 
         return self::$logger->log($message, $prio);
