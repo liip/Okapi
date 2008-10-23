@@ -1,4 +1,8 @@
 <?php
+/* Licensed under the Apache License, Version 2.0
+ * See the LICENSE and NOTICE file for further information
+ */
+
 /**
  * Static helper methods for HTTP handling.
  */
@@ -14,13 +18,13 @@ class api_helpers_http {
      */
     public static function redirectTo($to, $status=301) {
         error_log("api_helpers_http::redirectTo is deprecated. Use api_response->redirect() instead.");
-        
+
         if (headers_sent()) return false;
 
         if (strtolower(substr($to, 0, 7)) == 'http://') {
             $url = $to;
         } else {
-            $schema = $_SERVER['SERVER_PORT'] == '443' ? 'https' : 'http'; 
+            $schema = $_SERVER['SERVER_PORT'] == '443' ? 'https' : 'http';
             $host = (isset($_SERVER['HTTP_HOST']) && strlen($_SERVER['HTTP_HOST'])) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'];
             $to = strpos($to,'/')===0 ? $to : '/'.$to;
             $url = "$schema://$host$to";

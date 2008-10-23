@@ -1,4 +1,8 @@
 <?php
+/* Licensed under the Apache License, Version 2.0
+ * See the LICENSE and NOTICE file for further information
+ */
+
 /**
  * Default exception handler. Includes a very detailled backtrace in the
  * collected data including source file information.
@@ -53,7 +57,7 @@ class api_exceptionhandler_default extends api_exceptionhandler_base {
                 $args = array();
                 foreach($entry['args'] as $i => $arg) {
                     $args[$i] = gettype($arg);
-                }                                                        
+                }
                 $entry['args'] = $args;
             }
         }

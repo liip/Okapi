@@ -1,4 +1,8 @@
 <?php
+/* Licensed under the Apache License, Version 2.0
+ * See the LICENSE and NOTICE file for further information
+ */
+
 /**
  * Database factory. Creates database connections based on the
  * configuration settings.
@@ -38,10 +42,10 @@
 class api_db {
     /** All instances loaded so far by api_db::factory(). */
     protected static $instances = array();
-    
+
     /**
      * Returns the database connection specified by $name.
-     * 
+     *
      * @param $name string: Database connection name
      * @param $force bool: Force a new connection even if the connection
      *                     has already been opened.
@@ -53,16 +57,16 @@ class api_db {
         if (isset(self::$instances[$name]) && $force == false) {
             return self::$instances[$name];
         }
-        
+
         $db = api_config::getInstance()->db;
         if (empty($db[$name])) {
             return false;
         }
-        
+
         self::$instances[$name] = self::get($db[$name]);
         return self::$instances[$name];
     }
-    
+
     /**
      * Overwrites an adapter with another.
      * This is especially helpful for testing, as you can set your 'write' and
@@ -77,7 +81,7 @@ class api_db {
         if (empty($db[$newname])) {
             return false;
         }
-        
+
         self::$instances[$name] = self::get($db[$newname]);
         return true;
     }
@@ -100,13 +104,13 @@ class api_db {
     public static function reset() {
         self::$instances = array();
     }
-    
+
     /**
      * Constructor. Private according to the singleton pattern.
      */
     private function __construct() {
     }
-    
+
     /**
      * Returns a connection from the driver using it's getDBConnection()
      * method.
@@ -119,11 +123,11 @@ class api_db {
         if (empty($config['dsn'])) {
             return false;
         }
-        
+
         if (empty($config['driver'])) {
             $config['driver'] = "mdb2";
         }
-        
+
         $driver = "api_db_".$config['driver'];
         $db = new $driver;
         return $db->getDBConnection($config);

@@ -1,4 +1,8 @@
 <?php
+/* Licensed under the Apache License, Version 2.0
+ * See the LICENSE and NOTICE file for further information
+ */
+
 require_once('Zend/Auth.php');
 
 /**
@@ -117,14 +121,14 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
     /**
     * Authenticate against a database-table
     *
-    * Example for the YAML-File: 
-    * 
+    * Example for the YAML-File:
+    *
     * \code
     * pam:
     *   auth:
     *       class: zend
     *       options:
-    *           container: 
+    *           container:
     *               driver: dbtable
     *               adapter: Pdo_Mysql
     *               host: localhost
@@ -157,7 +161,7 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
                     ->setIdentity($user)
                     ->setCredential($pass);
 
-        // passtreatment id optional:            
+        // passtreatment id optional:
         if(array_key_exists('passtreatment', $rgOpts)){
            $authAdapter->setCredentialTreatment($rgOpts['passtreatment']);
         }

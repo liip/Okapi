@@ -1,8 +1,12 @@
 <?php
+/* Licensed under the Apache License, Version 2.0
+ * See the LICENSE and NOTICE file for further information
+ */
+
 /**
  * I18N retriever which loads messages directly from the language catalog
  * files.
- * 
+ *
  * The catalog files have the following format:
  * \code
  * <?xml version="1.0"?>
@@ -11,15 +15,15 @@
  *     <message key="CHF">CHF</message>
  * </catalogue>
  * \endcode
- * 
+ *
  * XIncludes are supported in the catalogue files.
- * 
+ *
  * The file names are based on the configuration. The file name is
  * constructed like this:
  * <tt>lang['dir'] + "/" + lang['fileprefix'] + "_" + $lang + ".xml"</tt>
  * where lang['dir'] and lang['fileprefix'] are configuration values and
  * <tt>$lang</tt> is the language given to the contructor.
- * 
+ *
  * @config <b>lang['dir']</b> (string): The directory where the language
  *         files are located.
  * @config <b>lang['fileprefix']</b> (string): Prefix prepended to the
@@ -29,7 +33,7 @@
 class api_i18n_default {
     /** DOMXPath: XPath instance for the message catalogue. */
     protected $xp = null;
-    
+
     /**
      * Constructor.
      *
@@ -39,7 +43,7 @@ class api_i18n_default {
     public function __construct($lang, $cfg) {
         $this->openFile($lang, $cfg);
     }
-    
+
     /**
      * Return the language key with the given key.
      *
@@ -65,7 +69,7 @@ class api_i18n_default {
         if (!$nodes || $nodes->length == 0) {
             return '';
         }
-        
+
         $node = $nodes->item(0);
         if ($node->getAttribute("asXML") == 'yes') {
             return array('type' => 'fragment', 'xml' => $node->nodeValue);
@@ -73,7 +77,7 @@ class api_i18n_default {
             return $node->nodeValue;
         }
     }
-    
+
     /**
      * Open language file and initialize the DOMXPath object.
      *
@@ -91,12 +95,12 @@ class api_i18n_default {
         if (!file_exists($file)) {
             die("Language file not found: $file\n");
         }
-            
+
         $dom = new DOMDocument();
         if (! $dom->load($file)) {
             die("Could not load language file: $file\n");
         }
-        
+
         $dom->xinclude();
         $this->xp = new DOMXPath($dom);
     }

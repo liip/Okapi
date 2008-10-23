@@ -1,4 +1,8 @@
 <?php
+/* Licensed under the Apache License, Version 2.0
+ * See the LICENSE and NOTICE file for further information
+ */
+
 /**
  * Static helper methods for string processing.
  */
@@ -15,7 +19,7 @@ class api_helpers_string {
                 array("\\'", "\\n", "\\r"),
                 $str);
     }
-    
+
     /**
      * Remove control characters and convert all whitespace chars to
      * spaces. Also converts the string to UTF8.
@@ -35,7 +39,7 @@ class api_helpers_string {
         }
         return $str;
     }
-    
+
     /**
      * Checks if the given string is UTF-8.
      * @param $str string: String to check.
@@ -54,7 +58,7 @@ class api_helpers_string {
             |  \xF4[\x80-\x8F][\x80-\xBF]{2}     # plane 16
             )*$%xs', $str);
     }
-    
+
     /**
      * Takes a string which may be UTF-8 or ISO-8859-1/15 and returns the
      * UTF-8 encoded version.
@@ -70,7 +74,7 @@ class api_helpers_string {
             return $str;
         }
     }
-    
+
     /**
      * Remove all characters from the string except letters, decimal
      * digits, underlines and dashes.
@@ -80,7 +84,7 @@ class api_helpers_string {
     static function clean($str) {
         return preg_replace("/[^\w^\d^_^-]*/", "", $str);
     }
-    
+
     /**
      * Replace double-slashes with one slash.
      * @param $str string: String to convert.

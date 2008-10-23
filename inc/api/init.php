@@ -1,15 +1,19 @@
 <?php
+/* Licensed under the Apache License, Version 2.0
+ * See the LICENSE and NOTICE file for further information
+ */
+
 /**
  * Initializes the Okapi environment by setting up global constants
  * and include paths.
- * 
+ *
  *
  */
 class api_init {
     /** bool: True if Okapi has been initialized already. Used so that
       * api_init::start() can be called repeatedly without problems. */
     private static $initialized = false;
-    
+
     /**
      * Sets up the Okapi environment.
      *
@@ -76,7 +80,7 @@ class api_init {
         if (!defined('DEVEL')) {
             define('DEVEL',0);
         }
-        
+
         define('API_NAMESPACE', "api");
         define('API_PROJECT_DIR', realpath(dirname(__FILE__) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR);
         define('API_INCLUDE_DIR', API_PROJECT_DIR."inc".DIRECTORY_SEPARATOR);
@@ -85,16 +89,16 @@ class api_init {
         define('API_THEMES_DIR', API_PROJECT_DIR.'themes'.DIRECTORY_SEPARATOR);
         define('API_VENDOR_DIR', API_INCLUDE_DIR.'lib'.DIRECTORY_SEPARATOR);
         define('API_LOCAL_VENDOR_DIR', API_LOCAL_INCLUDE_DIR.'lib'.DIRECTORY_SEPARATOR);
-        
-          
+
+
         // Set PHP include path (localinc - localinc/lib - ext - ext/lib - inc - inc/lib - include_path)
-        
+
         $incPath = API_INCLUDE_DIR;
         if (file_exists(API_VENDOR_DIR)){
             $incPath .= PATH_SEPARATOR . API_VENDOR_DIR;
         }
         $incPath .= PATH_SEPARATOR.ini_get("include_path");
-        
+
         // Prepend extension directories to include path
         if (is_dir(API_PROJECT_DIR . 'ext/')) {
             $lib = "";
@@ -105,35 +109,35 @@ class api_init {
                     $lib .= $dir."/lib" . PATH_SEPARATOR;
                 }
             }
-            if ($lib) {                    
+            if ($lib) {
                 $incPath = $lib . $incPath;
             }
             if ($inc) {
                 $incPath = $inc . $incPath;
-            } 
+            }
         }
         if (file_exists(API_LOCAL_VENDOR_DIR)) {
             $incPath = API_LOCAL_INCLUDE_DIR . PATH_SEPARATOR . API_LOCAL_VENDOR_DIR . PATH_SEPARATOR . $incPath;
         } else {
             $incPath = API_LOCAL_INCLUDE_DIR . PATH_SEPARATOR . $incPath;
         }
-        
+
         ini_set("include_path", $incPath);
-        
+
         // Autoloader which converts class name's underscores to slashes
         // on the file system.
         include_once API_LIBS_DIR."autoload.php";
-        
+
         // Load config
         include_once API_LIBS_DIR."config.php";
-        
+
         // Read config file
         $cfg = api_config::getInstance();
-        
+
         // Construct URL for Web home (root of current host)
         $hostname = (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '');
         $hostinfo = self::getHostConfig($hostname);
-        $schema = (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == '443') ? 'https' : 'http'; 
+        $schema = (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == '443') ? 'https' : 'http';
         $reqHostPath = '/';
         if ($hostname != '') {
             $reqHostPath = $schema.'://'.$hostname;
@@ -161,7 +165,7 @@ class api_init {
         } else {
             define('API_WEBROOT_STATIC', API_WEBROOT.'static/');
         }
-        
+
         // Create temporary directory
         $tmpDir = $cfg->tmpdir;
         if (! is_null($tmpDir)) {
@@ -170,16 +174,16 @@ class api_init {
             }
             define('API_TEMP_DIR', $tmpDir);
         }
-        
+
         // Enable libxml internal errors
         libxml_use_internal_errors(TRUE);
-        
+
         // Load routing configuration
         require_once(API_PROJECT_DIR."conf/commandmap.php");
-        
+
         self::$initialized = true;
     }
-    
+
     /**
      * Use the given host name to find it's corresponding configuration
      * in the configuration file.
@@ -218,7 +222,7 @@ class api_init {
     public static function getHostConfig($hostname) {
         $hosts = array();
         $host = null;
-        
+
         // Read config
         $cfg = api_config::getInstance();
         if ($cfg->hosts) {
@@ -231,7 +235,7 @@ class api_init {
                     $lookupName = $hostconfig['sld'];
                 }
                 $hostconfig['host'] = $lookupName;
-                
+
                 if ($key == $hostname) {
                     $host = $hostconfig;
                     break;
@@ -245,12 +249,12 @@ class api_init {
                 }
             }
         }
-        
+
         // Host not found
         if (is_null($host)) {
             return null;
         }
-        
+
         // Calculate tld from hostname if sld is set.
         if (isset($host['sld']) && !isset($host['tld'])) {
             if (strpos($hostname, $host['sld'] . '.') === 0) {
@@ -258,13 +262,13 @@ class api_init {
                 $host['tld'] = substr($hostname, strlen($host['sld'])+1);
             }
         }
-        
+
         // Return values
         $path = (!empty($host['path'])) ? $host['path'] : '/';
         if ($path[0] !== '/') {
             $path = '/' . $path;
         }
-        
+
         return array('host' => $host['host'],
                      'tld'  => @$host['tld'],
                      'sld'  => @$host['sld'],

@@ -1,23 +1,27 @@
 <?php
+/* Licensed under the Apache License, Version 2.0
+ * See the LICENSE and NOTICE file for further information
+ */
+
 /**
  * Returns the response of a HTTP request as a DOM. The HTTP response must
  * be valid XML as it's loaded using DOMDocument::load().
- * 
+ *
  * @author   Patrice Neff
  */
 class api_model_http extends api_model {
     /** resource: Initialized CURL resource. */
     protected $curl = null;
-    
+
     /** string: URL loaded by this object. */
     protected $url = '';
-    
+
     /** string: Headers to be set to the curl. */
     protected $headers = array();
-    
+
     /**
      * Create a new data object which returns a HTTP response as DOM.
-     * 
+     *
      * @param $url string: URL to request.
      * @exception api_exception_Backend if the CURL resource can't be
      *            initialized.
@@ -26,14 +30,14 @@ class api_model_http extends api_model {
         $this->curl = $this->prepareCurl($url);
         $this->url = $url;
     }
-    
+
     public function getCurlObject() {
         return $this->curl;
     }
-    
+
     /**
      * Read the CURL response and return it in a DOM.
-     * 
+     *
      * @exception api_exception_Backend if the response was empty or
      *            returned a status code different to 200.
      * @exception api_exception_XmlParseError if the response can't be
@@ -49,7 +53,7 @@ class api_model_http extends api_model {
         } else {
             $xmls = curl_multi_getcontent($this->curl);
         }
-        
+
         $status = (isset($info['http_code'])) ? $info['http_code'] : 0;
         if (empty($xmls)) {
             throw new api_exception_Backend(
@@ -64,18 +68,18 @@ class api_model_http extends api_model {
                 0,
                 "Got a bad HTTP status: " . $status);
         }
-        
+
         $dom = DOMDocument::loadXML($xmls);
         if ($dom === false) {
             throw new api_exception_XmlParseError(api_exception::THROW_FATAL, $this->url);
         }
-        
+
         return $dom;
     }
-    
+
     /**
      * Create the CURL request for a GET request to the given URL.
-     * 
+     *
      * @param $url string: URL to request.
      * @return resource: CURL resource.
      * @exception api_exception_Backend if the CURL resource can't be
@@ -91,9 +95,9 @@ class api_model_http extends api_model {
                 0,
                 "Could not initialize CURL object");
         }
-        
+
         curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);  //return data as string 
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);  //return data as string
         curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);  //follow redirects
         curl_setopt($curl, CURLOPT_MAXREDIRS, 2);       //maximum redirects
         curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 20); //timeout
@@ -101,10 +105,10 @@ class api_model_http extends api_model {
         curl_setopt($curl, CURLOPT_NOSIGNAL,true);
         curl_setopt($curl, CURLOPT_DNS_USE_GLOBAL_CACHE, FALSE);
         curl_setopt($curl, CURLOPT_FILETIME, TRUE);
-        
+
         $this->headers[] = 'Accept-Language: en';
         curl_setopt($curl, CURLOPT_HTTPHEADER, $this->headers);
-        
+
         return $curl;
     }
 }

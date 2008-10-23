@@ -1,4 +1,8 @@
 <?php
+/* Licensed under the Apache License, Version 2.0
+ * See the LICENSE and NOTICE file for further information
+ */
+
 /**
  * Memcached interface.
  *
@@ -16,7 +20,7 @@
  * memcached to connect to - the port can't currently be specified. If
  * no hosts or no memcache configuration at all is defined, then the class
  * connects to a memcached daemon running on localhost.
- * 
+ *
  * This class implements the singleton pattern. Use api_cache::getInstance()
  * to get an object.
  *
@@ -48,7 +52,7 @@ class api_cache {
      * specified in seconds.
      */
     protected $timeout = 2;
-    
+
     /**
      * Constructor. Reads configuration values and connects to the
      * memcached daemons.
@@ -58,7 +62,7 @@ class api_cache {
 
         $this->prefix = api_config::getInstance()->revision;
         $servers = api_config::getInstance()->memcache;
-        
+
         if (isset($servers['timeout'])) {
             $this->timeout = intval($servers['timeout']);
         }
@@ -68,7 +72,7 @@ class api_cache {
                 if ($host) {
                     $this->connect($host);
                 }
-            }                
+            }
         } else if ($servers && $servers['host']) {
             $this->connect($servers['host']);
         } else {
@@ -167,7 +171,7 @@ class api_cache {
             return $this->cache->get($keys);
         }
     }
-    
+
     /**
      * get() submethod when requested with an array of keys.
      * All keys need to have the prefix added and that prefix
@@ -177,9 +181,9 @@ class api_cache {
         foreach ($keys as $key => $value) {
             $keys[$key] = $this->prefix . $this->normalizeKey($value);
         }
-        
+
         $retval = $this->cache->get($keys);
-        
+
         $prefixLen = strlen($this->prefix);
         $newretval = array();
         foreach ($retval as $key => $value) {
@@ -247,7 +251,7 @@ class api_cache {
             return 1;
         }
     }
-    
+
     /**
      * Normalize the memcache keys.
      */

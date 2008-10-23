@@ -1,4 +1,7 @@
 <?php
+/* Licensed under the Apache License, Version 2.0
+ * See the LICENSE and NOTICE file for further information
+ */
 
 // Including all the needed stuff by the framework
 // TODO: Remove _once

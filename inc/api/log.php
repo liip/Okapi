@@ -1,4 +1,8 @@
 <?php
+/* Licensed under the Apache License, Version 2.0
+ * See the LICENSE and NOTICE file for further information
+ */
+
 /**
  * Wrapper class for Zend_Log which reads configuration from api_config
  * and creates the corresponding Log objects.

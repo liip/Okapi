@@ -1,4 +1,8 @@
 <?php
+/* Licensed under the Apache License, Version 2.0
+ * See the LICENSE and NOTICE file for further information
+ */
+
 /**
  * This factory is used to centralize the api_model calls and make them easily
  * replaceable with dummies for the unit and functional testing.

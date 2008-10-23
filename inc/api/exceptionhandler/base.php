@@ -1,20 +1,24 @@
 <?php
+/* Licensed under the Apache License, Version 2.0
+ * See the LICENSE and NOTICE file for further information
+ */
+
 /**
  * Base class for exception handlers.
  */
 abstract class api_exceptionhandler_base {
     /** Base directory for all exception handler XSLT files. */
     const VIEWDIR = 'exceptionhandler';
-    
+
     /** api_controller: Controller. Used to paint the exception using XSLT. */
     protected $context = null;
-    
+
     /**
      * Process the exception.
      * @param $e Exception: The exception to handle.
      */
     abstract public function handle(Exception $e);
-    
+
     /**
      * Sets the controller which is used for paint the exception.
      * @param $context api_controller
@@ -22,7 +26,7 @@ abstract class api_exceptionhandler_base {
     public function setContext(api_controller $context) {
         $this->context = $context;
     }
-    
+
     /**
      * Extracts source lines from the given files. This is used to extract
      * some context of the exception.
@@ -42,7 +46,7 @@ abstract class api_exceptionhandler_base {
         }
         return array();
     }
-    
+
     /**
      * Dumps the exception to the browser. Used if the context can't be
      * used to draw the exception.
@@ -58,14 +62,14 @@ abstract class api_exceptionhandler_base {
         }
         print "<h3>Trace:</h3><ul>";
         foreach($e->getTrace() as $trace) {
-            
+
             print "<li>".(isset($trace['class']) ? $trace['class'] : '') . "::".$trace['function'];
             print "<br/>".$trace['file']." (".$trace['line'].")</li>";
         }
-            
+
         print "</ul></div>";
     }
-    
+
     /**
      * Log the exception. This is called for all non-fatal exceptions.
      * @param $e Exception: The exception to log.
@@ -73,7 +77,7 @@ abstract class api_exceptionhandler_base {
     public function log(Exception $e) {
         error_log("Extension encountered: " . (string) $e);
     }
-    
+
     /**
      * Returns the relative path to the XSLT file for this exception
      * handler. Passed on to api_controller::setXsl().
@@ -83,7 +87,7 @@ abstract class api_exceptionhandler_base {
         $xslName = api_helpers_class::getBaseName($this);
         return self::VIEWDIR . DIRECTORY_SEPARATOR . $xslName.'.xsl';
     }
-    
+
     /**
      * Uses the context to display the data collect for the current
      * exception. Uses the XSLT file as returned by
