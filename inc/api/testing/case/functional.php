@@ -135,7 +135,7 @@ class api_testing_case_functional extends UnitTestCase {
         $resp = $response->getContents();
         $this->responseDom = DOMDocument::loadXML($resp);
         $this->assertIsA($this->responseDom, 'DOMDocument',
-            "The view didn't output valid XML. $resp");
+            "The view didn't output valid XML. (%s)");
     }
     
     /**
