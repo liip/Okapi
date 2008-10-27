@@ -20,7 +20,7 @@ class api_model_factory {
      * @return api_model_common
      */
     public static function get($name, $params = array(), $namespace = "api") {
-        if (class_exists('api_model_' . $name)) {
+        if (class_exists($namespace . '_model_' . $name)) {
             $name = $namespace . '_model_' . $name;
         }
         if (count($params) == 0) {
