@@ -1,4 +1,8 @@
 <?php
+/* Licensed under the Apache License, Version 2.0
+ * See the LICENSE and NOTICE file for further information
+ */
+
 /**
  * Base command to be extended by all commands.
  *
@@ -13,30 +17,30 @@ abstract class api_command {
      * request.
      */
     protected $request = null;
-    
+
     /**
      * api_response: Response object used to send output to the client.
      */
     protected $response = null;
-    
+
     /**
      * array: Route definition of the current request. This is the return
      * value of api_routing::getRoute().
      */
     protected $route = array();
-    
+
     /**
      * array of api_model: Data objects to be passed to the XSLT
      * stylesheets.
      */
     protected $data = array();
-    
+
     /**
      * string: Default Method. Gets called by api_command::process() when
      * the route does not contain a method.
      */
     protected $defaultMethod = 'defaultRequest';
-    
+
     /**
      * Constructor. Initializes the object's attributes but does not have
      * any side effects.
@@ -49,7 +53,7 @@ abstract class api_command {
         $this->route = &$route;
 
     }
-    
+
     /**
      * Get XSL parameters from command. Used to overwrite view configuration
      * from the route.
@@ -58,7 +62,7 @@ abstract class api_command {
     public function getXslParams() {
         return array();
     }
-    
+
     /**
      * Process request. This is the entry point of a command which calls
      * the method as passed in from the routing engine. If no method has
@@ -70,14 +74,16 @@ abstract class api_command {
         $route = $this->route;
         if (isset($route['method']) && $route['method'] != 'process') {
             // __call() may return false, then we go execute the default request
-            if ((!method_exists($this,$route['method']) || is_callable(array($this, $route['method']))) && $this->{$route['method']}()) {
+            if ((!method_exists($this, $route['method']) || is_callable(array($this, $route['method'])))
+                && $this->{$route['method']}()
+            ) {
                 return;
-            }   
+            }
         }
         $this->{$this->defaultMethod}();
         return;
     }
-    
+
     /**
      * Default method called by api_command::process (as specified with
      * api_command::$defaultMethod).
@@ -90,7 +96,7 @@ abstract class api_command {
      */
     public function defaultRequest() {
     }
-    
+
     /**
      * Safety purposes __call so that the default command is called when
      * somebody is careless in the route configuration. So if the route
@@ -103,20 +109,20 @@ abstract class api_command {
     public function __call($name, $argv) {
         return false;
     }
-    
+
     /**
      * Checks permission. To prevent a user from accessing a command, the
      * command has to redirect the user somewhere else in this method.
-     * 
+     *
      * When this method returns false the controller throws a
      * api_exception_CommandNotAllowed exception.
-     * 
+     *
      * @return bool
      */
     public function isAllowed() {
         return true;
     }
-    
+
     /**
      * Merge the response of all data objects in api_command::$data into
      * one XML DOM and return the DOM. This calls api_model::$getDOM()
@@ -132,7 +138,7 @@ abstract class api_command {
         $commandname = api_helpers_class::getBaseName($this);
         $cmdNode = $dom->documentElement;
         $cmdNode->setAttribute("name", $commandname);
-        
+
         foreach ($this->data as $d) {
             $dataDom = $d->getDOM();
             if (!is_null($dataDom) && $dataDom->documentElement) {
@@ -140,7 +146,7 @@ abstract class api_command {
                 $dom->documentElement->appendChild($node);
             }
         }
-        
+
         return $dom;
     }
 }

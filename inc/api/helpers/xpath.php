@@ -1,4 +1,8 @@
 <?php
+/* Licensed under the Apache License, Version 2.0
+ * See the LICENSE and NOTICE file for further information
+ */
+
 /**
  * Helper methods for processing XPath.
  */
@@ -13,7 +17,7 @@ class api_helpers_xpath {
         $xp->registerNamespace('x', 'http://www.w3.org/1999/xhtml');
         $xp->registerNamespace('xhtml', 'http://www.w3.org/1999/xhtml');
         $xp->registerNamespace('i18n', 'http://apache.org/cocoon/i18n/2.1');
-        
+
         $res = $xp->query($xpath);
         if (!$res || $res->length == 0) {
             return null;
@@ -21,7 +25,7 @@ class api_helpers_xpath {
             return $res->item(0);
         }
     }
-    
+
     /**
      * Gets the node value of the first node found with the given XPath.
      * @param $dom DOMDocument: DOM to search in
@@ -37,7 +41,7 @@ class api_helpers_xpath {
         }
         return null;
     }
-    
+
     /**
      * Gets the node values of all nodes found with the given XPath.
      * @param $dom DOMDocument: DOM to search in
@@ -45,7 +49,7 @@ class api_helpers_xpath {
      */
     public static function getTexts($dom, $xpath) {
         $nodes = self::getNodes($dom, $xpath);
-        
+
         $ret = array();
         foreach ($nodes as $node) {
             $text = $node->nodeValue;
@@ -55,7 +59,7 @@ class api_helpers_xpath {
         }
         return $ret;
     }
-    
+
     /**
      * Gets an attributed specified with the given XPath. The attribute
      * name is specified in the XPath after the last `@' character.
@@ -65,7 +69,7 @@ class api_helpers_xpath {
     public static function getAttribute($dom, $xpath) {
         $attribute = substr($xpath, strrpos($xpath, '@') + 1);
         $xpath = substr($xpath, 0, strrpos($xpath, '@'));
-        
+
         $node = self::getNode($dom, $xpath);
         if ($node) {
             $text = $node->getAttribute($attribute);
@@ -75,7 +79,7 @@ class api_helpers_xpath {
         }
         return null;
     }
-    
+
     /**
      * Gets an array which contains all matching nodes.
      * @param $dom DOMDocument: DOM to search in
@@ -96,7 +100,7 @@ class api_helpers_xpath {
         }
         return $ret;
     }
-    
+
     /**
      * Gets an array of attributes specified with the given XPath.
      * The attribute name is specified in the XPath after the last
@@ -109,15 +113,15 @@ class api_helpers_xpath {
     public static function getAttributes($dom, $xpath) {
         $attribute = substr($xpath, strrpos($xpath, '@') + 1);
         $xpath = substr($xpath, 0, strrpos($xpath, '@'));
-        
+
         $ret = array();
-        
+
         $nodes = self::getNodes($dom, $xpath);
         foreach ($nodes as $node) {
             $text = $node->getAttribute($attribute);
             // Strip multiple whitespaces
             $text = preg_replace("#[ \t]+#", ' ', $text);
-            
+
             array_push($ret, $text);
         }
         return $ret;

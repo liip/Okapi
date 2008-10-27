@@ -1,11 +1,15 @@
 <?php
+/* Licensed under the Apache License, Version 2.0
+ * See the LICENSE and NOTICE file for further information
+ */
+
 /**
  * Model which returns a DOM with information about the current request
  * from the command.
  *
  * This model is useful for passing the relevant information to the XSLT
  * stylesheets.
- * 
+ *
  * @author   Patrice Neff
  */
 class api_model_queryinfo extends api_model {
@@ -18,7 +22,7 @@ class api_model_queryinfo extends api_model {
     public function __construct($request, $route) {
         $this->request = $request;
         $this->route = $route;
-        
+
         $this->params = $request->getParameters();
         $this->path = $request->getPath();
         $this->lang = $request->getLang();
@@ -28,7 +32,7 @@ class api_model_queryinfo extends api_model {
         $this->tld = $request->getTld();
         $this->host = $request->getHost();
     }
-    
+
     /**
      * Returns a DOM with the following structure:
      *   - \b queryinfo: (root node)
@@ -48,7 +52,7 @@ class api_model_queryinfo extends api_model {
         $dom = new DOMDocument();
         $dom->loadXML('<queryinfo/>');
         $root = $dom->documentElement;
-        
+
         $elem = $dom->createElement('query');
         foreach($this->params as $name => $value) {
             $queryP = $dom->createElement($name);
@@ -60,7 +64,7 @@ class api_model_queryinfo extends api_model {
             $elem->appendChild($queryP);
         }
         $root->appendChild($elem);
-        
+
         $self = $dom->createElement('self');
         $self->nodeValue = htmlspecialchars($this->request->getUrl());
         $root->appendChild($self);
@@ -73,22 +77,22 @@ class api_model_queryinfo extends api_model {
         }
         $queryP->nodeValue = str_replace("&","&amp;", substr($requestUri, 1));
         $root->appendChild($queryP);
-        
+
         foreach(array('lang', 'command', 'method', 'sld', 'tld', 'host') as $key) {
             $node = $dom->createElement($key);
             $node->nodeValue = $this->$key;
             $root->appendChild($node);
         }
-        
+
         $langs = $this->request->getLanguages();
         $node = $dom->createElement('languages');
         api_helpers_xml::array2dom($langs, $dom, $node);
         $root->appendChild($node);
-        
+
         $node = $dom->createElement('route');
         api_helpers_xml::array2dom($this->route, $dom, $node);
         $root->appendChild($node);
-        
+
         return $dom;
     }
 }

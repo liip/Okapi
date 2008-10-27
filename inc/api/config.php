@@ -1,4 +1,7 @@
 <?php
+/* Licensed under the Apache License, Version 2.0
+ * See the LICENSE and NOTICE file for further information
+ */
 require_once(dirname(__FILE__) . '/vendor/sfYaml/sfYaml.class.php');
 
 /**
@@ -51,6 +54,9 @@ class api_config {
     /** The loaded configuration array for the current profile. */
     protected $configArray = array();
 
+    /** The loaded configuration array for the current command. */
+    protected $commandConfigArray = array();
+
     /** The currently active environment. */
     protected $env;
 
@@ -97,38 +103,57 @@ class api_config {
         } else {
             $this->env = self::$DEFAULT_ENV;
         }
-        if ($this->readFromCache($this->env)) {
+
+        $this->load();
+    }
+
+    public function load($command = false) {
+        if ($this->readFromCache($this->env, $command)) {
             return;
         }
 
         if (is_null(self::$loader)) {
-            $this->loadYaml($this->env);
+            $configArray = $this->loadYaml($this->env, $command);
         } else {
-            $this->configArray = self::$loader->load($this->env);
+            $configArray = self::$loader->load($this->env, $command);
         }
 
-        $this->saveCache($this->env);
+        if ($command) {
+            $this->commandConfigArray = $configArray;
+        } else {
+            $this->configArray = $configArray;
+        }
+
+        $this->saveCache($this->env, $command);
     }
 
     /**
      * Load the configuration using the default YAML loader.
      */
-    protected function loadYaml($env) {
-        $base = API_PROJECT_DIR . 'conf/config';
+    protected function loadYaml($env, $command = false) {
+        $base = API_PROJECT_DIR . 'conf';
+        if ($command) {
+            $base.= '/command.d/'.$command;
+        } else {
+            $base.= '/config';
+        }
+
         $configfile = $base . '.yml';
         $configdir = $base . '.d';
+
+        // TODO: since we append all the files together we can by default
+        // not provide an error message that contains the file name
+        // that caused the error.
         if (file_exists($configfile)) {
-            $this->init($configfile);
+            $yaml = file_get_contents($configfile);
         } else {
-            // TODO: since we append all the files together we can by default
-            // not provide an error message that contains the file name
-            // that caused the error.
             $yaml = '';
             foreach (glob($configdir . '/*.yml') as $file) {
                 $yaml .= file_get_contents($file) . "\n";
             }
-            $this->init($yaml);
         }
+
+        return $this->init($yaml);
     }
 
     /**
@@ -142,8 +167,9 @@ class api_config {
         if (!isset($cfg[$this->env])) {
             $this->env = self::$DEFAULT_ENV;
         }
-        $this->configArray = $cfg[$this->env];
-        $this->replaceAllConsts($this->configArray);
+        $configArray = $cfg[$this->env];
+        $this->replaceAllConsts($configArray);
+        return $configArray;
     }
 
     /**
@@ -165,6 +191,10 @@ class api_config {
             return null;
         }
 
+        if (isset($this->commandConfigArray[$name])) {
+            return $this->commandConfigArray[$name];
+        }
+
         if (isset($this->configArray[$name])) {
             return $this->configArray[$name];
         }
@@ -176,21 +206,24 @@ class api_config {
      * Checks availability of a cachefile and assigns the cached content
      * to the protected object variable $configCache.
      */
-    protected function readFromCache($env) {
-        $cachefile = $this->getConfigCachefile($env);
+    protected function readFromCache($env, $command = false) {
+        $cachefile = $this->getConfigCachefile($env, $command);
 
         if (!is_null($cachefile) && file_exists($cachefile) && is_readable($cachefile)) {
             $configString = file_get_contents($cachefile);
             $configArray = unserialize($configString);
             if (isset($configArray) && is_array($configArray)) {
-                $this->configArray = $configArray;
+                if ($command) {
+                    $this->commandConfigArray = $configArray;
+                } else {
+                    $this->configArray = $configArray;
+                }
                 return true;
             }
         }
 
         return false;
     }
-
 
     /**
      * Dump the loaded configuration file into a PHP file. On loading the
@@ -200,17 +233,18 @@ class api_config {
      * This behaviour must be turned on explicitly by setting the
      * configCache configuration value to true.
      */
-    protected function saveCache($env) {
-        if (!isset($this->configArray['configCache']) || $this->configArray['configCache'] !== true) {
+    protected function saveCache($env, $command = false) {
+        $configArray = $command ? $this->commandConfigArray : $this->configArray;
+        if (empty($configArray['configCache'])) {
             return;
         }
 
-        $file = $this->getConfigCachefile($env);
+        $file = $this->getConfigCachefile($env, $command);
         if (is_null($file)) {
             return;
         }
 
-        $configString = serialize($this->configArray);
+        $configString = serialize($configArray);
         file_put_contents($file, $configString);
         if (isset($this->configArray['umask'])) {
             chmod($file, $this->configArray['umask']);
@@ -221,12 +255,16 @@ class api_config {
     /**
      * Returns the filename of the configuration cache file to be used.
      */
-    protected function getConfigCachefile($env) {
+    protected function getConfigCachefile($env, $command = false) {
         $tmpdir = API_PROJECT_DIR . '/tmp/';
         if (!is_writable($tmpdir)) {
             return null;
         }
-        return $tmpdir . 'config-cache_' . $env . '.php';
+        $file = $tmpdir . 'config-cache_' . $env;
+        if ($command) {
+            $file.= $file . '_' . $command;
+        }
+        return $file . '.php';
     }
 
     /**

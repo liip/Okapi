@@ -1,4 +1,8 @@
 <?php
+/* Licensed under the Apache License, Version 2.0
+ * See the LICENSE and NOTICE file for further information
+ */
+
 /**
  * Response class which handles outputting the header and body.
  *
@@ -20,7 +24,7 @@ class api_response {
         off by default. If this is turned on, it will turn off HTTP chunked
         encoding. */
     protected $setContentLengthOutput = false;
-    
+
     /**
      * Gets an instance of api_response.
      * @param $forceReload bool: If true, forces instantiation of a new
@@ -33,14 +37,14 @@ class api_response {
         }
         return $instance;
     }
-    
+
     /**
      * Constructor. Turns on output buffering.
      */
     public function __construct() {
         ob_start();
     }
-    
+
     /**
      * Set a single header. Overwrites an existing header of the same
      * name if it exists.
@@ -50,14 +54,14 @@ class api_response {
     public function setHeader($header, $value) {
         $this->headers[$header] = $value;
     }
-    
+
     /**
      * Returns an associative array of all set headers.
      * @return hash: All headers which have been set.
      */
     public function getHeaders() {
         $headers = $this->headers;
-        
+
         if (!is_null($this->contenttype)) {
             $ct = $this->contenttype;
             if (!is_null($this->charset)) {
@@ -65,12 +69,12 @@ class api_response {
             }
             $headers['Content-Type'] = $ct;
         }
-        
+
         return $headers;
     }
-    
+
     /**
-     * Sets a cookie with the given value. 
+     * Sets a cookie with the given value.
      * Overwrites an existing Cookie if it's the same name
      *
      * @param $name string: Name of the cookie
@@ -81,7 +85,7 @@ class api_response {
      * @param $secure bool: Secure mode?
      * @param $httponly bool: Only allow HTTP usage?
      */
-    public function setCookie($name, $value = '', $maxage = 0, $path = '', $domain = '', 
+    public function setCookie($name, $value = '', $maxage = 0, $path = '', $domain = '',
                               $secure = false, $httponly = false) {
         $this->cookies[rawurlencode($name)] = rawurlencode($value)
                                               . (empty($domain) ? '' : '; Domain='.$domain)
@@ -90,7 +94,7 @@ class api_response {
                                               . (!$secure ? '' : '; Secure')
                                               . (!$httponly ? '' : '; HttpOnly');
     }
-    
+
     /**
      * Returns an associative array of all set cookies.
      * @return hash: All Cookies which have been set.
@@ -98,7 +102,7 @@ class api_response {
     public function getCookies() {
         return $this->cookies;
     }
-    
+
     /**
      * Sets the content type of the current request. By default no
      * content type header is sent to the client.
@@ -107,7 +111,7 @@ class api_response {
     public function setContentType($contenttype) {
         $this->contenttype = $contenttype;
     }
-    
+
     /**
      * Sets the character set of the current request. The character
      * set is only used when content type has been set. The default
@@ -118,7 +122,7 @@ class api_response {
     public function setCharset($charset) {
         $this->charset = $charset;
     }
-    
+
     /**
      * Sets the response code of the current request.
      * @param $code int: Response code to send.
@@ -127,7 +131,7 @@ class api_response {
     public function setCode($code) {
         $this->code = $code;
     }
-    
+
     /**
      * Returns whether the content length will be specified in the response
      * header.
@@ -135,7 +139,7 @@ class api_response {
     public function isContentLengthOutput() {
         return $this->setContentLengthOutput;
     }
-    
+
     /**
      * Output the content length in the output.
      * @param $cl boolean: True if the content length should be set.
@@ -143,7 +147,7 @@ class api_response {
     public function setContentLengthOutput($cl) {
         $this->setContentLengthOutput = $cl;
     }
-    
+
     /**
      * Redirects the user to another location. The location can be
      * relative or absolute, but this methods always converts it into
@@ -160,18 +164,18 @@ class api_response {
         if (strpos($to, 'http://') === 0 || strpos($to, 'https://') === 0) {
             $url = $to;
         } else {
-            $schema = $_SERVER['SERVER_PORT'] == '443' ? 'https' : 'http'; 
+            $schema = $_SERVER['SERVER_PORT'] == '443' ? 'https' : 'http';
             $host = (isset($_SERVER['HTTP_HOST']) && strlen($_SERVER['HTTP_HOST'])) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'];
             $to = strpos($to,'/')===0 ? $to : '/'.$to;
             $url = "$schema://$host$to";
         }
-        
+
         $this->setCode($status);
         $this->setHeader('Location', $url);
         $this->send();
         exit();
     }
-    
+
     /**
      * Sends the status code, and all headers to the client. Then flushes
      * the output buffer and thus sends the content out.
@@ -180,22 +184,26 @@ class api_response {
         if (!is_null($this->code)) {
             $this->sendStatus($this->code);
         }
-        
+
         foreach ($this->getHeaders() as $header => $value) {
             header("$header: $value");
         }
-        
+
         foreach ($this->getCookies() as $cookie => $value) {
             header("Set-Cookie: $cookie=$value", false);
         }
-        
+
         if ($this->setContentLengthOutput) {
             header("Content-Length: " . ob_get_length());
         }
-        
+
         ob_end_flush();
+
+        if ($this->setContentLengthOutput) {
+            die();
+        }
     }
-    
+
     /**
      * Send the status header line.
      * @param $code int: Response code to send.

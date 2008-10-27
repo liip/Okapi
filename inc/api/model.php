@@ -1,4 +1,8 @@
 <?php
+/* Licensed under the Apache License, Version 2.0
+ * See the LICENSE and NOTICE file for further information
+ */
+
 /**
  * Base model class.
  *
@@ -8,7 +12,7 @@
  *
  * The configuration of the model is expected to be done with the
  * constructor.
- * 
+ *
  * @author   Patrice Neff
  */
 class api_model {
@@ -28,7 +32,7 @@ class api_model {
     public function getCurlObject() {
         return null;
     }
-    
+
     /**
      * Return a DOM document representing the data of this model object.
      *

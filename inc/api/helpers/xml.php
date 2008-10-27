@@ -1,4 +1,8 @@
 <?php
+/* Licensed under the Apache License, Version 2.0
+ * See the LICENSE and NOTICE file for further information
+ */
+
 /**
  * Static helper methods for XML handling.
  */
@@ -49,7 +53,7 @@ class api_helpers_xml {
             } else {
                 $key = "entry";
             }
-            
+
             $n = (is_numeric($n)) ? $key:$n;
 
             $elem = $domdoc->createElement($n);
@@ -76,11 +80,11 @@ class api_helpers_xml {
 
                     }  else if ($node instanceof DOMDocument){
                         $nodeObj = $domdoc->importNode($node->documentElement, true);
-                        
+
                     } else if (is_bool($node)) {
                         $node = $node ? 'true' : 'false';
                         $nodeObj = $domdoc->createTextNode($node);
-                        
+
                     } else if (!is_object($node)) {
                         $nodeObj = $domdoc->createTextNode($node);
                     }

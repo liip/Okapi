@@ -1,4 +1,8 @@
 <?php
+/* Licensed under the Apache License, Version 2.0
+ * See the LICENSE and NOTICE file for further information
+ */
+
 /**
  * Base Okapi exception. Adds severity to the default PHP exceptions.
  *
@@ -10,10 +14,10 @@ class api_exception extends Exception {
     const THROW_NONE    = 0;
     /** Severity which marks a fatal exception. */
     const THROW_FATAL   = 1;
-    
+
     /** Parameters which are added to the exception summary. */
     protected $params   = array();
-    
+
     /**
      * Constructor.
      *
@@ -28,7 +32,7 @@ class api_exception extends Exception {
         $this->severity  = $severity;
         $this->params    = $params;
     }
-    
+
     /**
      * Sets a different human-readable message for this exception.
      * @param $message string: Human-readable information about the exception.
@@ -36,7 +40,7 @@ class api_exception extends Exception {
     public function setMessage($message) {
         $this->message = $message;
     }
-    
+
     /**
      * Get the base name of this exception.
      * @return string: Base name
@@ -44,7 +48,7 @@ class api_exception extends Exception {
     public function getName() {
         return api_helpers_class::getBaseName($this);;
     }
-    
+
     /**
      * Sets a different exception code.
      * @param $code int: Exception code.
@@ -52,7 +56,7 @@ class api_exception extends Exception {
     public function setCode($code) {
         $this->code = $code;
     }
-    
+
     /**
      * Gets the severity.
      * @return int: Severity. api_exception::THROW_NONE or api_exception::THROW_FATAL
@@ -60,7 +64,7 @@ class api_exception extends Exception {
     public function getSeverity() {
         return $this->severity;
     }
-    
+
     /**
      * Sets a different severity.
      * @param $severity int: Indicates whether the exception is fatal or not.
@@ -69,7 +73,7 @@ class api_exception extends Exception {
     public function setSeverity($severity) {
         $this->severity = $severity;
     }
-    
+
     /**
      * Returns all params currently set.
      * @return array: Parameters with details about the exception.
@@ -77,7 +81,7 @@ class api_exception extends Exception {
     public function getParams() {
         return $this->params;
     }
-    
+
     /**
      * Sets a new param array.
      * @param $params array: Parameters giving details about the exception.
@@ -85,7 +89,7 @@ class api_exception extends Exception {
     public function setParams($params) {
         $this->params = $params;
     }
-    
+
     /**
      * Sets one param.
      * @param $name string: Key of the param to set.
@@ -106,8 +110,8 @@ class api_exception extends Exception {
      */
     public function getSummary() {
         $summary = array(
-            'code'      => $this->getCode(), 
-            'message'   => $this->getMessage(), 
+            'code'      => $this->getCode(),
+            'message'   => $this->getMessage(),
             'severity'  => $this->getSeverity()
         );
         return array_merge($summary, $this->params);

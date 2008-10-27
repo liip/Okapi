@@ -1,4 +1,8 @@
 <?php
+/* Licensed under the Apache License, Version 2.0
+ * See the LICENSE and NOTICE file for further information
+ */
+
 /**
  * Static helper methods for class name handling.
  */
@@ -15,7 +19,7 @@ class api_helpers_class {
         if (! is_string($class)) {
             $class = get_class($class);
         }
-        
+
         $arr = explode("_", $class);
         return array_pop($arr);
     }

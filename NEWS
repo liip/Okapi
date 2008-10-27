@@ -1,5 +1,30 @@
 Release history of Okapi.
 
+2008-10-27 :: Version 1.1.4
+  - api_model_backend_get: Protocol can be specified in configuration. (ebi)
+  - api_config: Added ability to define command level configuration files
+    that overload the standard config. (lukas.smith)
+  - api_request: Match anything after the last dot for determining the node
+    extension. (lukas.smith)
+  - api_view: Simplified code. (lukas.smith)
+  - api_testing_case_functional: Ensuring properly that responseDOM is a
+    DOMDocument. (ebi)
+  - api_exceptionhandler_default: Handle the case when ReflectionMethod
+    throws an exception in the constructor. (lukas.smith)
+  - api_db: Ability to overwrite the adapter. (marc)
+  - api_log: New common code for logging. (chregu)
+  - api_model_factory: Added namespace support. (marc)
+  - api_db: Ability to overwrite the DB instance. (marc)
+  - api_controller, api_exceptionhandler_base, api_response: Don't die in
+    exception handler, instead die in api_response::send(). (pneff)
+  - api_exceptionhandler_default: Fix massaging of stackrace to avoid
+    overwriting by-reference variables. (pneff)
+  - api_exception_XsltParseError: Added XSL parse error to the exception
+    message. (marc)
+  - api_controller: Mad loadCommand public for testing purposes. (marc)
+  - api_response: Only die() in api_response::send() if the content length
+    has been output. (lukas.smith)
+
 2008-08-29 :: Version 1.1.3
   - api_cache: Fix get() method. Major fuckup by me. (pneff)
   - api_model_queryinfo: Make sure ? is only included in the URL if there are

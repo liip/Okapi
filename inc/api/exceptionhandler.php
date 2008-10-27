@@ -1,4 +1,8 @@
 <?php
+/* Licensed under the Apache License, Version 2.0
+ * See the LICENSE and NOTICE file for further information
+ */
+
 /**
  * Handles exceptions based on settings in the configuration file.
  *
@@ -24,15 +28,15 @@ class api_exceptionhandler {
     /** Wildcard exception. Used in the config file to specify the
         default exception. */
     const EXCEPTION_WILDCARD = "*";
-    
+
     /** Default exception handler if no exception handler was configured
       * for an exception and the catch-all (wildcard) isn't configured
       * either. */
     const DEFAULT_HANDLER = 'default';
-    
+
     /** Loaded api_exceptionhandler_base instances. */
     private static $instances = array();
-    
+
     /**
      * Handle the exception with the appropriate handler as configured
      * in the configuration file.
@@ -51,7 +55,7 @@ class api_exceptionhandler {
             $handler->handle($e);
         }
     }
-    
+
     /**
      * Log exceptions. This is called for non-fatal exceptions.
      *
@@ -69,7 +73,7 @@ class api_exceptionhandler {
             $handler->log($e);
         }
     }
-    
+
     /**
      * Returns the correct exception handler (subclass of
      * api_exceptionhandler_base) for the given class. Always returns the
@@ -88,10 +92,10 @@ class api_exceptionhandler {
                 self::$instances[$class]->setContext($context);
             }
         }
-        
+
         return self::$instances[$class];
     }
-    
+
     /**
      * Creates a new exception handler instances for the given class name.
      *
@@ -125,15 +129,15 @@ class api_exceptionhandler {
                 }
             }
         }
-        
+
         $handler = self::getExceptionHandlerClassName(self::DEFAULT_HANDLER);
         return new $handler;
     }
-    
+
     /**
      * Prepends the string "api_exceptionhandler_" to the given key.
      * Used to construct the full class name from a configuration value.
-     * 
+     *
      * @param $name string: Exception class name
      * @return string
      */

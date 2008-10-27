@@ -1,4 +1,7 @@
 <?php
+/* Licensed under the Apache License, Version 2.0
+ * See the LICENSE and NOTICE file for further information
+ */
 
 // Including all the needed stuff by the framework
 // TODO: Remove _once
@@ -135,7 +138,7 @@ class api_controller {
      *             is currently supported but will be removed in a future
      *             release.
      */
-    protected function loadCommand() {
+    public function loadCommand() {
         $routing = new api_routing();
         $route = $routing->getRoute($this->request);
         if (is_null($route) || !is_array($route)) {
@@ -162,6 +165,8 @@ class api_controller {
             }
         }
 
+        $config = api_config::getInstance();
+        $config->load($route['command']);
         $this->command = new $cmd($route);
         $this->route = &$route;
     }
@@ -169,7 +174,7 @@ class api_controller {
     /**
      * Calls the api_command::isAllowed() method to check if the command
      * can be executed. Then api_command::process() is called.
-     * 
+     *
      * @exception api_exception_CommandNotAllowed if api_command::isAllowed()
      *            returns false.
      *
@@ -271,7 +276,12 @@ class api_controller {
      * @param   $e api_exception: Thrown exception, passed to the exceptionhandler.
      */
     private function catchFinalException(Exception $e) {
-        return api_exceptionhandler::handle($e, $this);
+        api_exceptionhandler::handle($e, $this);
+        if ($this->response !== null) {
+            $this->response->send();
+        } else {
+            die();
+        }
     }
 
     /**
