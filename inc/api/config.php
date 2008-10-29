@@ -262,7 +262,7 @@ class api_config {
         }
         $file = $tmpdir . 'config-cache_' . $env;
         if ($command) {
-            $file.= $file . '_' . $command;
+            $file .= '_' . $command;
         }
         return $file . '.php';
     }
