@@ -49,7 +49,7 @@ class api_exceptionhandler {
      * @param $context api_controller: The controller is needed by some
      *        exception handlers to handle XSLT output.
      */
-    public static function handle(Exception $e, api_controller $context = null) {
+    public static function handle(Exception $e, $context = null) {
         $handler = self::getInstance($e, $context);
         if ($handler instanceof api_exceptionhandler_base) {
             $handler->handle($e);
@@ -67,7 +67,7 @@ class api_exceptionhandler {
      * @param $context api_controller: The controller is needed by some
      *        exception handlers to handle XSLT output.
      */
-    public static function log(api_exception $e, api_controller $context=null) {
+    public static function log(api_exception $e, $context = null) {
         $handler = self::getInstance($e, $context);
         if ($handler instanceof api_exceptionhandler_base) {
             $handler->log($e);
@@ -84,7 +84,7 @@ class api_exceptionhandler {
      *        exception handlers to handle XSLT output.
      * @return api_exceptionhandler_base instance
      */
-    private static function getInstance(Exception $e, api_controller $context) {
+    private static function getInstance(Exception $e, $context) {
         $class = get_class($e);
         if (!isset(self::$instances[$class])) {
             self::$instances[$class] = self::createInstance($class);
