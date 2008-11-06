@@ -74,7 +74,6 @@ class api_views_default extends api_views_common {
         }
 
         $xmldom = $this->getDom($data, $exceptions);
-            api_log::dump($xmldom->saveXML());
 
         // ?XML=1 trick
         if ($this->dumpDom) {
