@@ -168,7 +168,7 @@ class api_config {
             $this->env = self::$DEFAULT_ENV;
         }
         $configArray = $cfg[$this->env];
-        $this->replaceAllConsts($configArray);
+        $configArray = $this->replaceAllConsts($configArray);
         return $configArray;
     }
 
@@ -273,19 +273,21 @@ class api_config {
      * recursively.
      *
      * @param $arr array: Configuration array.
+     * @return array: Configuration array with all constants replaced
      */
-    protected function replaceAllConsts(&$arr) {
+    protected function replaceAllConsts($arr) {
         if (!is_array($arr)) {
-            return;
+            return $arr;
         }
 
-        foreach ($arr as $key => &$value) {
+        foreach ($arr as $key => $value) {
             if (is_array($value)) {
-                $this->replaceAllConsts($value);
+                $arr[$key] = $this->replaceAllConsts($value);
             } else {
                 $arr[$key] = $this->replaceConst($value);
             }
         }
+        return $arr;
     }
 
     /**
