@@ -153,7 +153,11 @@ class api_config {
             }
         }
 
-        return $this->init($yaml);
+        if (empty($yaml)) {
+            return array();
+        }
+
+        return $this->init($yaml, $this->env);
     }
 
     /**
@@ -161,13 +165,14 @@ class api_config {
      * resulting YAML document to replace constants.
      *
      * @param $yaml string: File name or complete YAML document as a string.
+     * @param $env string: OKAPI_ENV for which the config should be read
      */
-    protected function init($yaml) {
+    protected function init($yaml, $env) {
         $cfg = sfYaml::load($yaml);
-        if (!isset($cfg[$this->env])) {
-            $this->env = self::$DEFAULT_ENV;
+        if (!isset($cfg[$env])) {
+            $env = self::$DEFAULT_ENV;
         }
-        $configArray = $cfg[$this->env];
+        $configArray = $cfg[$env];
         $configArray = $this->replaceAllConsts($configArray);
         return $configArray;
     }
