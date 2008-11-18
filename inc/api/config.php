@@ -261,7 +261,7 @@ class api_config {
      * Returns the filename of the configuration cache file to be used.
      */
     protected function getConfigCachefile($env, $command = false) {
-        $tmpdir = API_PROJECT_DIR . '/tmp/';
+        $tmpdir = API_PROJECT_DIR . 'tmp/';
         if (!is_writable($tmpdir)) {
             return null;
         }
