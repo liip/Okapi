@@ -187,6 +187,36 @@ class RoutingTest extends UnitTestCase {
     }
     
     /**
+     * Add the subdomain as requisite to a route.
+     */
+    function testSld() {
+        $m = new api_routing();
+        $m->route('/test/:param1')
+          ->config(array('command' => 'test'))
+          ->when(array('sld' => 'foo'));
+        
+        $request = new mock_request(array('path' => '/test/abc', 'sld' => 'foo'));
+        $route = $m->getRoute($request);
+        $this->assertEqual($route, array('command' => 'test',
+            'method' => 'process', 'param1' => 'abc',
+            'view' => array()));
+    }
+    
+    /**
+     * Asserts that the route does not match if the subdomain is different.
+     */
+    function testSldNoMatch() {
+        $m = new api_routing();
+        $m->route('/test/:param1')
+          ->config(array('command' => 'test'))
+          ->when(array('sld' => 'foo'));
+        
+        $request = new mock_request(array('path' => '/test/abc', 'sld' => 'bar'));
+        $route = $m->getRoute($request);
+        $this->assertNull($route);
+    }
+    
+    /**
      * Groups of routes allow for common conditions for all the given
      * routes.
      */
