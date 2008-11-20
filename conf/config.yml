@@ -67,7 +67,7 @@ debug:
     backend:
         extapi: 
             <<: *extapi
-            host: extapi.trunk.local.ch
+            host: extapi.local.ch
         secure: *secure
 
 # =======================

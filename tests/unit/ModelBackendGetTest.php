@@ -44,6 +44,7 @@ class ModelBackendGetTest extends OkapiTestCase {
         // Get CURL object and execute it
         $model = new api_model_backend_get('extapi', 'cities', array('q' => 'Ol'));
         $model->setNodeAttributes(array('test' => 'abc'));
+        $modelUrl = curl_getinfo($model->getCurlObject(), CURLINFO_EFFECTIVE_URL);
         
         $dom = $model->getDOM();
         $this->assertXPath($dom, '/response/@status', 'ok');
@@ -55,13 +56,13 @@ class ModelBackendGetTest extends OkapiTestCase {
     
     function testParams() {
         $model = new api_model_backend_get('extapi', 'testparams', array('myparam' => 'foo'));
-        $this->assertBackendModelUrl($model, 'http://extapi.trunk.local.ch/0/foo/index.xml');
+        $this->assertBackendModelUrl($model, 'http://extapi.local.ch/0/foo/index.xml');
     }
     
     function testParamsAdditionalToQuerystring() {
         $model = new api_model_backend_get('extapi', 'testparams',
             array('myparam' => 'testing', 'another' => 'bar'));
-        $this->assertBackendModelUrl($model, 'http://extapi.trunk.local.ch/0/testing/index.xml?another=bar');
+        $this->assertBackendModelUrl($model, 'http://extapi.local.ch/0/testing/index.xml?another=bar');
     }
     
     function testProtocolDefinition() {
