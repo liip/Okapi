@@ -174,6 +174,8 @@ class api_routing_route implements api_Irouting {
 
         if (isset($this->conditions['verb']) && $this->conditions['verb'] != $request->getVerb()) {
             return null;
+        } else if (isset($this->conditions['sld']) && $this->conditions['sld'] != $request->getSld()) {
+            return null;
         } else if ($this->route == $uri) {
             return $this->params;
         } else if (($params = $this->parseRoute($request)) !== null) {
