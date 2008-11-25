@@ -65,7 +65,7 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
     }
 
     /**
-     * Returns the identity from storage or null if no identity is available
+     * Returns the user id from storage or null if no identity is available
      *
      * @return mixed|null
      */
@@ -83,7 +83,7 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
     }
 
     /**
-     * Returns the identity from storage or null if no identity is available
+     * Returns the user name from storage or null if no identity is available
      *
      * @return mixed|null
      */
