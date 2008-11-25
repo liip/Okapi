@@ -40,7 +40,17 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
             if($zaResult->getCode() !== 1){
                 throw new api_exception_Auth(api_exception::THROW_FATAL, array(), 0, $msg[0]);
             }
-            return $zaResult->isValid();
+            if ($zaResult->isValid()) {
+                $storage = self::$zaAuth->getStorage();
+                $rows = array(
+                        $this->opts['container']['usercol']
+                );
+                if (isset($this->opts['container']['idcol'])) {
+                    $rows[] = $this->opts['container']['idcol'];
+                }
+                $storage->write(self::$zaAdapter->getResultRowObject($rows));
+                return true;
+            }
         }
         return false;
     }
@@ -58,21 +68,32 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
      * Returns the identity from storage or null if no identity is available
      *
      * @return mixed|null
-     * @todo is supposed to only return the ID, instead of the whole identity
      */
     public  function getUserId() {
-        return self::$zaAuth->getIdentity();
+        if (self::$zaAuth->hasIdentity()) {
+            if (isset($this->opts['container']['idcol'])) {
+                $idcol = $this->opts['container']['idcol'];
+                return self::$zaAuth->getIdentity()->$idcol;
+            } else {
+                return $this->getUserName();
+            }
+        }
+
+        return null;
     }
 
     /**
      * Returns the identity from storage or null if no identity is available
      *
      * @return mixed|null
-     * @todo is supposed to only return the Username instead of the whole identidy
      */
     public  function getUserName() {
-        return self::$zaAuth->getIdentity();
+        if (self::$zaAuth->hasIdentity()) {
+            $usercol = $this->opts['container']['usercol'];
+            return self::$zaAuth->getIdentity()->$usercol;
+        }
 
+        return null;
     }
 
     /**
@@ -139,6 +160,7 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
     *               usercol: usernamecolumn
     *               passcol: passwordcolumn
     *               passtreatment: MD5(?)
+    *               idcol: idcolumn
     * \endcode
     *
     * @param $rgOpts array: Container options.
