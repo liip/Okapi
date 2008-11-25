@@ -41,14 +41,16 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
                 throw new api_exception_Auth(api_exception::THROW_FATAL, array(), 0, $msg[0]);
             }
             if ($zaResult->isValid()) {
-                $storage = self::$zaAuth->getStorage();
-                $rows = array(
-                        $this->opts['container']['usercol']
-                );
-                if (isset($this->opts['container']['idcol'])) {
-                    $rows[] = $this->opts['container']['idcol'];
+                if (isset($this->opts['container']['usercol'])) {
+                    $storage = self::$zaAuth->getStorage();
+                    $rows = array(
+                            $this->opts['container']['usercol']
+                    );
+                    if (isset($this->opts['container']['idcol'])) {
+                        $rows[] = $this->opts['container']['idcol'];
+                    }
+                    $storage->write(self::$zaAdapter->getResultRowObject($rows));
                 }
-                $storage->write(self::$zaAdapter->getResultRowObject($rows));
                 return true;
             }
         }
@@ -74,8 +76,10 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
             if (isset($this->opts['container']['idcol'])) {
                 $idcol = $this->opts['container']['idcol'];
                 return self::$zaAuth->getIdentity()->$idcol;
-            } else {
+            } else if (isset($this->opts['container']['usercol'])) {
                 return $this->getUserName();
+            } else {
+                return self::$zaAuth->getIdentity();
             }
         }
 
@@ -89,8 +93,12 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
      */
     public  function getUserName() {
         if (self::$zaAuth->hasIdentity()) {
-            $usercol = $this->opts['container']['usercol'];
-            return self::$zaAuth->getIdentity()->$usercol;
+            if (isset($this->opts['container']['usercol'])) {
+                $usercol = $this->opts['container']['usercol'];
+                return self::$zaAuth->getIdentity()->$usercol;
+            } else {
+                return self::$zaAuth->getIdentity();
+            }
         }
 
         return null;
