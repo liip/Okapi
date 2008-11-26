@@ -1,5 +1,25 @@
 Release history of Okapi.
 
+2008-11-26 :: Version 1.1.5
+  - api_config: Fix writing of cache files as they were written to incorrect
+    paths. (pneff)
+  - api_exceptionhandler: Remove type hinting which makes Okapi compatible
+    with PHP 5.1 again. (chregu)
+  - api_config: Improve replaceAllConsts() by not working on references but
+    instead returning a modified array. This may break compatibility for
+    projects that subclass api_config.
+  - api_routing_route: New routing implementation supporting regular
+    expressions for path matching. (marc)
+  - api_config: Fix writing of cache files with environment keys.
+    (lukas.smith)
+  - api_testing_case_functional: Use PATH_SEPARATOR instead of hard-coded
+    colon for include path. This fixes compatibility with MS Windows. (pneff)
+  - api_config: Fixed bug in config cache dir generation that would lead to a
+    double / in the file path. (lukas.smith)
+  - api_routing: Enable subdomain matching for routing. (pneff)
+  - api_pam_auth_zend: getUserId() returns the real user ID instead of the
+    full user identity. (fabian.vogler)
+
 2008-10-27 :: Version 1.1.4
   - api_model_backend_get: Protocol can be specified in configuration. (ebi)
   - api_config: Added ability to define command level configuration files
