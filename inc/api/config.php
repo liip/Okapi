@@ -153,7 +153,11 @@ class api_config {
             }
         }
 
-        return $this->init($yaml);
+        if (empty($yaml)) {
+            return array();
+        }
+
+        return $this->init($yaml, $this->env);
     }
 
     /**
@@ -161,14 +165,15 @@ class api_config {
      * resulting YAML document to replace constants.
      *
      * @param $yaml string: File name or complete YAML document as a string.
+     * @param $env string: OKAPI_ENV for which the config should be read
      */
-    protected function init($yaml) {
+    protected function init($yaml, $env) {
         $cfg = sfYaml::load($yaml);
-        if (!isset($cfg[$this->env])) {
-            $this->env = self::$DEFAULT_ENV;
+        if (!isset($cfg[$env])) {
+            $env = self::$DEFAULT_ENV;
         }
-        $configArray = $cfg[$this->env];
-        $this->replaceAllConsts($configArray);
+        $configArray = $cfg[$env];
+        $configArray = $this->replaceAllConsts($configArray);
         return $configArray;
     }
 
@@ -256,13 +261,13 @@ class api_config {
      * Returns the filename of the configuration cache file to be used.
      */
     protected function getConfigCachefile($env, $command = false) {
-        $tmpdir = API_PROJECT_DIR . '/tmp/';
+        $tmpdir = API_PROJECT_DIR . 'tmp/';
         if (!is_writable($tmpdir)) {
             return null;
         }
         $file = $tmpdir . 'config-cache_' . $env;
         if ($command) {
-            $file.= $file . '_' . $command;
+            $file .= '_' . $command;
         }
         return $file . '.php';
     }
@@ -273,19 +278,21 @@ class api_config {
      * recursively.
      *
      * @param $arr array: Configuration array.
+     * @return array: Configuration array with all constants replaced
      */
-    protected function replaceAllConsts(&$arr) {
+    protected function replaceAllConsts($arr) {
         if (!is_array($arr)) {
-            return;
+            return $arr;
         }
 
-        foreach ($arr as $key => &$value) {
+        foreach ($arr as $key => $value) {
             if (is_array($value)) {
-                $this->replaceAllConsts($value);
+                $arr[$key] = $this->replaceAllConsts($value);
             } else {
                 $arr[$key] = $this->replaceConst($value);
             }
         }
+        return $arr;
     }
 
     /**

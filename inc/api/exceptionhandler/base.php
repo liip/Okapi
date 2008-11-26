@@ -23,7 +23,7 @@ abstract class api_exceptionhandler_base {
      * Sets the controller which is used for paint the exception.
      * @param $context api_controller
      */
-    public function setContext(api_controller $context) {
+    public function setContext($context) {
         $this->context = $context;
     }
 

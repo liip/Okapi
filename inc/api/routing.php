@@ -115,19 +115,19 @@ class api_routing implements api_Irouting {
  */
 class api_routing_route implements api_Irouting {
     /** Default parameters. */
-    private $default = array(
+    protected $default = array(
         'method' => 'process',
         'view' => array());
 
     /** Route expression to match against the path. */
-    private $route      = null;
+    protected $route      = null;
     /** Additional route configuration which influences how the route
         is processed. */
-    private $routeConfig = array();
+    protected $routeConfig = array();
     /** Parameter hash for the route. Returned when the route matches. */
-    private $params     = array();
+    protected $params     = array();
     /** Additional conditions which does not match the path. */
-    private $conditions = array();
+    protected $conditions = array();
 
     /**
      * Constructor. Sets the default params.
@@ -173,6 +173,8 @@ class api_routing_route implements api_Irouting {
         $uri = $request->getPath();
 
         if (isset($this->conditions['verb']) && $this->conditions['verb'] != $request->getVerb()) {
+            return null;
+        } else if (isset($this->conditions['sld']) && $this->conditions['sld'] != $request->getSld()) {
             return null;
         } else if ($this->route == $uri) {
             return $this->params;
@@ -314,7 +316,7 @@ class api_routing_route implements api_Irouting {
      *
      * @param $request api_request: Request to get path of.
      */
-    private function getPath($request) {
+    protected function getPath($request) {
         $path = $request->getPath();
         $ext = $request->getExtension();
 
