@@ -2,7 +2,7 @@
 /**
  * Tests the api_helpers_xml class.
  */
-class HelperXmlTest extends OkapiTestCase {
+class HelperXmlTest extends api_testing_case_unit {
     /**
      * Tests api_helpers_class::array2dom() method.
      */
@@ -23,13 +23,13 @@ class HelperXmlTest extends OkapiTestCase {
         $dom->loadXML("<doc/>");
         api_helpers_xml::array2dom($array, $dom, $dom->documentElement);
         
-        $this->assertXPath($dom, '/doc/name', 'tester');
-        $this->assertXPath($dom, '/doc/address/street', 'example street');
-        $this->assertXPath($dom, '/doc/address/house', '22');
-        $this->assertXPath($dom, '/doc/address/po', '');
-        $this->assertXPath($dom, '/doc/interested', 'false');
-        $this->assertXPath($dom, '/doc/alive', 'true');
-        $this->assertXPath($dom, '/doc/html', '<strong>I feel good.</strong>');
+        $this->assertText($dom, '/doc/name', 'tester');
+        $this->assertText($dom, '/doc/address/street', 'example street');
+        $this->assertText($dom, '/doc/address/house', '22');
+        $this->assertText($dom, '/doc/address/po', '');
+        $this->assertText($dom, '/doc/interested', 'false');
+        $this->assertText($dom, '/doc/alive', 'true');
+        $this->assertText($dom, '/doc/html', '<strong>I feel good.</strong>');
         
         $xp = new DOMXPath($dom);
         $res = $xp->query('/doc/html');
@@ -58,13 +58,13 @@ class HelperXmlTest extends OkapiTestCase {
         api_helpers_xml::array2dom($array, $dom, $dom->documentElement,
                 array('html'));
         
-        $this->assertXPath($dom, '/doc/name', 'tester');
-        $this->assertXPath($dom, '/doc/address/street', 'example street');
-        $this->assertXPath($dom, '/doc/address/house', '22');
-        $this->assertXPath($dom, '/doc/address/po', '');
-        $this->assertXPath($dom, '/doc/interested', 'false');
-        $this->assertXPath($dom, '/doc/alive', 'true');
-        $this->assertXPath($dom, '/doc/html', '<strong>I feel good.</strong>');
+        $this->assertText($dom, '/doc/name', 'tester');
+        $this->assertText($dom, '/doc/address/street', 'example street');
+        $this->assertText($dom, '/doc/address/house', '22');
+        $this->assertText($dom, '/doc/address/po', '');
+        $this->assertText($dom, '/doc/interested', 'false');
+        $this->assertText($dom, '/doc/alive', 'true');
+        $this->assertText($dom, '/doc/html', '<strong>I feel good.</strong>');
         
         $xp = new DOMXPath($dom);
         $res = $xp->query('/doc/html');
@@ -86,8 +86,8 @@ class HelperXmlTest extends OkapiTestCase {
         api_helpers_xml::array2dom($array, $dom, $dom->documentElement,
                 null, array('html'));
         
-        $this->assertXPath($dom, '/doc/alive', 'true');
-        $this->assertXPath($dom, '/doc/html/strong', 'I feel good.');
+        $this->assertText($dom, '/doc/alive', 'true');
+        $this->assertText($dom, '/doc/html/strong', 'I feel good.');
     }
 }
 ?>

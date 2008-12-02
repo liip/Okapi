@@ -4,7 +4,7 @@
  * i18n namespace and translates all strings based on content from
  * the language files.
  */
-class I18nTest extends OkapiTestCase {
+class I18nTest extends api_testing_case_unit {
     function setUp() {
         $_SERVER['HTTP_HOST'] = 'demo.okapi.org';
         $_SERVER["REQUEST_URI"] = '/the/command';

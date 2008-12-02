@@ -6,7 +6,7 @@
  *
  * This test will fail if you don't have internet access.
  */
-class ModelBackendGetTest extends OkapiTestCase {
+class ModelBackendGetTest extends api_testing_case_unit {
     function setUp() {
         //set debug environment
         $_SERVER['OKAPI_ENV'] = 'debug';
@@ -25,10 +25,10 @@ class ModelBackendGetTest extends OkapiTestCase {
         curl_exec($curl);
         
         $dom = $model->getDOM();
-        $this->assertXPath($dom, '/response/@status', 'ok');
-        $this->assertXPath($dom, '/response/@server', 'extapi');
-        $this->assertXPath($dom, '/response/@command', 'cities');
-        $this->assertXPath($dom, '/response/cities/city[1]/@name', 'Olten');
+        $this->assertText($dom, '/response/@status', 'ok');
+        $this->assertText($dom, '/response/@server', 'extapi');
+        $this->assertText($dom, '/response/@command', 'cities');
+        $this->assertText($dom, '/response/cities/city[1]/@name', 'Olten');
     }
 
     function testModelInvalidCommand() {
@@ -47,11 +47,11 @@ class ModelBackendGetTest extends OkapiTestCase {
         $modelUrl = curl_getinfo($model->getCurlObject(), CURLINFO_EFFECTIVE_URL);
         
         $dom = $model->getDOM();
-        $this->assertXPath($dom, '/response/@status', 'ok');
-        $this->assertXPath($dom, '/response/@server', 'extapi');
-        $this->assertXPath($dom, '/response/@command', 'cities');
-        $this->assertXPath($dom, '/response/@test', 'abc');
-        $this->assertXPath($dom, '/response/cities/city[1]/@name', 'Olten');
+        $this->assertText($dom, '/response/@status', 'ok');
+        $this->assertText($dom, '/response/@server', 'extapi');
+        $this->assertText($dom, '/response/@command', 'cities');
+        $this->assertText($dom, '/response/@test', 'abc');
+        $this->assertText($dom, '/response/cities/city[1]/@name', 'Olten');
     }
     
     function testParams() {

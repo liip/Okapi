@@ -2,12 +2,12 @@
 /**
  * Tests the api_model_file class which returns an XML file verbatim
  */
-class ModelFileTest extends OkapiTestCase {
+class ModelFileTest extends api_testing_case_unit {
     function testModel() {
         $model = new api_model_file(dirname(__FILE__).'/../../lang/lang_en.xml');
         
         $dom = $model->getDOM();
-        $this->assertXPath($dom, '/catalogue/message[@key="chf"]', 'CHF');
+        $this->assertText($dom, '/catalogue/message[@key="chf"]', 'CHF');
     }
 
     /**

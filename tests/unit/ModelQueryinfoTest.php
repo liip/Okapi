@@ -3,7 +3,7 @@
  * Tests the api_model_queryinfo class which returns an XML representation
  * of the current request.
  */
-class ModelQueryinfoTest extends OkapiTestCase {
+class ModelQueryinfoTest extends api_testing_case_unit {
     function setUp() {
         parent::setUp();
         $_SERVER['HTTP_HOST'] = 'demo.okapi.org';
@@ -23,11 +23,11 @@ class ModelQueryinfoTest extends OkapiTestCase {
         $model = new api_model_queryinfo($request, $route);
         $dom = $model->getDOM();
         
-        $this->assertXPath($dom, '/queryinfo/query/param1', 'value1');
-        $this->assertXPath($dom, '/queryinfo/requestURI', 'mycommand/foo?param1=value1');
-        $this->assertXPath($dom, '/queryinfo/lang', 'en');
-        $this->assertXPath($dom, '/queryinfo/command', 'mycommand');
-        $this->assertXPath($dom, '/queryinfo/method', 'foo');
+        $this->assertText($dom, '/queryinfo/query/param1', 'value1');
+        $this->assertText($dom, '/queryinfo/requestURI', 'mycommand/foo?param1=value1');
+        $this->assertText($dom, '/queryinfo/lang', 'en');
+        $this->assertText($dom, '/queryinfo/command', 'mycommand');
+        $this->assertText($dom, '/queryinfo/method', 'foo');
     }
     
     function testArrayParams() {
@@ -37,7 +37,7 @@ class ModelQueryinfoTest extends OkapiTestCase {
         
         $model = new api_model_queryinfo($request, $route);
         $dom = $model->getDOM();
-        $this->assertXPath($dom, '/queryinfo/requestURI', 'mycommand/foo?param1%5B0%5D=foo&param1%5B1%5D=bar');
+        $this->assertText($dom, '/queryinfo/requestURI', 'mycommand/foo?param1%5B0%5D=foo&param1%5B1%5D=bar');
     }
     
     function testRequestUriWithoutParams() {
@@ -46,6 +46,6 @@ class ModelQueryinfoTest extends OkapiTestCase {
         
         $model = new api_model_queryinfo($request, $route);
         $dom = $model->getDOM();
-        $this->assertXPath($dom, '/queryinfo/requestURI', 'mycommand/foo');
+        $this->assertText($dom, '/queryinfo/requestURI', 'mycommand/foo');
     }
 }

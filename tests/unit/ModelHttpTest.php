@@ -5,7 +5,7 @@
  *
  * This test will fail if you don't have internet access.
  */
-class ModelHttpTest extends OkapiTestCase {
+class ModelHttpTest extends api_testing_case_unit {
     function testModel() {
         // Get CURL object and execute it
         $model = new api_model_http('http://extapi.local.ch/0/cities.xml?q=Ol');
@@ -13,8 +13,8 @@ class ModelHttpTest extends OkapiTestCase {
         curl_exec($curl);
         
         $dom = $model->getDOM();
-        $this->assertXPath($dom, '/response/@status', 'ok');
-        $this->assertXPath($dom, '/response/cities/city[1]/@name', 'Olten');
+        $this->assertText($dom, '/response/@status', 'ok');
+        $this->assertText($dom, '/response/cities/city[1]/@name', 'Olten');
     }
 
     /**
@@ -25,8 +25,8 @@ class ModelHttpTest extends OkapiTestCase {
         // Get CURL object and execute it
         $model = new api_model_http('http://extapi.local.ch/0/cities.xml?q=Ol');
         $dom = $model->getDOM();
-        $this->assertXPath($dom, '/response/@status', 'ok');
-        $this->assertXPath($dom, '/response/cities/city[1]/@name', 'Olten');
+        $this->assertText($dom, '/response/@status', 'ok');
+        $this->assertText($dom, '/response/cities/city[1]/@name', 'Olten');
     }
     
     /**
