@@ -277,7 +277,9 @@ class api_controller {
      */
     private function catchFinalException(Exception $e) {
         api_exceptionhandler::handle($e, $this);
-        if ($this->response === null) {
+        if ($this->response !== null) {
+            $this->response->send();
+        } else {
             die();
         }
     }
