@@ -30,8 +30,16 @@ class api_routing_regex extends api_routing {
 class api_routing_regex_route extends api_routing_route {
     protected $routeParams = array();
     
+    protected $mappings = array();
+    
     public function map($mappings) {
         $this->mappings = $mappings;
+        return $this;
+    }
+    
+    public function route($route, $config = array()) {
+        $this->route = $route;
+        $this->routeConfig = $config;
         return $this;
     }
     
@@ -55,7 +63,7 @@ class api_routing_regex_route extends api_routing_route {
      *
      * \code
      * $m = new api_routing_regex();
-     * $m->route('/(?<command>[\w\d]+)(/?)test/([\d]*)', array("substitute"=>true))
+     * $m->route('/(?<command>[\w\d]+)(/?)test/([\d]*)', array("substitute"=>True))
      *     ->map('id' => 3)
      *     ->config(array('view' => array('xsl' => '{command}.xsl')));
      * \endcode
@@ -83,11 +91,13 @@ class api_routing_regex_route extends api_routing_route {
         
         // Set the parameters from the url which have a numbered mapping
         $params = $this->routeParams;
-        foreach ($this->mappings as $key => $index) {
-            if (!isset($paramMatches[$index]) || $paramMatches[$index] == "") {
-                continue;
+        if (is_array($this->mappings)) {
+            foreach ($this->mappings as $key => $index) {
+                if (!isset($paramMatches[$index]) || $paramMatches[$index] == "") {
+                    continue;
+                }
+                $params[$key] = $paramMatches[$index];
             }
-            $params[$key] = $paramMatches[$index];
         }
         $this->routeParams = $params;
         
