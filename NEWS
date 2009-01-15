@@ -1,5 +1,13 @@
 Release history of Okapi.
 
+2009-01-15 :: Version 1.1.6
+  - api_routing_regex: Fix E_NOTICE when mappings where not defined. (marc)
+  - api_db: Use databases without DSN. (jordi.boggiano)
+  - api_controller: processCommand is now public to bootstrap okapi in testing
+    environments. (marc)
+  - api_model_factory (testing/mocks/functional/): made $DEFAULTS publicly 
+    accessible for testing purpose. (patrick.jezek)
+
 2008-11-26 :: Version 1.1.5
   - api_config: Fix writing of cache files as they were written to incorrect
     paths. (pneff)
