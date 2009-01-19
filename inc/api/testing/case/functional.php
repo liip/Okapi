@@ -313,4 +313,18 @@ class api_testing_case_functional extends UnitTestCase {
         }
         $this->expectException(new api_testing_exception("Redirect 301 => $path"));
     }
+
+    /**
+     * Opens the rendered HTML directly in the browser.
+     */
+    protected function openInBrowser() {
+        $responseString = $this->responseDom->saveXML();
+        $file = tempnam(sys_get_temp_dir(), 'okapitest') . '.html';
+        file_put_contents($file, $responseString);
+        if( strtoupper (substr(PHP_OS, 0,3)) == 'WIN' ) {
+            throw new Exception("api_testing_case_functional::openInBrowser does not work on Windows.");
+        }
+        system("python -c \"import webbrowser; webbrowser.open('" . $file . "');\"");
+    }
+
 }
