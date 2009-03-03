@@ -1,123 +1,207 @@
 <?xml version="1.0"?>
-<xsl:stylesheet
-        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
-        xmlns="http://www.w3.org/1999/xhtml"
-        exclude-result-prefixes="xhtml"
-        version="1.0">
-    
-    <xsl:output encoding="utf-8" method="xml" doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd" doctype-public="-//W3C//DTD XHTML 1.0 Transitional//EN"/>
-    
-    <xsl:variable name="exception" select="/command/exception"/>
-    
-    <xsl:template match="/">
-        <html>
+<xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    version="1.0">
+
+    <xsl:output encoding="utf-8" method="xml" doctype-system="http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"
+        doctype-public="-//W3C//DTD XHTML 1.1//EN" />
+
+    <xsl:template match="/command/exception">
+        <html xml:lang="en">
+            <xsl:attribute name="xmlns">http://www.w3.org/1999/xhtml</xsl:attribute>
             <head>
+                <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+                <meta name="robots" content="NONE,NOARCHIVE" />
                 <title>
-                    <i18n:text>Exception</i18n:text>
+                    <xsl:value-of select="name" />
+                    <xsl:text> - Okapi default error page</xsl:text>
                 </title>
-                <link rel="stylesheet" type="text/css" href="{$webrootStatic}css/exceptionhandler.css"/>
+                <link rel="stylesheet" type="text/css" href="{concat($webrootStatic, 'stylesheets/error.css')}" />
+
             </head>
             <body>
-                <xsl:call-template name="content"/>
+                <div id="summary">
+                    <h1>
+                        <xsl:value-of select="name" />
+                    </h1>
+                    <pre class="exception_value">
+                        <xsl:value-of select="message" />
+                    </pre>
+                    <table class="meta">
+                        <tr>
+                            <th>
+                                <xsl:text>Exception Location:</xsl:text>
+                            </th>
+                            <td>
+                                <xsl:value-of select="file" />
+                                <xsl:text>, line </xsl:text>
+                                <xsl:value-of select="line" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <xsl:text>Theme:</xsl:text>
+                            </th>
+                            <td>
+                                <xsl:value-of select="$theme" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <xsl:text>Language:</xsl:text>
+                            </th>
+                            <td>
+                                <xsl:value-of select="$lang" />
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div id="traceback">
+                    <h2>
+                        <xsl:text>Traceback</xsl:text>
+                    </h2>
+
+                    <div id="browserTraceback">
+                        <ul class="traceback">
+                            <xsl:apply-templates select="backtrace/entry" />
+                        </ul>
+                    </div>
+                </div>
+
+                <div id="requestinfo">
+                    <h2>
+                        <xsl:text>Request information</xsl:text>
+                    </h2>
+
+                    <h3 id="get-info">
+                        <xsl:text>Settings</xsl:text>
+                    </h3>
+                    <table class="req">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <xsl:text>Variable</xsl:text>
+                                </th>
+                                <th>
+                                    <xsl:text>Value</xsl:text>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>
+                                    <xsl:text>API_WEBROOT:</xsl:text>
+                                </th>
+                                <td class="code">
+                                    <div>
+                                        <xsl:value-of select="$webroot" />
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <xsl:text>API_WEBROOT_STATIC:</xsl:text>
+                                </th>
+                                <td class="code">
+                                    <div>
+                                        <xsl:value-of select="$webrootStatic" />
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <xsl:text>API_MOUNTPATH:</xsl:text>
+                                </th>
+                                <td class="code">
+                                    <div>
+                                        <xsl:value-of select="$mountpath" />
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <xsl:text>API_PROJECT_DIR:</xsl:text>
+                                </th>
+                                <td class="code">
+                                    <div>
+                                        <xsl:value-of select="$projectDir" />
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="explanation">
+                    <p>
+                        <xsl:text>Okapi default error page. Please don't use in production - it won't make clients happy.</xsl:text>
+                    </p>
+                </div>
             </body>
         </html>
     </xsl:template>
 
-    <xsl:template name="content">
-        <div id="content">
-            <h1><xsl:value-of select="$exception/name"/>&#xA0;<i18n:text>Exception</i18n:text></h1>
-            <p>
-                <i18n:text>With message:</i18n:text>
-            </p>
-            <h2>
-                <xsl:value-of select="$exception/message"/>
-            </h2>
-            <p>
-                <i18n:text>Thrown at:</i18n:text>&#xA0;<xsl:value-of select="$exception/file"/>&#xA0;(<xsl:value-of select="$exception/line"/>)
-	        </p>
-	        
-            <table class="stacktrace">
-                <thead>
-                    <th/>
-                    <th>Class/Method</th>
-                    <th>File</th>
-                    <th>Line</th>
-                </thead>
-                <tbody>
-                    <xsl:apply-templates select="$exception/backtrace/entry" />
-                </tbody>
-            </table>
-        </div>
-    </xsl:template>
-    
     <xsl:template match="backtrace/entry">
-        <xsl:variable name="caller" select="caller"/>
-        
-        <tr class="exceptionInfo">
-            <td/>
-            <td>
+        <li class="frame">
+            <code>
+                <xsl:value-of select="substring-after(file,$projectDir)" />
+            </code>
+            <xsl:text>, line </xsl:text>
+            <code>
+                <xsl:value-of select="caller + 1" />
+            </code>
+            <xsl:text> in </xsl:text>
+            <code>
                 <xsl:if test="class != ''">
-                    <xsl:value-of select="class"/>
+                    <xsl:value-of select="class" />
                     <xsl:text>::</xsl:text>
                 </xsl:if>
-                <xsl:value-of select="function"/>
-            </td>
-            <td><xsl:value-of select="substring-after(file,$projectDir)"/></td>
-            <td><xsl:value-of select="line"/></td>
-        </tr>
-        
-        <xsl:if test="source/entry">
-            <tr class="exceptionCode">
-                <td colspan="4">
-                    <div class="codeblock">
-                        <table border="0" cellspacing="0" cellpadding="0" width="100%">
-                            <xsl:apply-templates select="source/entry" />
-                        </table>
-                    </div>
-                </td>
-            </tr>
-        </xsl:if>
+                <xsl:value-of select="function" />
+            </code>
+
+            <xsl:if test="source/entry">
+                <div class="context">
+                    <ol class="pre-context" start="{source/entry/@key + 1}">
+                        <xsl:apply-templates select="source/entry" />
+                    </ol>
+                </div>
+            </xsl:if>
+        </li>
     </xsl:template>
-    
+
     <xsl:template match="backtrace/entry/source/entry">
         <xsl:variable name="caller" select="../../caller" />
-        
-        <tr>
-            <td width="40">
-                <xsl:value-of select="@key"/>
-            </td>
-            <td>
-                <xsl:if test="$caller != '' and @key=$caller">
-                    <xsl:attribute name="class">caller</xsl:attribute>
-                </xsl:if>
-                <pre>
-                    <xsl:value-of select="." disable-output-escaping="yes"/>
-                </pre>
-            </td>
-        </tr>
+
+        <li>
+            <xsl:if test="$caller != '' and @key=$caller">
+                <xsl:attribute name="class">caller</xsl:attribute>
+            </xsl:if>
+            <pre>
+                <xsl:call-template name="filter-line-breaks">
+                    <xsl:with-param name="text" select="." />
+                </xsl:call-template>
+                <xsl:text>&#160;</xsl:text>
+            </pre>
+        </li>
     </xsl:template>
-    
-    <xsl:template match="xhtml:h1" mode="xhtml">
-    </xsl:template>
-    
-    <!-- add everything from head to the output -->
-    <xsl:template name="html_head">
-    </xsl:template>
-    
-    <!-- except the title -->
-    <xsl:template match="xhtml:head/xhtml:title" mode="xhtml">
-    </xsl:template>
-    
-    <!-- except the links -->
-    <xsl:template match="xhtml:head/xhtml:link" mode="xhtml">
-    </xsl:template>
-    
-    <!-- do not output meta tags without @content -->
-    <xsl:template match="xhtml:head/xhtml:meta[not(@content)]" mode="xhtml">
-    </xsl:template>
-    
-    <xsl:template name="body_attributes">
+
+    <xsl:template name="filter-line-breaks">
+        <xsl:param name="text" />
+        <xsl:choose>
+            <xsl:when test="contains($text, '&#13;')">
+                <xsl:value-of select="substring-before($text, '&#13;')" />
+                <xsl:call-template name="filter-line-breaks">
+                    <xsl:with-param name="text" select="substring-after($text, '&#13;')" />
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:when test="contains($text, '&#10;')">
+                <xsl:value-of select="substring-before($text, '&#10;')" />
+                <xsl:call-template name="filter-line-breaks">
+                    <xsl:with-param name="text" select="substring-after($text, '&#10;')" />
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$text" />
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 </xsl:stylesheet>
