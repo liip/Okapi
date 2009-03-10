@@ -55,13 +55,21 @@ class api_model_queryinfo extends api_model {
 
         $elem = $dom->createElement('query');
         foreach($this->params as $name => $value) {
-            $queryP = $dom->createElement($name);
-            if (is_array($value)) {
-                api_helpers_xml::array2dom($value, $dom, $queryP);
-            } else {
-                $queryP->nodeValue = htmlspecialchars(urldecode($value), ENT_QUOTES, 'UTF-8');
+            try {
+                $queryP = $dom->createElement($name);
+                if (is_array($value)) {
+                    api_helpers_xml::array2dom($value, $dom, $queryP);
+                } else {
+                    $queryP->nodeValue = htmlspecialchars(urldecode($value), ENT_QUOTES, 'UTF-8');
+                }
+                $elem->appendChild($queryP);
+            } catch (DOMException $e) {
+                // silently ignore catched DOM_INVALID_CHARACTER_ERR
+                if (DOM_INVALID_CHARACTER_ERR !== $e->getCode()) {
+                    // rethrow all other Exceptions
+                    throw $e;
+                }
             }
-            $elem->appendChild($queryP);
         }
         $root->appendChild($elem);
 

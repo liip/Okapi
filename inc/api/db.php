@@ -120,7 +120,7 @@ class api_db {
      *         the driver.
      */
     private static function get($config) {
-        if (empty($config['dsn'])) {
+        if (empty($config['dsn']) && empty($config['host'])) {
             return false;
         }
 

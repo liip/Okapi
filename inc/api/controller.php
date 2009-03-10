@@ -179,7 +179,7 @@ class api_controller {
      *            returns false.
      *
      */
-    protected function processCommand() {
+    public function processCommand() {
         try {
             if (!$this->command->isAllowed()) {
                 throw new api_exception_CommandNotAllowed("Command access not allowed: ".get_class($this->command));
@@ -205,6 +205,7 @@ class api_controller {
         if (is_null($data) && $this->command instanceof api_command) {
             $data = $this->command->getData();
         }
+        
         $this->view->dispatch($data, $this->exceptions);
     }
 
@@ -277,9 +278,7 @@ class api_controller {
      */
     private function catchFinalException(Exception $e) {
         api_exceptionhandler::handle($e, $this);
-        if ($this->response !== null) {
-            $this->response->send();
-        } else {
+        if ($this->response === null) {
             die();
         }
     }

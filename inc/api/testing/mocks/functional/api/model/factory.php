@@ -16,7 +16,7 @@ class api_model_factory {
     protected static $fixtures = array();
     
     /** array: List of models which can always be instantiated without fixture. */
-    protected static $DEFAULTS = array('config', 'queryinfo', 'userstatus');
+    public static $DEFAULTS = array('config', 'queryinfo', 'userstatus');
     
     /** bool: True if the default behavior should be kept as a fallback. */
     protected static $defaultFallback = true;
