@@ -35,7 +35,7 @@ class api_exceptionhandler_default extends api_exceptionhandler_base {
             if (isset($entry['class'])) {
                 try {
                     $refl = new ReflectionMethod($entry['class'], $entry['function']);
-                    if (isset($trace[$i -1])) {
+                    if (isset($trace[$i -1]) && isset($trace[$i -1]['line'])) {
                         $entry['caller'] = (int) $trace[$i -1]['line'] -1;
                     } else if ($i === 0) {
                         $entry['caller'] = (int) $e->getLine() -1;
