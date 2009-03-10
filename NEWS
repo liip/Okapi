@@ -1,5 +1,14 @@
 Release history of Okapi.
 
+2009-03-10 :: Version 1.1.7
+  - api_testing_case_functional: Added openInBrowser method for debugging
+    (alain)
+  - api_init: Only define API_PROJECT_DIR if it's not defined, yet. 
+    Needed to the inc/ folder can be a symlink to some central location.
+    (pneff)
+  - api_exceptionhandler_default: Check if 'line' is a valid index (marc /
+    harry fuecks)
+
 2009-01-15 :: Version 1.1.6
   - api_routing_regex: Fix E_NOTICE when mappings where not defined. (marc)
   - api_db: Use databases without DSN. (jordi.boggiano)
