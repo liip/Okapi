@@ -89,7 +89,6 @@ class api_views_default extends api_views_common {
         if (! $xmldom instanceof DOMDocument && $this->xsldom && $this->xslproc) {
             return;
         }
-        libxml_clear_errors();
 
         $xml = @$this->xslproc->transformToDoc($xmldom);
         $xslt_errors = libxml_get_errors();
@@ -154,6 +153,10 @@ class api_views_default extends api_views_common {
      *            does not contain valid XML.
      */
     public function prepare() {
+        // Need to clear errors for unit tests, where errors
+        // from a previous test could persist into the next
+        libxml_clear_errors();
+        
         $defaults = array('theme' => 'default', 'css' => 'default',
                           'view' => 'default', 'passdom' => 'no');
         $attrib = $this->route['view'];
