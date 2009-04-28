@@ -251,8 +251,8 @@ class api_config {
 
         $configString = serialize($configArray);
         file_put_contents($file, $configString);
-        if (isset($this->configArray['umask'])) {
-            chmod($file, $this->configArray['umask']);
+        if (isset($configArray['umask'])) {
+            chmod($file, $configArray['umask']);
         }
         return true;
     }
