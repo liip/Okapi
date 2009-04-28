@@ -12,7 +12,7 @@ class api_testing_case_functional extends UnitTestCase {
     /** string: Original include path before setUp() was called. Used to
         recover the include path in the tearDown() method. */
     protected $includepathOriginal = '';
-    
+
     /**
      * Sets up the testing environment for the functional tests.
      * Prepends the directory mocks/functional to the include
@@ -27,10 +27,10 @@ class api_testing_case_functional extends UnitTestCase {
         set_include_path(dirname(__FILE__).'/../mocks/functional/' .
             PATH_SEPARATOR . get_include_path());
         api_model_factory::reset();
-        
+
         parent::setUp();
     }
-    
+
     /**
      * Resets the testing environment. Reverts to the original include path.
      */
@@ -72,7 +72,7 @@ class api_testing_case_functional extends UnitTestCase {
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $this->request($path, $params);
     }
-    
+
     /**
      * Executes the given request internally using the PUT method.
      * @param $path string: Path relative to the application root to
@@ -84,7 +84,7 @@ class api_testing_case_functional extends UnitTestCase {
         $_SERVER['REQUEST_METHOD'] = 'PUT';
         $this->request($path, $params);
     }
-    
+
     /**
      * Executes the given request internally using the DELETE method.
      * @param $path string: Path relative to the application root to
@@ -96,7 +96,7 @@ class api_testing_case_functional extends UnitTestCase {
         $_SERVER['REQUEST_METHOD'] = 'DELETE';
         $this->request($path, array());
     }
-    
+
     /**
      * Common request handling for get/post.
      * @param $path string: Path relative to the application root to
@@ -108,7 +108,7 @@ class api_testing_case_functional extends UnitTestCase {
         $_SERVER["REQUEST_URI"] = $path;
         $components = parse_url($path);
         $_GET = $_POST = $_REQUEST = $_FILES = array();
-        
+
         if (isset($components['query'])) {
             $query = array();
             parse_str($components['query'], $query);
@@ -117,7 +117,7 @@ class api_testing_case_functional extends UnitTestCase {
         $_POST = $params;
         $this->uploadFiles($_POST, $_FILES);
         $_REQUEST = array_merge($_GET, $_POST);
-        
+
         api_request::getInstance(true);
         api_response::getInstance(true);
         $this->controller = new api_controller();
@@ -125,7 +125,7 @@ class api_testing_case_functional extends UnitTestCase {
         $this->loadResponse();
         $this->removeUploadedFiles();
     }
-    
+
     /**
      * Loads the response into the DOM.
      * May be overwritten in implementations where the response
@@ -138,7 +138,7 @@ class api_testing_case_functional extends UnitTestCase {
         $this->assertIsA($this->responseDom, 'DOMDocument',
             "The view didn't output valid XML. (%s)");
     }
-    
+
     /**
      * Takes all paramaters form the POST array whose value's
      * start with an `@' and interprets those as file uploads.
@@ -165,7 +165,7 @@ class api_testing_case_functional extends UnitTestCase {
                     $upload_file = sys_get_temp_dir() . '/_file_' . count($files);
                     copy($orig_file, $upload_file);
                 }
-                
+
                 // Get MIME type
                 if (function_exists('finfo_open')) {
                     $finfo = finfo_open(FILEINFO_MIME);
@@ -176,7 +176,7 @@ class api_testing_case_functional extends UnitTestCase {
                 } else {
                     $type = '';
                 }
-                
+
                 // File upload
                 $files[$key] = array(
                     'name' => basename($orig_file),
@@ -189,7 +189,7 @@ class api_testing_case_functional extends UnitTestCase {
             }
         }
     }
-    
+
     /**
      * Remove all uploaded files from the current request.
      */
@@ -200,7 +200,7 @@ class api_testing_case_functional extends UnitTestCase {
             }
         }
     }
-    
+
     /**
      * Constructs the correct URI for the given route path.
      * @param $route string: Relative URL from the application root.
@@ -209,7 +209,7 @@ class api_testing_case_functional extends UnitTestCase {
     protected function getURI($route, $lang = 'de') {
         return API_HOST . $lang . API_MOUNTPATH . substr($route, 1);
     }
-    
+
     /**
      * Constructs the correct path relative to the root of the host for
      * the given route path. Prepends the mount path and language.
@@ -228,7 +228,7 @@ class api_testing_case_functional extends UnitTestCase {
     protected function getNode($xpath) {
         return api_helpers_xpath::getNode($this->responseDom, $xpath);
     }
-    
+
     /**
      * Asserts that the given node exists.
      * @param $xpath string: XPath expression to test.
@@ -240,7 +240,7 @@ class api_testing_case_functional extends UnitTestCase {
         }
         $this->assertNotNull($this->getNode($xpath), "{$message}No node found for $xpath");
     }
-    
+
     /**
      * Asserts that the given node does not exist.
      * @param $xpath string: XPath expression to test.
@@ -252,7 +252,7 @@ class api_testing_case_functional extends UnitTestCase {
         }
         $this->assertNull($this->getNode($xpath), "{$message}Node found for $xpath but none was expected.");
     }
-    
+
     /**
      * Gets the first result of the current page by XPath.
      * @param $xpath string: XPath expression to return text for.
@@ -261,7 +261,7 @@ class api_testing_case_functional extends UnitTestCase {
     public function getText($xpath) {
         return api_helpers_xpath::getText($this->responseDom, $xpath);
     }
-    
+
     /**
      * Asserts that the text retrieved by an XPath expression matches.
      * @param $xpath string: XPath expression to test.
@@ -272,7 +272,7 @@ class api_testing_case_functional extends UnitTestCase {
     public function assertText($xpath, $expected, $message = '%s') {
         return $this->assertEqual($expected, $this->getText($xpath), $message);
     }
-    
+
     /**
      * Gets the first result of the current page by XPath.
      * @param $xpath string: XPath expression to return attribute for. The
@@ -285,7 +285,7 @@ class api_testing_case_functional extends UnitTestCase {
     public function getAttribute($xpath) {
         return api_helpers_xpath::getAttribute($this->responseDom, $xpath);
     }
-    
+
     /**
      * Asserts that the attribute retrieved by an XPath expression matches.
      * @param $xpath string: XPath expression.
