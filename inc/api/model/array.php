@@ -34,4 +34,8 @@ class api_model_array extends api_model {
         api_helpers_xml::array2dom($this->array, $dom, $dom->documentElement);
         return $dom;
     }
+    
+    public function getData() {
+    	return $this->array;
+    }
 }
