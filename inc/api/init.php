@@ -103,8 +103,7 @@ class api_init {
 
         // Prepend extension directories to include path
         if (is_dir(API_PROJECT_DIR . 'ext/')) {
-            $lib = "";
-            $inc = "";
+            $lib = $inc = '';
             foreach (glob(API_PROJECT_DIR . 'ext/*') as $dir) {
                 $inc .= $dir . PATH_SEPARATOR;
                 if (is_dir($dir."/lib")) {
@@ -118,23 +117,27 @@ class api_init {
                 $incPath = $inc . $incPath;
             }
         }
+
         if (file_exists(API_LOCAL_VENDOR_DIR)) {
-            $incPath = API_LOCAL_INCLUDE_DIR . PATH_SEPARATOR . API_LOCAL_VENDOR_DIR . PATH_SEPARATOR . $incPath;
-        } else {
-            $incPath = API_LOCAL_INCLUDE_DIR . PATH_SEPARATOR . $incPath;
+            $incPath = API_LOCAL_VENDOR_DIR . PATH_SEPARATOR . $incPath;
         }
+        $incPath = API_LOCAL_INCLUDE_DIR . PATH_SEPARATOR . $incPath;
 
         ini_set("include_path", $incPath);
 
-        // Autoloader which converts class name's underscores to slashes
-        // on the file system.
-        include_once API_LIBS_DIR."autoload.php";
-
-        // Load config
-        include_once API_LIBS_DIR."config.php";
-
-        // Read config file
+        // Load and read config
+        require_once API_LIBS_DIR."config.php";
         $cfg = api_config::getInstance();
+
+        // Load autoloader
+        $autoload = $cfg->autoload;
+        if (empty($autoload)) {
+            $autoload = API_LIBS_DIR."autoload.php";
+            require_once $autoload;
+            spl_autoload_register(array('autoload', 'load'));
+        } else {
+            require_once API_LOCAL_INCLUDE_DIR.$autoload;
+        }
 
         // Construct URL for Web home (root of current host)
         $hostname = (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '');
@@ -178,12 +181,40 @@ class api_init {
         }
 
         // Enable libxml internal errors
-        libxml_use_internal_errors(TRUE);
+        libxml_use_internal_errors(true);
 
-        // Load routing configuration
-        require_once(API_PROJECT_DIR."conf/commandmap.php");
+        // Create ServiceContainer
+        $serviceContainerCfg = $cfg->serviceContainer;
+        if (empty($serviceContainerCfg)) {
+            $serviceContainer = 'api_servicecontainer';
+        } else {
+            $api_container_file = API_TEMP_DIR.'servicecontainer.php';
+            $serviceContainer = $serviceContainerCfg['class'];
+            if (file_exists($api_container_file)) {
+                require_once $api_container_file;
+            } else {
+                $sc = new sfServiceContainerBuilder();
+                $loader = $serviceContainerCfg['loader'];
+                $loader = new $loader($sc);
+                $loader->load(API_PROJECT_DIR.'conf/'.$serviceContainerCfg['file']);
+
+                if ($cfg->configCache) {
+                    $dumper = new sfServiceContainerDumperPhp($sc);
+                    $code = $dumper->dump(array('class' => $serviceContainer));
+                    file_put_contents($api_container_file, $code);
+                }
+            }
+        }
+
+        if (!isset($sc)) {
+            $sc = new $serviceContainer();
+        }
+
+        $sc->routingcontainer;
 
         self::$initialized = true;
+
+        return $sc;
     }
 
     /**
