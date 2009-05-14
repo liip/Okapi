@@ -173,7 +173,7 @@ class api_init {
 
         // Create temporary directory
         $tmpDir = $cfg->tmpdir;
-        if (! is_null($tmpDir)) {
+        if (!is_null($tmpDir)) {
             if (!is_dir($tmpDir)) {
                 mkdir($tmpDir, 0777, true);
             }
@@ -210,10 +210,9 @@ class api_init {
             $sc = new $serviceContainer();
         }
 
+        // Load the routing rules
         $sc->routingcontainer;
-
         self::$initialized = true;
-
         return $sc;
     }
 
