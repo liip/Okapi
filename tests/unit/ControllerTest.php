@@ -104,8 +104,8 @@ class ControllerTest extends UnitTestCase {
         $this->controller->process();
 
         $this->assertEqual($this->controller->getCommandName(), 'foo_command_bar');
+        $this->assertIsA($this->controller->getCommand(), 'foo_command_bar');
         $this->assertEqual($this->controller->getFinalViewName(), 'foo_views_default');
-        
     }
     
     /**
@@ -140,6 +140,7 @@ class ControllerTest extends UnitTestCase {
         $this->controller->process();
 
         $this->assertEqual($this->controller->getCommandName(), 'bar_command_foo');
+        $this->assertIsA($this->controller->getCommand(), 'bar_command_foo');
         $this->assertEqual($this->controller->getFinalViewName(), 'api_views_default');
         
     }
