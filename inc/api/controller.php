@@ -351,6 +351,16 @@ class api_controller {
     }
 
     /**
+     * Returns the current loaded command. Might returns
+     * an empty array if no command is loaded.
+     *
+     * @return api_command|array
+     */
+    public function getCommand() {
+        return $this->command;
+    }
+
+    /**
      * Returns the final, dispatched view  name, needed by tests
      *
      */
