@@ -5,6 +5,10 @@ UPCOMING RELEASE
     which represented potential security issues through spoofing. Headers
     must now be supplied via config - defaults to just REMOTE_ADDR
     (harry fuecks)
+  - Added api_model_interceptor for overriding the behaviour of
+    api_model_factory at runtime, by intercepting requests made to
+    it and returning a different object from the factory instead.
+    (harry fuecks)
 
 2009-03-10 :: Version 1.1.7
   - api_testing_case_functional: Added openInBrowser method for debugging
