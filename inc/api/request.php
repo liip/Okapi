@@ -227,11 +227,11 @@ class api_request {
      * X-Cluster-Client-IP header.
      */
     public function getClientIp() {
-        $headers = array('HTTP_X_FORWARDED_FOR', 'HTTP_X_CLUSTER_CLIENT_IP',
-                         'HTTP_FORWARDED_FOR', 'HTTP_X_FORWARDED',
-                         'HTTP_FORWARDED', 'HTTP_VIA', 'HTTP_X_COMING_FROM',
-                         'HTTP_X_COMING_FROM', 'HTTP_COMING_FROM',
-                         'REMOTE_ADDR');
+        $headers = api_config::getInstance()->clientIpHeaders;
+        if ( !is_array($headers) || count($headers) == 0 ) {
+            $headers = array('REMOTE_ADDR');
+        }
+        
         foreach ($headers as $header) {
             if (isset($_SERVER[$header])) {
                 return $_SERVER[$header];
