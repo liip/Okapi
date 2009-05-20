@@ -1,5 +1,11 @@
 Release history of Okapi.
 
+UPCOMING RELEASE
+  - api_request::getClientIp() - removed the hard coded list of headers
+    which represented potential security issues through spoofing. Headers
+    must now be supplied via config - defaults to just REMOTE_ADDR
+    (harry fuecks)
+
 2009-03-10 :: Version 1.1.7
   - api_testing_case_functional: Added openInBrowser method for debugging
     (alain)
