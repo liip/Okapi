@@ -40,6 +40,7 @@ class api_log {
      * Log a message if a logger is configured
      */
     public static function log($prio) {
+return false;
         if (self::$instance === false) {
             return false;
         }
@@ -70,13 +71,13 @@ class api_log {
     /**
      * Initialize the logger.
      */
-    public function __construct() {
+    public function __construct($config) {
         if (self::$logger !== null) {
             // Already initialized
             return;
         }
 
-        $configs = api_config::getInstance()->log;
+        $configs = $config->log;
 
         if (empty($configs[0]['class'])) {
             // Logging is not activated

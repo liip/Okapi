@@ -2,7 +2,6 @@
 /* Licensed under the Apache License, Version 2.0
  * See the LICENSE and NOTICE file for further information
  */
-require_once(dirname(__FILE__) . '/vendor/sfYaml/sfYaml.php');
 
 /**
  * Generic config file class.
@@ -67,20 +66,6 @@ class api_config {
     protected static $loader = null;
 
     /**
-     * Gets an instance of api_config.
-     * @param $forceReload bool: If true, forces instantiation of a
-     *        new instance. Used for testing.
-     * @return api_config an api_config instance;
-     */
-    public static function getInstance($forceReload = FALSE) {
-        if (! self::$instance instanceof api_config || $forceReload) {
-            self::$instance = new api_config();
-        }
-
-        return self::$instance;
-    }
-
-    /**
      * Set a custom loader.
      *
      * The loader is an object used to load the configuration. The object
@@ -97,7 +82,7 @@ class api_config {
     /**
      * Constructor. Loads the configuration file into memory.
      */
-    protected function __construct() {
+    public function __construct() {
         if (isset($_SERVER['OKAPI_ENV'])) {
             $this->env = $_SERVER['OKAPI_ENV'];
         } else {
@@ -108,14 +93,19 @@ class api_config {
     }
 
     public function load($command = false) {
-        if ($this->readFromCache($this->env, $command)) {
-            return;
-        }
-
-        if (is_null(self::$loader)) {
-            $configArray = $this->loadYaml($this->env, $command);
-        } else {
-            $configArray = self::$loader->load($this->env, $command);
+        $cachefile = $this->getConfigCachefile($this->env, $command);
+        $writeCache = false;
+        if ($cachefile) {
+            $configArray = $this->readFromCache($cachefile);
+            if (!$configArray) {
+                if (is_null(self::$loader)) {
+                    $configArray = $this->loadYaml($this->env, $command);
+                } else {
+                    $configArray = self::$loader->load($this->env, $command);
+                }
+            } elseif (empty($configArray['configCache'])) {
+                $writeCache = true;
+            }
         }
 
         if ($command) {
@@ -124,7 +114,9 @@ class api_config {
             $this->configArray = $configArray;
         }
 
-        $this->saveCache($this->env, $command);
+        if ($writeCache) {
+            $this->saveCache($cachefile, $configArray);
+        }
     }
 
     /**
@@ -211,19 +203,12 @@ class api_config {
      * Checks availability of a cachefile and assigns the cached content
      * to the protected object variable $configCache.
      */
-    protected function readFromCache($env, $command = false) {
-        $cachefile = $this->getConfigCachefile($env, $command);
-
+    protected function readFromCache($cachefile) {
         if (!is_null($cachefile) && file_exists($cachefile) && is_readable($cachefile)) {
             $configString = file_get_contents($cachefile);
             $configArray = unserialize($configString);
             if (isset($configArray) && is_array($configArray)) {
-                if ($command) {
-                    $this->commandConfigArray = $configArray;
-                } else {
-                    $this->configArray = $configArray;
-                }
-                return true;
+                return $configArray;
             }
         }
 
@@ -238,21 +223,15 @@ class api_config {
      * This behaviour must be turned on explicitly by setting the
      * configCache configuration value to true.
      */
-    protected function saveCache($env, $command = false) {
-        $configArray = $command ? $this->commandConfigArray : $this->configArray;
-        if (empty($configArray['configCache'])) {
-            return;
-        }
-
-        $file = $this->getConfigCachefile($env, $command);
-        if (is_null($file)) {
+    protected function saveCache($cachefile, $configArray) {
+        if (is_null($cachefile)) {
             return;
         }
 
         $configString = serialize($configArray);
-        file_put_contents($file, $configString);
+        file_put_contents($cachefile, $configString);
         if (isset($configArray['umask'])) {
-            chmod($file, $configArray['umask']);
+            chmod($cachefile, $configArray['umask']);
         }
         return true;
     }

@@ -28,4 +28,22 @@ class api_servicecontainer extends sfServiceContainer
 
     return $this->shared['controller'] = $instance;
   }
+
+  protected function getRequestService()
+  {
+    if (isset($this->shared['request'])) return $this->shared['request'];
+
+    $instance = new api_request();
+
+    return $this->shared['request'] = $instance;
+  }
+
+  protected function getResponseService()
+  {
+    if (isset($this->shared['response'])) return $this->shared['response'];
+
+    $instance = new api_response();
+
+    return $this->shared['response'] = $instance;
+  }
 }

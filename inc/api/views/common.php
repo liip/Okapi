@@ -17,29 +17,13 @@ abstract class api_views_common {
     protected $route = array();
 
     /**
-     * Set the response object to use.
-     * @param $response api_response: Response object.
-     */
-    public function setResponse($response) {
-        $this->response = $response;
-    }
-
-    /**
-     * Set the request object to use.
-     * @param $request api_request: Request object.
-     */
-    public function setRequest($request) {
-        $this->request = $request;
-    }
-
-    /**
      * Constructor.
      * @param $route hash: Route parameters.
      */
-    public function __construct($route) {
-        $this->request = api_request::getInstance();
+    public function __construct($route, $request, $response) {
         $this->route = $route;
-        $this->response = api_response::getInstance();
+        $this->request = $request;
+        $this->response = $response;
     }
 
     /**

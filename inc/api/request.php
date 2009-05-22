@@ -50,12 +50,12 @@ class api_request {
      * Constructor. Parses the request and fills in all the
      * values it can.
      */
-    protected function __construct() {
+    public function __construct($config) {
+        $this->config = $config;
         $this->host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
 
-        $config = api_config::getInstance();
-        $this->outputLangs = $config->lang['languages'];
-        $this->defaultLang = $config->lang['default'];
+        $this->outputLangs = $this->config->lang['languages'];
+        $this->defaultLang = $this->config->lang['default'];
         if (is_null($this->outputLangs)) {
             $this->outputLangs = array('en');
         }
@@ -64,7 +64,7 @@ class api_request {
         }
 
         // Parse host, get SLD / TLD
-        $hostinfo = api_init::getHostConfig($this->host);
+        $hostinfo = api_init::getHostConfig($this->config, $this->host);
         if ($hostinfo) {
             $this->sld = $hostinfo['sld'];
             $this->tld = $hostinfo['tld'];
@@ -118,7 +118,7 @@ class api_request {
              * config file, only these extensions are valid extensions.
              * the rest is not parsed as an extension */
             preg_match("#\.([a-z]+)$#", $this->filename, $matches);
-            $aExtensions = api_config::getInstance()->extensions;
+            $aExtensions = $this->config->extensions;
             if (isset($matches[1]) && !empty($matches[1])) {
                 if (isset($aExtensions) && is_array($aExtensions)) {
                     if (in_array($matches[1], $aExtensions)) {
@@ -310,8 +310,7 @@ class api_request {
         }
 
         // lang is in ACCEPT_LANGUAGE
-        $config = api_config::getInstance();
-        if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) && $config->acceptLanguage !== false) {
+        if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) && $this->config->acceptLanguage !== false) {
             $accls = explode(",", $_SERVER['HTTP_ACCEPT_LANGUAGE']);
             if (is_array($accls)) {
                 foreach($accls as $accl) {

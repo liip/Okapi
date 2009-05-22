@@ -40,7 +40,7 @@ class api_view {
      * @param $response api_response: Response object.
      * @todo  Is omitextension still needed here?
      */
-    public static function factory($name, $request, $route, $response) {
+    public static function getViewName($name, $request, $route) {
         $rgNamespace = Array();
         $ext = $request->getExtension();
 
@@ -51,12 +51,12 @@ class api_view {
         $rgNamespace[] = api_view::$defaultNamespace;
 
         foreach ($rgNamespace as $ns) {
-            if (($obj = api_view::getViewWithNamespace($ns, $ext, $name, $route, $response)) != false) {
-                return $obj;
+            if (($className = api_view::getViewWithNamespace($ns, $ext, $name, $route)) != false) {
+                return $className;
             }
         }
 
-        return false;
+        throw new api_exception_NoViewFound("View " . $name . " not found");
     }
 
     /**
@@ -76,7 +76,7 @@ class api_view {
      * @param $response api_response: Response object.
      * @return api_view|false
      */
-    private static function getViewWithNamespace($ns, $ext, $name, $route, $response) {
+    public static function getViewWithNamespace($ns, $ext, $name, $route) {
         $omitExt = (!empty($route['view']['omitextension']) && $route['view']['omitextension']) ? true : false;
         $className = $ns.api_view::$classNameBase.strtolower($name);
 
@@ -101,9 +101,7 @@ class api_view {
         }
 
         if (class_exists($className)) {
-            $obj = new $className($route);
-            $obj->setResponse($response);
-            return $obj;
+            return $className;
         }
 
         return false;

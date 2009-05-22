@@ -73,28 +73,11 @@ class api_controller {
      * Constructor. Gets instances of api_request and api_response
      * but doesn't yet do anything else.
      */
-    public function __construct() {
-        try {
-            $this->request = api_request::getInstance();
-            $this->response = api_response::getInstance();
-        } catch(api_exception $e) {
-            $this->catchFinalException($e);
-        } catch(Exception $e) {
-            $this->catchFinalException($e);
-        }
-    }
-
-    /**
-     * Set a custom api_response object. Must be called before the
-     * process method to be of use.
-     *
-     * The main use for this is in testing so that the headers
-     * which have been sent can be tested.
-     *
-     * @param $response api_response: Response to use.
-     */
-    public function setResponse($response) {
+    public function __construct($request, $response, $routing, $config) {
+        $this->request = $request;
         $this->response = $response;
+        $this->routing = $routing;
+        $this->config = $config;
     }
 
     /**
@@ -108,16 +91,17 @@ class api_controller {
      *    - api_controller::processCommand()
      *    - api_controller::prepareAndDispatch()
      */
-    public function process() {
+    public function process($command) {
+        $this->command = $command;
+
         try {
-            $this->loadCommand();
             $this->processCommand();
-            $this->prepareAndDispatch();
+            return $this->getViewName();
         } catch(Exception $e) {
             $this->catchFinalException($e);
         }
 
-        return true;
+        return false;
     }
 
     /**
@@ -138,37 +122,20 @@ class api_controller {
      *             is currently supported but will be removed in a future
      *             release.
      */
-    public function loadCommand() {
-        $routing = new api_routing();
-        $route = $routing->getRoute($this->request);
-        if (is_null($route) || !is_array($route)) {
+    public function findCommandName($route) {
+        if (!($route instanceOf api_routing_route)) {
             throw new api_exception_NoCommandFound();
         }
-        if (isset($route['namespace'])) {
-            $route['namespace'] = api_helpers_string::clean($route['namespace']);
+
+        $this->route = $route->getParams();
+        if (isset($this->route['namespace'])) {
+            $this->route['namespace'] = api_helpers_string::clean($this->route['namespace']);
         } else {
-            $route['namespace'] = API_NAMESPACE;
+            $this->route['namespace'] = API_NAMESPACE;
         }
 
-
-        $cmd = $route['namespace'].'_command_' . $route['command'];
-
-        if (!class_exists($cmd)) {
-            $cmd_old = $cmd;
-            // Try old naming (NAMESPACE_commands_*)
-            $cmd = $route['namespace'] . '_commands_' . $route['command'];
-            if (class_exists($cmd)) {
-                error_log("$cmd: using ${route['namespace']}_commands_* is deprecated. Please use ${route['namespace']}_command_* instead.");
-            } else {
-                // Inform that both classes could not be found
-                throw new api_exception_NoCommandFound("Command $cmd or $cmd_old not found.");
-            }
-        }
-
-        $config = api_config::getInstance();
-        $config->load($route['command']);
-        $this->command = new $cmd($route);
-        $this->route = &$route;
+        $this->config->load($this->route['command']);
+        return $this->route['namespace'].'_command_' . $this->route['command'];
     }
 
     /**
@@ -191,41 +158,6 @@ class api_controller {
     }
 
     /**
-     * Gets content from the command and dispatches to view. If the $data
-     * param is null, it uses the api_command::getData() method to retrieve
-     * the command's data.
-     *
-     * api_views_common::dispatch() is called on the initialized view
-     * with the retrieved data.
-     *
-     * @param $data DOMDocument: optionally pass in the data for the view.
-     *              Used by the exceptionhandler.
-     */
-    public function dispatch($data = null) {
-        if (is_null($data) && $this->command instanceof api_command) {
-            $data = $this->command->getData();
-        }
-        
-        $this->view->dispatch($data, $this->exceptions);
-    }
-
-    /**
-     * Loads the view and initializes it.
-     *
-     * Uses api_view::factory() to construct the view object. Then calls
-     * api_views_common::prepare() on the new view object.
-     */
-    public function prepare() {
-        $this->view = api_view::factory($this->getViewName(), $this->request, $this->route, $this->response);
-
-        if ($this->view instanceof api_views_common) {
-            $this->view->prepare();
-        } else {
-            throw new api_exception_NoViewFound("View " . $this->getViewName() . " not found");
-        }
-    }
-
-    /**
      * Loads the view and uses it to display the response for the
      * current request.
      *
@@ -234,15 +166,19 @@ class api_controller {
      *    - api_controller::prepare()
      *    - api_controller::dispatch()
      */
-    protected function prepareAndDispatch() {
+    public function getViewName() {
         $this->updateViewParams();
-        if (isset($this->route['view']) && isset($this->route['view']['ignore'])
-                                        && $this->route['view']['ignore'] === true) {
-            // Ignore view
-        } else {
-            $this->prepare();
-            $this->dispatch();
+        if (empty($this->route['view']) || (empty($this->route['view']['ignore']))) {
+            if (isset($this->route['view']) && isset($this->route['view']['class'])) {
+                $viewName = $this->route['view']['class'];
+            } else {
+                $viewName = 'default';
+            }
+            return api_view::getViewName($viewName, $this->request, $this->route);
         }
+
+        // Ignore view
+        return;
     }
 
     /**
@@ -266,6 +202,10 @@ class api_controller {
         }
 
         array_push($this->exceptions, $e);
+    }
+
+    public function getExceptions() {
+        return $this->exceptions;
     }
 
     /**
@@ -304,21 +244,6 @@ class api_controller {
             api_exceptionhandler::log($e);
         } else {
             throw $e;
-        }
-    }
-
-    /**
-     * Get the name of the view to load. This is defined by the route using
-     * the view['class'] parameter. If that parameter is not defined, then
-     * the view called "default" is used.
-     *
-     * @return string: View name defined for the current request.
-     */
-    private function getViewName() {
-        if (isset($this->route['view']) && isset($this->route['view']['class'])) {
-            return $this->route['view']['class'];
-        } else {
-            return 'default';
         }
     }
 

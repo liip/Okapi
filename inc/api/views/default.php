@@ -33,8 +33,8 @@ class api_views_default extends api_views_common {
     /** string: XSLT file used for transforming the output. */
     protected $xslfile = '';
 
-    public function __construct($route) {
-        parent::__construct($route);
+    public function __construct($route, $request, $response) {
+        parent::__construct($route, $request, $response);
         $this->dumpDom = $this->parseDumpDomConfig();
     }
 
@@ -156,7 +156,7 @@ class api_views_default extends api_views_common {
         // Need to clear errors for unit tests, where errors
         // from a previous test could persist into the next
         libxml_clear_errors();
-        
+
         $defaults = array('theme' => 'default', 'css' => 'default',
                           'view' => 'default', 'passdom' => 'no');
         $attrib = $this->route['view'];

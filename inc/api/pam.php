@@ -76,20 +76,11 @@ class api_pam {
     /**
      * Constructor. Loads the PAM configuration.
      */
-    private function __construct() {
-        $pamConf = api_config::getInstance()->pam;
+    public function __construct($config, $auth, $perm) {
+        $pamConf = $config->pam;
+        $this->auth = $auth;
+        $this->perm = $perm;
         $this->pamLoadConfig($pamConf);
-    }
-
-    /**
-     * Return an instance of this class.
-     * @return api_pam: Instance.
-     */
-    public static function getInstance() {
-        if (!self::$instance instanceof api_pam) {
-            self::$instance = new api_pam();
-        }
-        return self::$instance;
     }
 
     /**
@@ -276,7 +267,7 @@ class api_pam {
      * @return api_pam_Iperm: Permission object.
      */
     private function getPermObj() {
-        return $this->pamGetObject($this->permprefix, $this->getPermScheme());
+        return $this->perm;
     }
 
     /**
@@ -284,7 +275,7 @@ class api_pam {
      * @return api_pam_Iauth: Authentication object.
      */
     private function getAuthObj() {
-        return $this->pamGetObject($this->authprefix, $this->getAuthScheme());
+        return $this->auth;
     }
 
     /**

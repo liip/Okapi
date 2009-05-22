@@ -102,8 +102,8 @@ class api_routing implements api_Irouting {
         $uri = $request->getPath();
 
         foreach (self::$routes as $route) {
-            if ($retval = $route->match($request)) {
-                return $retval;
+            if ($route->match($request)) {
+                return $route;
             }
         }
         return null;
@@ -164,6 +164,10 @@ class api_routing_route implements api_Irouting {
         return $this;
     }
 
+    public function getParams() {
+        return $this->params;
+    }
+
     /**
      * Returns the route object for the command if this route matches the
      * passed request. Returns null otherwise.
@@ -173,16 +177,19 @@ class api_routing_route implements api_Irouting {
         $uri = $request->getPath();
 
         if (isset($this->conditions['verb']) && $this->conditions['verb'] != $request->getVerb()) {
-            return null;
-        } else if (isset($this->conditions['sld']) && $this->conditions['sld'] != $request->getSld()) {
-            return null;
-        } else if ($this->route == $uri) {
-            return $this->params;
-        } else if (($params = $this->parseRoute($request)) !== null) {
-            return array_merge($this->params, $params);
-        } else {
-            return null;
+            return false;
         }
+        if (isset($this->conditions['sld']) && $this->conditions['sld'] != $request->getSld()) {
+            return false;
+        }
+        if ($this->route == $uri) {
+            return true;
+        }
+        if (($params = $this->parseRoute($request)) !== null) {
+            $this->params = array_merge($this->params, $params);
+            return true;
+        }
+        return false;
     }
 
     /**

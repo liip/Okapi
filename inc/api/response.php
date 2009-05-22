@@ -26,19 +26,6 @@ class api_response {
     protected $setContentLengthOutput = false;
 
     /**
-     * Gets an instance of api_response.
-     * @param $forceReload bool: If true, forces instantiation of a new
-     *        instance. Used for testing.
-     */
-    public static function getInstance($forceReload = false) {
-        static $instance;
-        if ((!isset($instance) || !($instance instanceof api_response)) || $forceReload) {
-            $instance = new api_response();
-        }
-        return $instance;
-    }
-
-    /**
      * Constructor. Turns on output buffering.
      */
     public function __construct() {

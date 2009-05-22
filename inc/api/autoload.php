@@ -46,7 +46,7 @@ class autoload {
                 autoload::generateClassFileMap($class_file_map, API_LIBS_DIR.'vendor');
             }
             $return = include $class_file_map;
-            self::$class_file_map = $return ? $mapping : false;
+            self::$class_file_map = ($return && $mapping) ? $mapping : false;
         }
 
         // check class file map

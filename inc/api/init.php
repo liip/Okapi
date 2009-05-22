@@ -92,7 +92,6 @@ class api_init {
         define('API_VENDOR_DIR', API_INCLUDE_DIR.'lib'.DIRECTORY_SEPARATOR);
         define('API_LOCAL_VENDOR_DIR', API_LOCAL_INCLUDE_DIR.'lib'.DIRECTORY_SEPARATOR);
 
-
         // Set PHP include path (localinc - localinc/lib - ext - ext/lib - inc - inc/lib - include_path)
 
         $incPath = API_INCLUDE_DIR;
@@ -126,22 +125,31 @@ class api_init {
         ini_set("include_path", $incPath);
 
         // Load and read config
-        require_once API_LIBS_DIR."config.php";
-        $cfg = api_config::getInstance();
+        $boostrapfile = API_PROJECT_DIR . 'conf/boostrap.yml';
+        require_once API_LIBS_DIR.'/vendor/sfYaml/sfYaml.php';
+        $cfg = sfYaml::load($boostrapfile);
+        $cfg = empty($cfg[$_SERVER['OKAPI_ENV']]) ? $cfg['default'] : $cfg[$_SERVER['OKAPI_ENV']];
+
+        // Create temporary directory
+        if (!empty($cfg['tmpdir'])) {
+            if (!is_dir($cfg['tmpdir'])) {
+                mkdir($cfg['tmpdir'], 0777, true);
+            }
+            define('API_TEMP_DIR', $cfg['tmpdir']);
+        }
 
         // Load autoloader
-        $autoload = $cfg->autoload;
-        if (empty($autoload)) {
+        if (empty($cfg['autoload'])) {
             $autoload = API_LIBS_DIR."autoload.php";
             require_once $autoload;
             spl_autoload_register(array('autoload', 'load'));
         } else {
-            require_once API_LOCAL_INCLUDE_DIR.$autoload;
+            require_once API_LOCAL_INCLUDE_DIR.$cfg['autoload'];
         }
 
         // Construct URL for Web home (root of current host)
         $hostname = (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '');
-        $hostinfo = self::getHostConfig($hostname);
+        $hostinfo = empty($cfg['hosts']) ? null : self::getHostConfig($cfg['hosts'], $hostname);
         $schema = (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == '443') ? 'https' : 'http';
         $reqHostPath = '/';
         if ($hostname != '') {
@@ -158,62 +166,47 @@ class api_init {
 
         // Define webrootStatic constant. From config file or computed
         // from webroot.
-        if (isset($cfg->webpaths['static'])) {
-            $static = $cfg->webpaths['static'];
-            if (strpos($static, 'http://') === 0 || strpos($static, '/') === 0) {
+        if (!empty($cfg['static_path'])) {
+            if (strpos($cfg['static_path'], 'http://') === 0 || strpos($cfg['static_path'], '/') === 0) {
                 // Complete URI or Absolute URL
-                define('API_WEBROOT_STATIC', $cfg->webpaths['static']);
+                define('API_WEBROOT_STATIC', $cfg['static_path']);
             } else {
                 // Relative URL
-                define('API_WEBROOT_STATIC', API_WEBROOT . $cfg->webpaths['static']);
+                define('API_WEBROOT_STATIC', API_WEBROOT . $cfg['static_path']);
             }
         } else {
             define('API_WEBROOT_STATIC', API_WEBROOT.'static/');
-        }
-
-        // Create temporary directory
-        $tmpDir = $cfg->tmpdir;
-        if (!is_null($tmpDir)) {
-            if (!is_dir($tmpDir)) {
-                mkdir($tmpDir, 0777, true);
-            }
-            define('API_TEMP_DIR', $tmpDir);
         }
 
         // Enable libxml internal errors
         libxml_use_internal_errors(true);
 
         // Create ServiceContainer
-        $serviceContainerCfg = $cfg->serviceContainer;
-        if (empty($serviceContainerCfg)) {
+        if (empty($cfg['serviceContainer'])) {
             $serviceContainer = 'api_servicecontainer';
         } else {
             $api_container_file = API_TEMP_DIR.'servicecontainer.php';
-            $serviceContainer = $serviceContainerCfg['class'];
-            if (file_exists($api_container_file)) {
+            $serviceContainer = $cfg['serviceContainer']['class'];
+            if (false && file_exists($api_container_file)) {
                 require_once $api_container_file;
             } else {
                 $sc = new sfServiceContainerBuilder();
-                $loader = $serviceContainerCfg['loader'];
+                $loader = $cfg['serviceContainer']['loader'];
                 $loader = new $loader($sc);
-                $loader->load(API_PROJECT_DIR.'conf/'.$serviceContainerCfg['file']);
+                $loader->load(API_PROJECT_DIR.'conf/'.$cfg['serviceContainer']['file']);
 
-                if ($cfg->configCache) {
+                // TODO: cache by environment
+                if (!empty($cfg['configCache'])) {
                     $dumper = new sfServiceContainerDumperPhp($sc);
                     $code = $dumper->dump(array('class' => $serviceContainer));
                     file_put_contents($api_container_file, $code);
                 }
+                self::$initialized = true;
+                return $sc;
             }
         }
 
-        if (!isset($sc)) {
-            $sc = new $serviceContainer();
-        }
-
-        // Load the routing rules
-        $sc->routingcontainer;
-        self::$initialized = true;
-        return $sc;
+        return new $serviceContainer();
     }
 
     /**
@@ -251,15 +244,12 @@ class api_init {
      *         to "/".
      * @param $hostname: Host name to return config for.
      */
-    public static function getHostConfig($hostname) {
-        $hosts = array();
+    public static function getHostConfig($hosts, $hostname) {
         $host = null;
 
         // Read config
-        $cfg = api_config::getInstance();
-        if ($cfg->hosts) {
-            $hosts = $cfg->hosts;
-            foreach($hosts as $key => &$hostconfig) {
+        if ($hosts) {
+            foreach ($hosts as $key => &$hostconfig) {
                 $lookupName = $key;
                 if (isset($hostconfig['host'])) {
                     $lookupName = $hostconfig['host'];

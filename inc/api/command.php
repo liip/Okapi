@@ -47,11 +47,11 @@ abstract class api_command {
      * @param    $route array: The attributes as returned by
      *                         api_routing::getRoute().
      */
-    public function __construct(&$route) {
-        $this->request = api_request::getInstance();
-        $this->response = api_response::getInstance();
-        $this->route = &$route;
-
+    public function __construct($route, $request, $response, $config) {
+        $this->route = $route;
+        $this->request = $request;
+        $this->response = $response;
+        $this->config = $config;
     }
 
     /**
@@ -71,7 +71,7 @@ abstract class api_command {
      * @return void
      */
     public function process() {
-        $route = $this->route;
+        $route = $this->route->getParams();
         if (isset($route['method']) && $route['method'] != 'process') {
             // __call() may return false, then we go execute the default request
             if ((!method_exists($this, $route['method']) || is_callable(array($this, $route['method'])))
