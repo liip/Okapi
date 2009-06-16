@@ -3,16 +3,16 @@ class ModelInterceptorTest extends api_testing_case_unit {
     
     function testNotIntercepted() {
         api_model_factory::registerInterceptor(new test_interceptor());
-        $model = api_model_factory::get('array');
-        $this->assertEquals(get_class($model), 'api_model_array');
+        $model = api_model_factory::get('array',array(array()));
+        $this->assertEqual(get_class($model), 'api_model_array');
     }
     
     function testIntercepted() {
         $interceptor = new test_interceptor();
         $interceptor->intercepts = true;
         api_model_factory::registerInterceptor($interceptor);
-        $model = api_model_factory::get('array');
-        $this->assertEquals(get_class($model), 'test_model');
+        $model = api_model_factory::get('array',array(array()));
+        $this->assertEqual(get_class($model), 'test_model');
     }
 }
 
