@@ -264,7 +264,7 @@ class api_request {
      * @return string: File name
      */
     private function parseFilename($path) {
-        preg_match("#[\s\w\xc0-\xff\-\_\%2F\+]*\.[a-z0-9]{1,}$#i", $path, $matches);
+        preg_match("#[^\/]*\.[a-z0-9]{1,}$#i", $path, $matches);
         if (isset($matches[0])) {
             return api_helpers_string::ensureUtf8(urldecode($matches[0]));
         }
