@@ -165,7 +165,7 @@ class api_routing_route implements ArrayAccess, Countable, api_Irouting {
     }
 
     public function getParams() {
-        return $this->params;
+        return $this;
     }
 
     /**
