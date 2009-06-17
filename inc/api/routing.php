@@ -113,7 +113,7 @@ class api_routing implements api_Irouting {
 /**
  * Standard route. Matches path to commands.
  */
-class api_routing_route implements api_Irouting {
+class api_routing_route implements ArrayAccess, Countable, api_Irouting {
     /** Default parameters. */
     protected $default = array(
         'method' => 'process',
@@ -334,5 +334,28 @@ class api_routing_route implements api_Irouting {
 
         $path = rtrim($path, '/');
         return $path;
+    }
+
+    /**
+     * ArrayAccess methods
+     */
+    public function offsetSet($offset, $value) {
+        $this->params[$offset] = $value;
+    }
+
+    public function offsetExists($offset) {
+        return isset($this->params[$offset]);
+    }
+
+    public function offsetUnset($offset) {
+        unset($this->params[$offset]);
+    }
+
+    public function offsetGet($offset) {
+        return isset($this->params[$offset]) ? $this->params[$offset] : null;
+    }
+
+    public function count() {
+        return count($this->params);
     }
 }
