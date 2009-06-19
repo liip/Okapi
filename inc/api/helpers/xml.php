@@ -54,9 +54,18 @@ class api_helpers_xml {
                 $key = "entry";
             }
 
-            $n = (is_numeric($n)) ? $key:$n;
-
-            $elem = $domdoc->createElement($n);
+            try {
+                $elem = $domdoc->createElement($n);
+            } catch (DOMException $e) {
+                if ($e->getCode() == DOM_INVALID_CHARACTER_ERR) {
+                    // invalid charcater name, use alternative
+                    $n = $key;
+                    $elem = $domdoc->createElement($n);
+                } else {
+                    // rethrow other exceptions
+                    throw $e;
+                }
+            }
             if ($elem instanceof DOMNode) {
                 if ($n === $key) {
                     $elem->setAttribute('key', $v);
