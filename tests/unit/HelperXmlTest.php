@@ -17,6 +17,8 @@ class HelperXmlTest extends api_testing_case_unit {
             'interested' => false,
             'alive'      => true,
             'html'       => '<strong>I feel good.</strong>',
+            ''           => 'empty key',
+            '123'        => 'wrong key',
         );
         
         $dom = new DOMDocument();
@@ -30,6 +32,8 @@ class HelperXmlTest extends api_testing_case_unit {
         $this->assertText($dom, '/doc/interested', 'false');
         $this->assertText($dom, '/doc/alive', 'true');
         $this->assertText($dom, '/doc/html', '<strong>I feel good.</strong>');
+        $this->assertText($dom, '/doc/entry[@key = \'\']', 'empty key');
+        $this->assertText($dom, '/doc/entry[@key = \'123\']', 'wrong key');
         
         $xp = new DOMXPath($dom);
         $res = $xp->query('/doc/html');
@@ -51,6 +55,8 @@ class HelperXmlTest extends api_testing_case_unit {
             'interested' => false,
             'alive'      => true,
             'html'       => '<strong>I feel good.</strong>',
+            ''           => 'empty key',
+            '123'        => 'wrong key',
         );
         
         $dom = new DOMDocument();
@@ -65,6 +71,8 @@ class HelperXmlTest extends api_testing_case_unit {
         $this->assertText($dom, '/doc/interested', 'false');
         $this->assertText($dom, '/doc/alive', 'true');
         $this->assertText($dom, '/doc/html', '<strong>I feel good.</strong>');
+        $this->assertText($dom, '/doc/entry[@key = \'\']', 'empty key');
+        $this->assertText($dom, '/doc/entry[@key = \'123\']', 'wrong key');
         
         $xp = new DOMXPath($dom);
         $res = $xp->query('/doc/html');
