@@ -73,6 +73,16 @@ class api_pam {
     /** string: Permission scheme in use. */
     private $permScheme = '';
 
+    /** Login callback function name */
+    private $loginCallback = null;
+
+    /** Failed Login callback function name */
+    private $loginFailedCallback = null;
+
+    /** Logout callback function name */
+    private $logoutCallback = null;
+
+
     /**
      * Constructor. Loads the PAM configuration.
      */
@@ -104,7 +114,17 @@ class api_pam {
      */
     public function login($user, $pass) {
         if (($ao = $this->getAuthObj()) !== false) {
-            return $ao->login($user, $pass);
+            if ($ao->login($user, $pass)) {
+                if ($this->loginCallback && is_callabale($this->loginCallback)) {
+                    call_user_func($this->loginCallback, $user, $this);
+                }
+                return true;
+            } else {
+                if ($this->loginFailedCallback && is_callabale($this->loginFailedCallback)) {
+                    call_user_func($this->loginFailedCallback, $user, $this);
+                }
+                return false;
+            }
         }
         return false;
     }
@@ -117,7 +137,11 @@ class api_pam {
      */
     public function logout() {
         if (($ao = $this->getAuthObj()) !== false) {
-            return $ao->logout();
+            $logout = $ao->logout();
+            if ($this->logoutCallback && is_callable($this->logoutCallback)) {
+                    call_user_func($this->logoutCallback, $this);
+            }
+            return $logout;
         }
         return false;
     }
@@ -259,6 +283,44 @@ class api_pam {
         }
 
         return false;
+    }
+
+    /**
+     * Register a callback function to be called on failed user login.
+     * The function will receive two parameters, the username and a reference to the auth object.
+     *
+     * @param  string  callback function name
+     * @return void
+     * @access public
+     */
+    public function setFailedLoginCallback($loginFailedCallback) {
+        $this->loginFailedCallback = $loginFailedCallback;
+    }
+
+    /**
+     * Register a callback function to be called on user logout.
+     * The function will receive three parameters, the username and a reference to the auth object.
+     *
+     * @param  string  callback function name
+     * @return void
+     * @see    setLoginCallback()
+     * @access public
+     */
+    public function setLogoutCallback($logoutCallback) {
+        $this->logoutCallback = $logoutCallback;
+    }
+
+    /**
+     * Register a callback function to be called on user login.
+     * The function will receive two parameters, the username and a reference to the auth object.
+     *
+     * @param  string  callback function name
+     * @return void
+     * @see    setLogoutCallback()
+     * @access public
+     */
+    public function setLoginCallback($loginCallback) {
+        $this->loginCallback = $loginCallback;
     }
 
     /**
