@@ -128,6 +128,7 @@ class api_init {
         $boostrapfile = API_PROJECT_DIR . 'conf/boostrap.yml';
         require_once API_LIBS_DIR.'/vendor/sfYaml/sfYaml.php';
         $cfg = sfYaml::load($boostrapfile);
+        // TODO: implement caching
         $cfg = empty($cfg[$_SERVER['OKAPI_ENV']]) ? $cfg['default'] : $cfg[$_SERVER['OKAPI_ENV']];
 
         // Create temporary directory
@@ -183,11 +184,11 @@ class api_init {
 
         // Create ServiceContainer
         if (empty($cfg['serviceContainer'])) {
-            $serviceContainer = 'api_servicecontainer';
+            $serviceContainerClass = 'api_servicecontainer';
         } else {
-            $api_container_file = API_TEMP_DIR.'servicecontainer.php';
-            $serviceContainer = $cfg['serviceContainer']['class'];
-            if (false && file_exists($api_container_file)) {
+            $api_container_file = API_TEMP_DIR.'servicecontainer_'.$_SERVER['OKAPI_ENV'].'.php';
+            $serviceContainerClass = $cfg['serviceContainer']['class'];
+            if (file_exists($api_container_file)) {
                 require_once $api_container_file;
             } else {
                 $sc = new sfServiceContainerBuilder();
@@ -195,18 +196,18 @@ class api_init {
                 $loader = new $loader($sc);
                 $loader->load(API_PROJECT_DIR.'conf/'.$cfg['serviceContainer']['file']);
 
-                // TODO: cache by environment
                 if (!empty($cfg['configCache'])) {
                     $dumper = new sfServiceContainerDumperPhp($sc);
-                    $code = $dumper->dump(array('class' => $serviceContainer));
+                    $code = $dumper->dump(array('class' => $serviceContainerClass));
                     file_put_contents($api_container_file, $code);
                 }
+
                 self::$initialized = true;
                 return $sc;
             }
         }
 
-        return new $serviceContainer();
+        return new $serviceContainerClass();
     }
 
     /**
