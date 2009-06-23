@@ -33,17 +33,17 @@ class api_views_default extends api_views_common {
     /** string: XSLT file used for transforming the output. */
     protected $xslfile = '';
 
-    public function __construct($route, $request, $response) {
+    public function __construct($route, $request, $response, $config) {
         parent::__construct($route, $request, $response);
-        $this->dumpDom = $this->parseDumpDomConfig();
+        $this->dumpDom = $this->parseDumpDomConfig($config);
     }
 
-    protected function parseDumpDomConfig() {
+    protected function parseDumpDomConfig($cfg) {
         if ($this->request->getParam('XML') != '1') {
             return false;
         }
 
-        $cfg = api_config::getInstance()->allowDomDump;
+        $cfg = $cfg->allowDomDump;
         if ($cfg === true) {
             return true;
         } else if (is_array($cfg)) {
@@ -78,11 +78,10 @@ class api_views_default extends api_views_common {
         // ?XML=1 trick
         if ($this->dumpDom) {
             $this->setXMLHeaders();
-            /* Ported from popoon: mozilla does not display the XML
+                /* Ported from popoon: mozilla does not display the XML
                neatly, if there's a xhtml namespace in it, so we spoof it
                here (mainly used for XML=1 purposes) */
-            print str_replace("http://www.w3.org/1999/xhtml","http://www.w3.org/1999/xhtml#trickMozillaDisplay", $xmldom->saveXML());
-            $this->sendResponse();
+            print str_replace("http://www.w3.org/1999/xhtml", "http://www.w3.org/1999/xhtml#trickMozillaDisplay", $xmldom->saveXML());
             return;
         }
 
@@ -96,7 +95,6 @@ class api_views_default extends api_views_common {
             $this->transformI18n($this->request->getLang(), $xml);
             $this->setHeaders();
             echo $this->getOuputFromDom($xml);
-            $this->sendResponse();
             return;
         } else {
             throw new api_exception_XsltParseError(api_exception::THROW_FATAL, $this->xslfile, $xslt_errors);
@@ -124,16 +122,16 @@ class api_views_default extends api_views_common {
      * @param $xmlstr string: XML string
      */
     protected function cleanXml($xmlstr) {
-        $xmlstr = preg_replace("#^<\?xml.*\?>#","", $xmlstr);
-        $xmlstr = preg_replace("#<!\[CDATA\[\W*\]\]>#","",$xmlstr);
+        $xmlstr = preg_replace("#^<\?xml.*\?>#", "", $xmlstr);
+        $xmlstr = preg_replace("#<!\[CDATA\[\W*\]\]>#", "", $xmlstr);
         // strip CDATA just after <script>
-        $xmlstr = preg_replace("#(<script[^>]*>)\W*<!\[CDATA\[#","$1",$xmlstr);
+        $xmlstr = preg_replace("#(<script[^>]*>)\W*<!\[CDATA\[#", "$1", $xmlstr);
         // strip ]]> just before </script>
-        $xmlstr =  preg_replace("#\]\]>\W*(</script>)#","$1",$xmlstr);
+        $xmlstr = preg_replace("#\]\]>\W*(</script>)#", "$1", $xmlstr);
         // strip CDATA just after <style>
-        $xmlstr = preg_replace("#(<style[^>]*>)\W*<!\[CDATA\[#","$1",$xmlstr);
+        $xmlstr = preg_replace("#(<style[^>]*>)\W*<!\[CDATA\[#", "$1", $xmlstr);
         // strip ]]> just before </style>
-        $xmlstr =  preg_replace("#\]\]>\W*(</style>)#","$1",$xmlstr);
+        $xmlstr = preg_replace("#\]\]>\W*(</style>)#", "$1", $xmlstr);
 
         // Strip namespaces
         $xmlstr = preg_replace('#(<[^>]*)xmlns=""#', "$1", $xmlstr);
@@ -159,8 +157,8 @@ class api_views_default extends api_views_common {
 
         $defaults = array('theme' => 'default', 'css' => 'default',
                           'view' => 'default', 'passdom' => 'no');
-        $attrib = $this->route['view'];
-        $attrib = array_merge($defaults, $attrib);
+
+        $attrib = array_merge($defaults, $this->response->viewParams);
 
         if (!isset($attrib['xsl'])) {
             throw new api_exception_NoXsltFound("No XSLT stylesheet was specified for this route.");
@@ -191,8 +189,8 @@ class api_views_default extends api_views_common {
         }
 
         $this->xsldom = new DOMDocument();
-        if(!$this->xsldom->load($this->xslfile)) {
-            if(!file_exists($this->xslfile)) {
+        if (!$this->xsldom->load($this->xslfile)) {
+            if (!file_exists($this->xslfile)) {
                 throw new api_exception_FileNotFound(api_exception::THROW_FATAL, $this->xslfile);
             }
             throw new api_exception_XmlParseError(api_exception::THROW_FATAL, $this->xslfile);
@@ -227,8 +225,8 @@ class api_views_default extends api_views_common {
         $this->xslproc->setParameter("", "lang", $this->request->getLang());
         $this->xslproc->setParameter("", "projectDir", API_PROJECT_DIR);
 
-        if(isset($attrib['xslproc']) && is_array($attrib['xslproc']) ) {
-            foreach($attrib['xslproc'] as $key => $val) {
+        if (isset($attrib['xslproc']) && is_array($attrib['xslproc'])) {
+            foreach ($attrib['xslproc'] as $key => $val) {
                 $this->xslproc->setParameter("", $key, $val);
             }
         }
@@ -238,6 +236,6 @@ class api_views_default extends api_views_common {
      * Sends the response using the methods of api_response.
      */
     protected function sendResponse() {
-        $this->response->send();
+        // $this->response->send();
     }
 }

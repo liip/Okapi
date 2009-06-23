@@ -47,11 +47,17 @@ abstract class api_command {
      * @param    $route array: The attributes as returned by
      *                         api_routing::getRoute().
      */
-    public function __construct($route, $request, $response, $config) {
-        $this->route = $route;
+    public function __construct(api_routing_route $route, api_request $request, api_response $response, $config) {
+       $this->route = $route;
         $this->request = $request;
         $this->response = $response;
         $this->config = $config;
+        $this->response->getDataCallback = array($this,'getData');
+    }
+
+    public function postAction(api_response $response) {
+           $response->viewParams = $this->getXslParams();
+           return $response;
     }
 
     /**
@@ -81,7 +87,7 @@ abstract class api_command {
             }
         }
         $this->{$this->defaultMethod}();
-        return;
+        return $this->response;
     }
 
     /**
@@ -148,5 +154,9 @@ abstract class api_command {
         }
 
         return $dom;
+    }
+
+    public function setLogger($logger) {
+        $this->log = $logger;
     }
 }

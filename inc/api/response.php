@@ -25,6 +25,14 @@ class api_response {
         encoding. */
     protected $setContentLengthOutput = false;
 
+    public $getDataCallback = null;
+
+    public $data = null;
+
+    public $viewParams = array();
+
+    protected $command = null;
+
     /**
      * Constructor. Turns on output buffering.
      */
@@ -153,7 +161,7 @@ class api_response {
         } else {
             $schema = $_SERVER['SERVER_PORT'] == '443' ? 'https' : 'http';
             $host = (isset($_SERVER['HTTP_HOST']) && strlen($_SERVER['HTTP_HOST'])) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'];
-            $to = strpos($to,'/')===0 ? $to : '/'.$to;
+            $to = strpos($to, '/') === 0 ? $to : '/' . $to;
             $url = "$schema://$host$to";
         }
 
@@ -199,4 +207,19 @@ class api_response {
     protected function sendStatus($code) {
         header(' ', true, $code);
     }
+
+    public function getData() {
+        if ($this->data) {
+            return $this->data;
+        }
+        //this makes it possible to register a method/function
+        // which is called after the view prepare
+        // eg. start an async curl request in the action
+        // but get the result here in this method
+        // Very needed, one of the initial goals of okapi
+        if (is_callable($this->getDataCallback)) {
+            return call_user_func($this->getDataCallback);
+        }
+    }
+
 }
