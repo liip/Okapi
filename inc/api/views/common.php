@@ -9,9 +9,9 @@
  * @author   Silvan Zurbruegg
  */
 abstract class api_views_common {
-    /** api_response Response object. */
+    /** api_response: Response object. */
     protected $response = null;
-    /** api_request Request object. */
+    /** api_request: Request object. */
     protected $request = null;
     /** Route parameters. */
     protected $route = array();
@@ -33,7 +33,7 @@ abstract class api_views_common {
      * Useful for instantiation of DOM objects etc.
      */
     public function prepare() {
-        return true;
+       return true;
     }
 
     /**
@@ -73,7 +73,7 @@ abstract class api_views_common {
          */
         return;
          $cfg = api_config::getInstance()->lang;
-        if (isset($cfg['i18ntransform']) && $cfg['i18ntransform'] === false) {
+        if(isset($cfg['i18ntransform']) && $cfg['i18ntransform'] === false){
             return;
         }
 
@@ -130,9 +130,9 @@ abstract class api_views_common {
         }
 
         $exceptionsNode = $xmldom->createElement('exceptions');
-        foreach ($exceptions as $exception) {
+        foreach($exceptions as $exception) {
             $exceptionNode = $xmldom->createElement('exception');
-            foreach ($exception->getSummary() as $name => $value) {
+            foreach($exception->getSummary() as $name => $value) {
                 $child = $xmldom->createElement($name);
                 $child->nodeValue = $value;
                 $exceptionNode->appendChild($child);
