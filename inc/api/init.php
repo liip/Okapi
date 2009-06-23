@@ -129,7 +129,10 @@ class api_init {
         require_once API_LIBS_DIR.'/vendor/sfYaml/sfYaml.php';
         $cfg = sfYaml::load($boostrapfile);
         // TODO: implement caching
-        $cfg = empty($cfg[$_SERVER['OKAPI_ENV']]) ? $cfg['default'] : $cfg[$_SERVER['OKAPI_ENV']];
+        if (!isset($_SERVER['OKAPI_ENV']) || empty($cfg[$_SERVER['OKAPI_ENV']])) {
+            $_SERVER['OKAPI_ENV'] = 'default';
+        }
+        $cfg = $cfg[$_SERVER['OKAPI_ENV']];
 
         // Create temporary directory
         if (!empty($cfg['tmpdir'])) {
