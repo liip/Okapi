@@ -53,7 +53,7 @@ class api_db {
      *         database connection doesn't exist. The driver's
      *         getDBConnection() method is used to retrieve that connection.
      */
-    public static function factory($config, $name = "default", $force = false) {
+    public static function factory($config, $name = "default", $force = false, $log = null) {
         if (isset(self::$instances[$name]) && $force == false) {
             return self::$instances[$name];
         }
@@ -63,7 +63,8 @@ class api_db {
             return false;
         }
 
-        self::$instances[$name] = self::get($db[$name]);
+
+        self::$instances[$name] = self::get($db[$name], $log);
         return self::$instances[$name];
     }
 
@@ -119,7 +120,7 @@ class api_db {
      * @return DatabaseConnection: Database connection retrieved from
      *         the driver.
      */
-    private static function get($config) {
+    private static function get($config, $log = null) {
         if (empty($config['dsn']) && empty($config['host'])) {
             return false;
         }
@@ -130,6 +131,7 @@ class api_db {
 
         $driver = "api_db_".$config['driver'];
         $db = new $driver;
-        return $db->getDBConnection($config);
+        return $db->getDBConnection($config, $log);
     }
+
 }
