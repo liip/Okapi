@@ -159,7 +159,11 @@ class api_init {
         if ($hostname != '') {
             $reqHostPath = $schema.'://'.$hostname;
             if (is_null($hostinfo)) {
-                $reqHostPath .= '/';
+               if (isset($_SERVER['SCRIPT_NAME']) && $_SERVER['SCRIPT_NAME'] != '/index.php') {
+                  $reqHostPath .= substr($_SERVER['SCRIPT_NAME'],0,-9);
+               }  else {
+                   $reqHostPath .= '/';
+               }
             } else {
                 $reqHostPath .= $hostinfo['path'];
             }

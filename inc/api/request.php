@@ -74,7 +74,11 @@ class api_request {
         if (strpos($path, '?') !== FALSE) {
             $path = substr($path, 0, strpos($path, '?'));
         }
-
+        
+        if (isset($_SERVER['SCRIPT_NAME']) && $_SERVER['SCRIPT_NAME'] != '/index.php') {
+            $scriptpathlen = strlen($_SERVER['SCRIPT_NAME']) -10;
+            $path = substr($path,$scriptpathlen);
+        }
         // Get language from the beginning of the URL
         $lang = $this->getLanguageFromPath($path);
         if ($lang !== null) {

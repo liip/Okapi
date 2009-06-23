@@ -100,7 +100,7 @@ class api_routing implements api_Irouting {
      */
     public function getRoute($request) {
         $uri = $request->getPath();
-
+        
         foreach (self::$routes as $route) {
             if ($route->match($request)) {
                 return $route;
