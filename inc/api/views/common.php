@@ -20,10 +20,13 @@ abstract class api_views_common {
      * Constructor.
      * @param $route hash: Route parameters.
      */
-    public function __construct($route, $request, $response) {
+    public function __construct($route, $request, $response, $config = null, $i18n = null) {
         $this->route = $route;
         $this->request = $request;
         $this->response = $response;
+        $this->config = $config;
+        $this->i18n = $i18n;
+
     }
 
     /**
@@ -71,13 +74,12 @@ abstract class api_views_common {
     protected function transformI18n($lang, $xmlDoc) {
         /*TODO: doesn't work yet :)
          */
-        return;
-         $cfg = api_config::getInstance()->lang;
+         $cfg = $this->config->lang;
         if(isset($cfg['i18ntransform']) && $cfg['i18ntransform'] === false){
             return;
         }
 
-        $i = api_i18n::getInstance($lang);
+        $i = $this->i18n->getInstance($lang);
         $i->i18n($xmlDoc);
     }
 

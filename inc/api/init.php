@@ -188,7 +188,7 @@ class api_init {
         } else {
             $api_container_file = API_TEMP_DIR.'servicecontainer_'.$_SERVER['OKAPI_ENV'].'.php';
             $serviceContainerClass = $cfg['serviceContainer']['class'];
-            if (file_exists($api_container_file)) {
+            if (false && file_exists($api_container_file)) {
                 require_once $api_container_file;
             } else {
                 $sc = new sfServiceContainerBuilder();

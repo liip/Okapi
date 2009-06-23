@@ -43,9 +43,7 @@
  *         by default, thus api_i18n_default is the default retriever.
  */
 class api_i18n {
-    /** array: Instances as returned by the getInstance() method.
-     * One instance is stored for each language. */
-    private static $instances = array();
+
 
     /** string: Namespace used in the XML documents to find i18n nodes. */
     private $ns = 'http://apache.org/cocoon/i18n/2.1';
@@ -61,34 +59,10 @@ class api_i18n {
      *
      * @param $lang string: Language into which this object will translate.
      */
-    private function __construct($lang) {
+    public function __construct($lang, $config) {
         $this->lang = $lang;
-        $this->loadRetriever($lang);
-    }
-
-    /**
-     * Return a new instance of this class for the given language.
-     *
-     * @param $lang string: Language into which the object will translate.
-     */
-    public static function getInstance($lang) {
-        if (!isset(self::$instances[$lang])) {
-            self::$instances[$lang] = new api_i18n($lang);
-        }
-        return self::$instances[$lang];
-    }
-
-    /**
-     * Get the translation for a key for a certain language. This method
-     * is intended for commands to retrieve single translations. To
-     * transform documents the i18n() must should be used.
-     *
-     * @param $lang string: Language to translate into.
-     * @param $key string: Language key to retrieve translation for.
-     */
-    public static function getMessage($lang, $key) {
-        $i = self::getInstance($lang);
-        return $i->i18nGetMessage($key);
+        $this->loadRetriever($lang, $config);
+        $this->config = $config;
     }
 
     /**
@@ -340,8 +314,7 @@ class api_i18n {
      *
      * @param $lang string: Language to load the retriever for.
      */
-    private function loadRetriever($lang) {
-        $cfg = api_config::getInstance()->lang;
+    private function loadRetriever($lang, $cfg) {
         $retriever = 'default';
         if (isset($cfg['retriever'])) {
             $retriever = $cfg['retriever'];
