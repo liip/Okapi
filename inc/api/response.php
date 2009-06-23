@@ -25,6 +25,12 @@ class api_response {
         encoding. */
     protected $setContentLengthOutput = false;
 
+    public $getDataCallback = null;
+
+    public $data = null;
+
+    public $viewParams = array();
+
     /**
      * Constructor. Turns on output buffering.
      */
@@ -199,4 +205,19 @@ class api_response {
     protected function sendStatus($code) {
         header(' ', true, $code);
     }
+
+    public function getData() {
+        if ($this->data) {
+            return $this->data;
+        }
+        //this makes it possible to register a method/function
+        // which is called after the view prepare
+        // eg. start an async curl request in the action
+        // but get the result here in this method
+        // Very needed, one of the initial goals of okapi
+        if (is_callable($this->getDataCallback)) {
+            return call_user_func($this->getDataCallback);
+        }
+    }
+
 }

@@ -35,15 +35,15 @@ class api_views_default extends api_views_common {
 
     public function __construct($route, $request, $response, $config, $i18n) {
         parent::__construct($route, $request, $response, $config, $i18n);
-        $this->dumpDom = $this->parseDumpDomConfig();
+        $this->dumpDom = $this->parseDumpDomConfig($config);
     }
 
-    protected function parseDumpDomConfig() {
+    protected function parseDumpDomConfig($cfg) {
         if ($this->request->getParam('XML') != '1') {
             return false;
         }
 
-        $cfg = api_config::getInstance()->allowDomDump;
+        $cfg = $cfg->allowDomDump;
         if ($cfg === true) {
             return true;
         } else if (is_array($cfg)) {
@@ -82,7 +82,6 @@ class api_views_default extends api_views_common {
                neatly, if there's a xhtml namespace in it, so we spoof it
                here (mainly used for XML=1 purposes) */
             print str_replace("http://www.w3.org/1999/xhtml","http://www.w3.org/1999/xhtml#trickMozillaDisplay", $xmldom->saveXML());
-            $this->sendResponse();
             return;
         }
 
@@ -96,7 +95,6 @@ class api_views_default extends api_views_common {
             $this->transformI18n($this->request->getLang(), $xml);
             $this->setHeaders();
             echo $this->getOuputFromDom($xml);
-            $this->sendResponse();
             return;
         } else {
             throw new api_exception_XsltParseError(api_exception::THROW_FATAL, $this->xslfile, $xslt_errors);
@@ -159,8 +157,8 @@ class api_views_default extends api_views_common {
 
         $defaults = array('theme' => 'default', 'css' => 'default',
                           'view' => 'default', 'passdom' => 'no');
-        $attrib = $this->route['view'];
-        $attrib = array_merge($defaults, $attrib);
+
+        $attrib = array_merge($defaults, $this->response->viewParams);
 
         if (!isset($attrib['xsl'])) {
             throw new api_exception_NoXsltFound("No XSLT stylesheet was specified for this route.");
@@ -238,6 +236,6 @@ class api_views_default extends api_views_common {
      * Sends the response using the methods of api_response.
      */
     protected function sendResponse() {
-        $this->response->send();
+        // $this->response->send();
     }
 }

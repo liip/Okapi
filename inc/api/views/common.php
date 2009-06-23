@@ -72,8 +72,6 @@ abstract class api_views_common {
      *         no transformations are done. Defaults to true.
      */
     protected function transformI18n($lang, $xmlDoc) {
-        /*TODO: doesn't work yet :)
-         */
          $cfg = $this->config->lang;
         if(isset($cfg['i18ntransform']) && $cfg['i18ntransform'] === false){
             return;

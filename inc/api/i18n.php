@@ -61,8 +61,8 @@ class api_i18n {
      */
     public function __construct($lang, $config) {
         $this->lang = $lang;
-        $this->loadRetriever($lang, $config);
         $this->config = $config;
+        $this->loadRetriever($lang, $config);
     }
 
     /**

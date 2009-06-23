@@ -40,68 +40,89 @@ class api_controller {
      * api_request: Request container. Contains parsed information about
      * the current request.
      */
-    private $request = null;
-
-    /**
-     * api_response: Response object - passed to the command and view to
-     * handle response headers.
-     */
-    private $response = null;
-
-    /**
-     * api_views_common: View object which handles the output.
-     */
-    private $view = null;
+    protected $request = null;
 
     /**
      * array: Route which matched the current request.
      * Return value of api_routing::getRoute().
      */
-    private $route = null;
-
-    /**
-     * api_command: Command to process the current request.
-     */
-    private $command = array();
+    protected $route = null;
 
     /**
      * array: All non-fatal exceptions which have been caught.
      */
-    private $exceptions = array();
+    protected $exceptions = array();
+
+    /**
+     * object sfEventDispatcher the EventDispatcher
+     */
+
+    protected $dispatcher = null;
 
     /**
      * Constructor. Gets instances of api_request and api_response
      * but doesn't yet do anything else.
      */
-    public function __construct($request, $response, $routing, $config) {
+    public function __construct(api_request $request, api_routing $routing, api_config $config) {
+
         $this->request = $request;
-        $this->response = $response;
         $this->routing = $routing;
         $this->config = $config;
+
+        $this->dispatcher = new sfEventDispatcher();
+        $this->dispatcher->connect('application.request', array(
+                $this,
+                'loadRoute'
+        ));
+
+        $this->dispatcher->connect('application.load_controller', array(
+                $this,
+                'loadController'
+        ));
+
+        $this->dispatcher->connect('application.view', array(
+                $this,
+                'view'
+        ));
     }
 
-    /**
-     * Process the current request. This loads the correct command,
-     * processes it and then uses the view to display the result.
-     *
-     * In the case of exceptions, api_exceptionhandler is used to handle them.
-     *
-     * Calls the following methods in that order:
-     *    - api_controller::loadCommand()
-     *    - api_controller::processCommand()
-     *    - api_controller::prepareAndDispatch()
-     */
-    public function process($command) {
-        $this->command = $command;
+    public function run() {
+        $handler = new sfRequestHandler($this->dispatcher);
+        $response = $handler->handle($this->request);
+        return $response;
+    }
 
-        try {
-            $this->processCommand();
-            return $this->getViewName();
-        } catch(Exception $e) {
-            $this->catchFinalException($e);
+    public function setScLookup($sc) {
+        $this->scLookup = $sc;
+    }
+
+    public function loadRoute(sfEvent $event) {
+        $this->route = $this->routing->getRoute($event['request']);
+        $this->scLookup->setRoute($this->route);
+    }
+
+    public function loadController(sfEvent $event) {
+        $commandName = $this->findCommandName($this->route);
+        $command = $this->scLookup->getCommand($commandName);
+        $event->setReturnValue(array(
+                array(
+                        $this,
+                        'processCommand'
+                ),
+                array($command)
+        ));
+        return true;
         }
 
-        return false;
+    public function view(sfEvent $event, $response) {
+
+        $viewName = $this->getViewName($this->route, $this->request, $response);
+        $view = $this->scLookup->getView($viewName);
+        $view->prepare();
+        //FIXME: shouldn't we just pass the response object to the view?
+        $data = $response->getData();
+        $view->dispatch($data, $this->getExceptions());
+        return $response;
     }
 
     /**
@@ -127,15 +148,13 @@ class api_controller {
             throw new api_exception_NoCommandFound();
         }
 
-        $this->route = $route->getParams();
-        if (isset($this->route['namespace'])) {
-            $this->route['namespace'] = api_helpers_string::clean($this->route['namespace']);
+        if (isset($route['namespace'])) {
+            $route['namespace'] = api_helpers_string::clean($route['namespace']);
         } else {
-            $this->route['namespace'] = API_NAMESPACE;
+            $route['namespace'] = API_NAMESPACE;
         }
-
-        $this->config->load($this->route['command']);
-        return $this->route['namespace'].'_command_' . $this->route['command'];
+        $this->config->load($route['command']);
+        return $route['namespace'].'_command_' . $route['command'];
     }
 
     /**
@@ -146,12 +165,21 @@ class api_controller {
      *            returns false.
      *
      */
-    public function processCommand() {
+    public function processCommand($command) {
         try {
-            if (!$this->command->isAllowed()) {
-                throw new api_exception_CommandNotAllowed("Command access not allowed: ".get_class($this->command));
+            if (!$command->isAllowed()) {
+                throw new api_exception_CommandNotAllowed("Command access not allowed: ".get_class($command));
             }
-            $this->command->process();
+            if (is_callable(array($command,"preAction"))) {
+                call_user_func(array($command,"preAction"));
+
+            }
+            $response = $command->process();
+            if (is_callable(array($command,"postAction"))) {
+                $response = call_user_func(array($command,"postAction"), $response);
+            }
+            return $response;
+
         } catch(Exception $e) {
             $this->catchException($e, array('command' => $this->route['command']));
         }
@@ -166,15 +194,17 @@ class api_controller {
      *    - api_controller::prepare()
      *    - api_controller::dispatch()
      */
-    public function getViewName() {
-        $this->updateViewParams();
-        if (empty($this->route['view']) || (empty($this->route['view']['ignore']))) {
-            if (isset($this->route['view']) && isset($this->route['view']['class'])) {
-                $viewName = $this->route['view']['class'];
+    public function getViewName($route,$request,$response) {
+        $viewParams = $this->initViewParams($route, $response);
+        //FIXME: needed BC? getViewName needs $route['namespace'] and $route['view']['omitextension']
+        $route['view'] = $viewParams;
+        if (empty($viewParams) || (empty($viewParams['ignore']))) {
+            if (isset($viewParams) && isset($viewParams['class'])) {
+                $viewName = $viewParams['class'];
             } else {
                 $viewName = 'default';
             }
-            return api_view::getViewName($viewName, $this->request, $this->route);
+            return api_view::getViewName($viewName, $request, $route);
         }
 
         // Ignore view
@@ -262,14 +292,15 @@ class api_controller {
      * view parameters. All parameters returned by the command
      * are written into the 'view' array of the route.
      */
-    private function updateViewParams() {
-        $this->route['view'] = array_merge($this->route['view'],
-                $this->command->getXslParams());
+    private function initViewParams($route,$response) {
+        $response->viewParams = array_merge($route['view'], $response->viewParams);
+        return $response->viewParams;
     }
 
     /**
      * Returns the command name, needed by tests
      *
+     * FIXME: I'd like to get rid of $this->command ...
      */
     public function getCommandName() {
         return get_class($this->command);
@@ -278,6 +309,7 @@ class api_controller {
     /**
      * Returns the final, dispatched view  name, needed by tests
      *
+     * FIXME: I'd like to get rid of $this->view ...
      */
     public function getFinalViewName() {
         return get_class($this->view);
