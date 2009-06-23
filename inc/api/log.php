@@ -102,10 +102,10 @@ class api_log {
      *        new instance. Used for testing.
      * @return api_log an api_log instance;
      */
-    public static function getInstance($forceReload = FALSE) {
+    public static function getInstance($forceReload = FALSE, $config = null) {
         if (!self::$instance instanceof api_log || $forceReload) {
             self::$logger = null;
-            self::$instance = new api_log();
+            self::$instance = new api_log($config);
         }
 
         return self::$instance;
