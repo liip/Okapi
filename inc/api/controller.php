@@ -75,17 +75,16 @@ class api_controller {
     public function run() {
         $this->dispatcher = new sfEventDispatcher();
 
-        $filters = $this->config->filters;
+        $this->filters = $this->config->filters;
 
-        if (!$filters || !$filters['request']) {
-            $filters['request']['controller'] = null;
+        if (!$this->filters || !$this->filters['request']) {
+            $this->filters['request']['controller'] = null;
         }
-        foreach ($filters['request'] as $r => $v) {
-            $this->dispatcher->connect('application.request', array(
-                    $this->sc->getService($r),
-                    'request'
+
+        $this->dispatcher->connect('application.request', array(
+                    $this,
+                    'requestDispatcher'
             ));
-        }
 
         $this->dispatcher->connect('application.load_controller', array(
                 $this,
@@ -103,8 +102,8 @@ class api_controller {
                 'exception'
         ));
 
-        if (isset($filters['response'])) {
-            foreach ($filters['response'] as $r => $v) {
+        if (isset($this->filters['response'])) {
+            foreach ($this->filters['response'] as $r => $v) {
                 $this->dispatcher->connect('application.response', array(
                         $this->sc->getService($r),
                         'response'
@@ -132,8 +131,17 @@ class api_controller {
         return true;
     }
 
+    public function requestDispatcher(sfEvent $event) {
+        while ($current = array_splice($this->filters['request'], 0, 1)) {
+            $class = $this->sc->getService(key($current));
+            if ($class->request($event)) {
+                return true;
+            }
+        }
+    }
+
     public function request(sfEvent $event) {
-        $this->loadRoute($event);
+             $this->loadRoute($event);
     }
 
     protected function loadRoute(sfEvent $event) {
