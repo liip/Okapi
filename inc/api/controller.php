@@ -142,7 +142,6 @@ class api_controller {
     }
 
     public function loadController(sfEvent $event) {
-
         $commandName = $this->findCommandName($this->route);
         $command = $this->sc->$commandName;
         $event->setReturnValue(array(
@@ -166,7 +165,7 @@ class api_controller {
         $view->setResponse($response);
         $view->prepare();
         //FIXME: shouldn't we just pass the response object to the view?
-        $data = $response->getData();
+        $data = $response->getInputData();
         $view->dispatch($data, $this->getExceptions());
         return $response;
     }

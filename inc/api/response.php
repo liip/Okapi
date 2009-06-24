@@ -27,8 +27,9 @@ class api_response {
 
     public $getDataCallback = null;
 
-    public $data = null;
+    protected $inputdata = null;
 
+    protected $content = "";
     public $viewParams = array();
 
     /**
@@ -159,7 +160,7 @@ class api_response {
         } else {
             $schema = $_SERVER['SERVER_PORT'] == '443' ? 'https' : 'http';
             $host = (isset($_SERVER['HTTP_HOST']) && strlen($_SERVER['HTTP_HOST'])) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'];
-            $to = strpos($to,'/')===0 ? $to : '/'.$to;
+            $to = strpos($to, '/') === 0 ? $to : '/' . $to;
             $url = "$schema://$host$to";
         }
 
@@ -187,12 +188,14 @@ class api_response {
         }
 
         if ($this->setContentLengthOutput) {
-            header("Content-Length: " . ob_get_length());
+            header("Content-Length: " . ob_get_length() + strlen($this->content));
         }
-
-        ob_end_flush();
-        if ($this->data) {
-            print $this->data;
+        //FIXME: The mix between content and ob_* I do not really like :( see also get/setContent)
+        while (ob_get_level()) {
+            ob_end_flush();
+        }
+        if ($this->content) {
+            print $this->content;
         }
 
         if ($this->setContentLengthOutput) {
@@ -209,9 +212,9 @@ class api_response {
         header(' ', true, $code);
     }
 
-    public function getData() {
-        if ($this->data) {
-            return $this->data;
+    public function getInputData() {
+        if ($this->inputdata) {
+            return $this->inputdata;
         }
         //this makes it possible to register a method/function
         // which is called after the view prepare
@@ -223,12 +226,30 @@ class api_response {
         }
     }
 
-    public function setData($data) {
-        $this->data = $data;
+    public function setInputData($data) {
+        $this->inputdata = $data;
     }
 
     public function setViewParam($key,$value) {
         $this->viewParams[$key] = $value;
     }
 
+    public function getContent() {
+        $content = "";
+        while (ob_get_level()) {
+            $content .=  ob_get_contents();
+            ob_end_clean();
+        }
+        $this->content = $this->content . $content;
+        return $this->content;
+
+    }
+
+    public function setContent($content) {
+        //clear flush
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+        $this->content = $content;
+    }
 }
