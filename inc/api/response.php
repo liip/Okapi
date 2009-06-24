@@ -252,4 +252,8 @@ class api_response {
         }
         $this->content = $content;
     }
+
+    public function addContent($content) {
+        $this->content .= $content;
+    }
 }
