@@ -16,13 +16,13 @@ require_once API_LIBS_DIR."model.php";
  * Used in views to indicate that the view has been prepared and
  * can be used now.
  */
-define('API_STATE_READY',   1);
+define('API_STATE_READY', 1);
 
 /**
  * Used in views to indicate that the view is still it it's uninitialized
  * state.
  */
-define('API_STATE_FALSE',   0);
+define('API_STATE_FALSE', 0);
 
 /**
  * Main controller to handle whole request. Should be used in your
@@ -112,7 +112,7 @@ class api_controller {
                 array($command)
         ));
         return true;
-        }
+    }
 
     public function view(sfEvent $event, $response) {
 
@@ -228,7 +228,7 @@ class api_controller {
      */
     private function aggregateException(api_exception $e, array $prms) {
         if (!empty($prms)) {
-            foreach($prms as $n=>$v) {
+            foreach ($prms as $n => $v) {
                 if (!empty($v)) {
                     $e->setParam($n, $v);
                 }
