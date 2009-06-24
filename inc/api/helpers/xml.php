@@ -42,7 +42,7 @@ class api_helpers_xml {
      * @return void
      */
     public static function array2dom($array, &$domdoc, &$domnode, $cdataNodes = array(), $fragmNodes = array(), $keys = array(), $parentKey = null) {
-        if (! is_array($array)) {
+        if (! is_array($array) && ! $array instanceof ArrayObject ) {
             return;
         }
 

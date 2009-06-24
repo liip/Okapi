@@ -105,7 +105,7 @@ abstract class api_views_common {
         } else if (is_string($data) && !empty($data)) {
             $xmldom = new DOMDocument();
             $xmldom->loadXML($data);
-        } else if (is_array($data)) {
+        } else if (is_array($data) || $data instanceof ArrayObject) {
             $xmldom = new DOMDocument();
             $xmldom->loadXML("<command/>");
             api_helpers_xml::array2dom($data, $xmldom, $xmldom->documentElement);
