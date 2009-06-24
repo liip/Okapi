@@ -139,7 +139,6 @@ class api_controller {
     protected function loadRoute(sfEvent $event) {
         $this->route = $this->routing->getRoute($event['request']);
         $this->sc->setService('route', $this->route);
-        throw new api_exception_Db();
     }
 
     public function loadController(sfEvent $event) {

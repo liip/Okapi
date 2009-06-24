@@ -191,6 +191,9 @@ class api_response {
         }
 
         ob_end_flush();
+        if ($this->data) {
+            print $this->data;
+        }
 
         if ($this->setContentLengthOutput) {
             die();
