@@ -92,18 +92,18 @@ class api_controller {
         return $response;
     }
 
-    public function setScLookup($sc) {
-        $this->scLookup = $sc;
+    public function setServiceContainer($sc) {
+        $this->sc = $sc;
     }
 
     public function loadRoute(sfEvent $event) {
         $this->route = $this->routing->getRoute($event['request']);
-        $this->scLookup->setRoute($this->route);
+        $this->sc->setService('route', $this->route);
     }
 
     public function loadController(sfEvent $event) {
         $commandName = $this->findCommandName($this->route);
-        $command = $this->scLookup->getCommand($commandName);
+        $command = $this->sc->$commandName;
         $event->setReturnValue(array(
                 array(
                         $this,
@@ -117,7 +117,11 @@ class api_controller {
     public function view(sfEvent $event, $response) {
 
         $viewName = $this->getViewName($this->route, $this->request, $response);
-        $view = $this->scLookup->getView($viewName);
+        try {
+            $view = $this->sc->$viewName;
+        } catch (InvalidArgumentException $e) {
+            $view = new $viewName($this->sc->route, $this->sc->request, $this->sc->response, $this->sc->config);
+        }
         $view->prepare();
         //FIXME: shouldn't we just pass the response object to the view?
         $data = $response->getData();
