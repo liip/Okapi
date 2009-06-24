@@ -36,7 +36,7 @@ abstract class api_views_common {
      * Useful for instantiation of DOM objects etc.
      */
     public function prepare() {
-       return true;
+        return true;
     }
 
     /**
@@ -103,9 +103,11 @@ abstract class api_views_common {
         if ($data instanceof DOMDocument) {
             $xmldom = $data;
         } else if (is_string($data) && !empty($data)) {
-            $xmldom = DOMDocument::loadXML($data);
+            $xmldom = new DOMDocument();
+            $xmldom->loadXML($data);
         } else if (is_array($data)) {
-            @$xmldom = DOMDocument::loadXML("<command/>");
+            $xmldom = new DOMDocument();
+            $xmldom->loadXML("<command/>");
             api_helpers_xml::array2dom($data, $xmldom, $xmldom->documentElement);
         }
 
@@ -141,5 +143,9 @@ abstract class api_views_common {
         }
 
         $xmldom->documentElement->appendChild($exceptionsNode);
+    }
+
+    public function setResponse($response) {
+        $this->response = $response;
     }
 }

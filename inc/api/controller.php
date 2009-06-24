@@ -69,11 +69,23 @@ class api_controller {
         $this->routing = $routing;
         $this->config = $config;
 
+
+    }
+
+    public function run() {
         $this->dispatcher = new sfEventDispatcher();
-        $this->dispatcher->connect('application.request', array(
-                $this,
-                'loadRoute'
-        ));
+
+        $filters = $this->config->filters;
+
+        if (!$filters || !$filters['request']) {
+            $filters['request']['controller'] = null;
+        }
+        foreach ($filters['request'] as $r => $v) {
+            $this->dispatcher->connect('application.request', array(
+                    $this->sc->getService($r),
+                    'request'
+            ));
+        }
 
         $this->dispatcher->connect('application.load_controller', array(
                 $this,
@@ -84,9 +96,22 @@ class api_controller {
                 $this,
                 'view'
         ));
-    }
 
-    public function run() {
+
+        $this->dispatcher->connect('application.exception', array(
+                $this,
+                'exception'
+        ));
+
+        if (isset($filters['response'])) {
+            foreach ($filters['response'] as $r => $v) {
+                $this->dispatcher->connect('application.response', array(
+                        $this->sc->getService($r),
+                        'response'
+                ));
+            }
+        }
+
         $handler = new sfRequestHandler($this->dispatcher);
         $response = $handler->handle($this->request);
         return $response;
@@ -96,12 +121,29 @@ class api_controller {
         $this->sc = $sc;
     }
 
-    public function loadRoute(sfEvent $event) {
+    public function exception(sfEvent $event) {
+
+        //FIXME: This is another approach than we took in Okapi1. I'm not sure it's better, but it usess the exceptionhandler of sfRequestHandler
+        // Maybe we should mix it
+        $r = $this->sc->response_exception;
+        $r->data = $event['exception'];
+        $event->setReturnValue($r);
+
+        return true;
+    }
+
+    public function request(sfEvent $event) {
+        $this->loadRoute($event);
+    }
+
+    protected function loadRoute(sfEvent $event) {
         $this->route = $this->routing->getRoute($event['request']);
         $this->sc->setService('route', $this->route);
+        throw new api_exception_Db();
     }
 
     public function loadController(sfEvent $event) {
+
         $commandName = $this->findCommandName($this->route);
         $command = $this->sc->$commandName;
         $event->setReturnValue(array(
@@ -122,6 +164,7 @@ class api_controller {
         } catch (InvalidArgumentException $e) {
             $view = new $viewName($this->sc->route, $this->sc->request, $this->sc->response, $this->sc->config);
         }
+        $view->setResponse($response);
         $view->prepare();
         //FIXME: shouldn't we just pass the response object to the view?
         $data = $response->getData();

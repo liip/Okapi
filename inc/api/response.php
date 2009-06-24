@@ -220,4 +220,12 @@ class api_response {
         }
     }
 
+    public function setData($data) {
+        $this->data = $data;
+    }
+
+    public function setViewParam($key,$value) {
+        $this->viewParams[$key] = $value;
+    }
+
 }
