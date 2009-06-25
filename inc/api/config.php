@@ -94,7 +94,8 @@ class api_config {
 
     public function load($command = false) {
         $cachefile = $this->getConfigCachefile($this->env, $command);
-        $writeCache = false;
+        //FIXME $writeCache = false doesn't work with configCache correctly
+        $writeCache =  (defined('API_CACHE_YAML') && API_CACHE_YAML);
         if ($cachefile) {
             $configArray = $this->readFromCache($cachefile);
             if (!$configArray) {
@@ -107,7 +108,6 @@ class api_config {
                 $writeCache = true;
             }
         }
-
         if ($command) {
             $this->commandConfigArray = $configArray;
         } else {

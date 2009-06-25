@@ -125,15 +125,23 @@ class api_init {
         ini_set("include_path", $incPath);
 
         // Load and read config
-        $boostrapfile = API_PROJECT_DIR . 'conf/boostrap.yml';
-        require_once API_LIBS_DIR.'/vendor/sfYaml/sfYaml.php';
-        $cfg = sfYaml::load($boostrapfile);
-        // TODO: implement caching
+
+
         if (!isset($_SERVER['OKAPI_ENV']) || empty($cfg[$_SERVER['OKAPI_ENV']])) {
             $_SERVER['OKAPI_ENV'] = 'default';
         }
-        $cfg = $cfg[$_SERVER['OKAPI_ENV']];
+        // FIXME: implement correct caching
+        $cachefile = self::getBootstrapCachefile($_SERVER['OKAPI_ENV']);
+        if (defined('API_CACHE_YAML') && API_CACHE_YAML && $cachefile && file_exists($cachefile)) {
+            $cfg = unserialize(file_get_contents($cachefile));
+        } else {
+            $boostrapfile = API_PROJECT_DIR . 'conf/boostrap.yml';
+            require_once API_LIBS_DIR.'/vendor/sfYaml/sfYaml.php';
+            $cfg = sfYaml::load($boostrapfile);
+            file_put_contents($cachefile,serialize($cfg));
+        }
 
+        $cfg = $cfg[$_SERVER['OKAPI_ENV']];
         // Create temporary directory
         if (!empty($cfg['tmpdir'])) {
             if (!is_dir($cfg['tmpdir'])) {
@@ -195,7 +203,7 @@ class api_init {
         } else {
             $api_container_file = API_TEMP_DIR.'servicecontainer_'.$_SERVER['OKAPI_ENV'].'.php';
             $serviceContainerClass = $cfg['serviceContainer']['class'];
-            if (false && file_exists($api_container_file)) {
+            if ( file_exists($api_container_file)) {
                 require_once $api_container_file;
             } else {
                 $sc = new sfServiceContainerBuilder();
@@ -303,5 +311,18 @@ class api_init {
                      'tld'  => @$host['tld'],
                      'sld'  => @$host['sld'],
                      'path' => $path);
+    }
+
+    /**
+     * Returns the filename of the configuration cache file to be used.
+     */
+    protected static function getBootstrapCachefile($env) {
+        $tmpdir = API_PROJECT_DIR . 'tmp/';
+        if (!is_writable($tmpdir)) {
+            return null;
+        }
+        $file = $tmpdir . 'bootstrap-cache_' . $env;
+
+        return $file . '.php';
     }
 }
