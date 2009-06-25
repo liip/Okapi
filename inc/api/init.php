@@ -198,7 +198,7 @@ class api_init {
         libxml_use_internal_errors(true);
 
         // Create ServiceContainer
-        if (empty($cfg['serviceContainer'])) {
+        if (defined('API_CACHE_YAML') && API_CACHE_YAML && empty($cfg['serviceContainer'])) {
             $serviceContainerClass = 'api_servicecontainer';
         } else {
             $api_container_file = API_TEMP_DIR.'servicecontainer_'.$_SERVER['OKAPI_ENV'].'.php';
@@ -212,8 +212,8 @@ class api_init {
                 $loader->load(API_PROJECT_DIR.'conf/'.$cfg['serviceContainer']['file']);
 
                 if (!empty($cfg['configCache'])) {
-                    $dumper = new sfServiceContainerDumperPhp($sc);
-                    $code = $dumper->dump(array('class' => $serviceContainerClass));
+                    $dumper = new api_sf_servicecontainerdumperphp($sc);
+                    $code = $dumper->dump(array('class' => $serviceContainerClass , 'extends' => 'api_sf_servicecontainer'));
                     file_put_contents($api_container_file, $code);
                 }
 
