@@ -72,7 +72,7 @@ class api_controller {
     }
 
     public function run() {
-        $this->dispatcher = new sfEventDispatcher();
+        $this->dispatcher = $this->sc->sfEventDispatcher;
 
         if (!$this->filters || empty($this->filters['request'])) {
             $this->filters['request']['controller'] = null;
@@ -108,7 +108,7 @@ class api_controller {
             }
         }
 
-        $handler = new sfRequestHandler($this->dispatcher);
+        $handler = $this->sc->sfRequestHandler;
         $response = $handler->handle($this->request);
         return $response;
     }
