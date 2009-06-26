@@ -131,7 +131,7 @@ class api_init {
             $_SERVER['OKAPI_ENV'] = 'default';
         }
 
-        $cachefile = defined('API_CACHE_BOOTSTRAP_YAML') && API_CACHE_BOOTSTRAP_YAML
+        $cachefile = (defined('API_CACHE_BOOTSTRAP_YAML') && API_CACHE_BOOTSTRAP_YAML)
             ? self::getCacheFilename('bootstrap', API_PROJECT_DIR . 'tmp/', $_SERVER['OKAPI_ENV'])
             : false;
 
@@ -202,16 +202,12 @@ class api_init {
         libxml_use_internal_errors(true);
 
         // Create ServiceContainer
-        if (empty($cfg['serviceContainer'])) {
-            $serviceContainerClass = 'api_servicecontainer';
-        } else {
-            $api_container_file = !empty($cfg['configCache'])
-                ? self::getCacheFilename('servicecontainer', API_TEMP_DIR, $_SERVER['OKAPI_ENV'])
-                : false;
-            $serviceContainerClass = $cfg['serviceContainer']['class'];
-            if ($api_container_file && file_exists($api_container_file)) {
-                require_once $api_container_file;
-            } else {
+        if (isset($cfg['serviceContainer'])) {
+            $api_container_file = empty($cfg['configCache'])
+                ? false
+                : self::getCacheFilename('servicecontainer', API_TEMP_DIR, $_SERVER['OKAPI_ENV']);
+
+            if (!$api_container_file || !file_exists($api_container_file)) {
                 $sc = new sfServiceContainerBuilder();
                 $loader = $cfg['serviceContainer']['loader'];
                 $loader = new $loader($sc);
@@ -219,13 +215,22 @@ class api_init {
 
                 if ($api_container_file) {
                     $dumper = new api_sf_servicecontainerdumperphp($sc);
-                    $code = $dumper->dump(array('class' => $serviceContainerClass , 'extends' => 'api_sf_servicecontainer'));
+                    $dumper_cfg = array(
+                        'class' => $cfg['serviceContainer']['class'],
+                        'extends' => 'api_sf_servicecontainer',
+                    );
+                    $code = $dumper->dump($dumper_cfg);
                     file_put_contents($api_container_file, $code);
                 }
 
                 self::$initialized = true;
                 return $sc;
             }
+
+            $serviceContainerClass = $cfg['serviceContainer']['class'];
+            require_once $api_container_file;
+        } else {
+            $serviceContainerClass = 'api_servicecontainer';
         }
 
         return new $serviceContainerClass();
