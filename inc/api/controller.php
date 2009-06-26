@@ -63,21 +63,18 @@ class api_controller {
      * Constructor. Gets instances of api_request and api_response
      * but doesn't yet do anything else.
      */
-    public function __construct(api_request $request, api_routing $routing, api_config $config) {
+    public function __construct(api_request $request, api_routing $routing, api_config $config, $filters) {
 
         $this->request = $request;
         $this->routing = $routing;
         $this->config = $config;
-
-
+        $this->filters = $filters;
     }
 
     public function run() {
         $this->dispatcher = new sfEventDispatcher();
 
-        $this->filters = $this->config->filters;
-
-        if (!$this->filters || !$this->filters['request']) {
+        if (!$this->filters || empty($this->filters['request'])) {
             $this->filters['request']['controller'] = null;
         }
 
@@ -122,7 +119,8 @@ class api_controller {
 
     public function exception(sfEvent $event) {
 
-        //FIXME: This is another approach than we took in Okapi1. I'm not sure it's better, but it usess the exceptionhandler of sfRequestHandler
+        //FIXME: This is another approach than we took in Okapi1.
+        // I'm not sure it's better, but it usess the exceptionhandler of sfRequestHandler
         // Maybe we should mix it
         $r = $this->sc->response_exception;
         $r->data = $event['exception'];
