@@ -130,18 +130,22 @@ class api_init {
         if (!isset($_SERVER['OKAPI_ENV']) || empty($cfg[$_SERVER['OKAPI_ENV']])) {
             $_SERVER['OKAPI_ENV'] = 'default';
         }
-        // FIXME: implement correct caching
-        $cachefile = self::getBootstrapCachefile($_SERVER['OKAPI_ENV']);
-        if (defined('API_CACHE_YAML') && API_CACHE_YAML && $cachefile && file_exists($cachefile)) {
+
+        $cachefile = defined('API_CACHE_BOOTSTRAP_YAML') && API_CACHE_BOOTSTRAP_YAML
+            ? self::getCacheFilename('bootstrap', API_PROJECT_DIR . 'tmp/', $_SERVER['OKAPI_ENV'])
+            : false;
+
+        if ($cachefile && file_exists($cachefile)) {
             $cfg = unserialize(file_get_contents($cachefile));
         } else {
-            $boostrapfile = API_PROJECT_DIR . 'conf/boostrap.yml';
             require_once API_LIBS_DIR.'/vendor/sfYaml/sfYaml.php';
-            $cfg = sfYaml::load($boostrapfile);
-            file_put_contents($cachefile,serialize($cfg));
+            $cfg = sfYaml::load(API_PROJECT_DIR . 'conf/boostrap.yml');
+            $cfg = isset($cfg[$_SERVER['OKAPI_ENV']]) ? $cfg[$_SERVER['OKAPI_ENV']] : $cfg['default'];
+            if ($cachefile) {
+                file_put_contents($cachefile, serialize($cfg));
+            }
         }
 
-        $cfg = $cfg[$_SERVER['OKAPI_ENV']];
         // Create temporary directory
         if (!empty($cfg['tmpdir'])) {
             if (!is_dir($cfg['tmpdir'])) {
@@ -198,12 +202,14 @@ class api_init {
         libxml_use_internal_errors(true);
 
         // Create ServiceContainer
-        if (defined('API_CACHE_YAML') && API_CACHE_YAML && empty($cfg['serviceContainer'])) {
+        if (empty($cfg['serviceContainer'])) {
             $serviceContainerClass = 'api_servicecontainer';
         } else {
-            $api_container_file = API_TEMP_DIR.'servicecontainer_'.$_SERVER['OKAPI_ENV'].'.php';
+            $api_container_file = !empty($cfg['configCache'])
+                ? self::getCacheFilename('servicecontainer', API_TEMP_DIR, $_SERVER['OKAPI_ENV'])
+                : false;
             $serviceContainerClass = $cfg['serviceContainer']['class'];
-            if ( file_exists($api_container_file)) {
+            if ($api_container_file && file_exists($api_container_file)) {
                 require_once $api_container_file;
             } else {
                 $sc = new sfServiceContainerBuilder();
@@ -211,7 +217,7 @@ class api_init {
                 $loader = new $loader($sc);
                 $loader->load(API_PROJECT_DIR.'conf/'.$cfg['serviceContainer']['file']);
 
-                if (!empty($cfg['configCache'])) {
+                if ($api_container_file) {
                     $dumper = new api_sf_servicecontainerdumperphp($sc);
                     $code = $dumper->dump(array('class' => $serviceContainerClass , 'extends' => 'api_sf_servicecontainer'));
                     file_put_contents($api_container_file, $code);
@@ -316,12 +322,12 @@ class api_init {
     /**
      * Returns the filename of the configuration cache file to be used.
      */
-    protected static function getBootstrapCachefile($env) {
-        $tmpdir = API_PROJECT_DIR . 'tmp/';
+    public static function getCacheFilename($name, $tmpdir, $env) {
         if (!is_writable($tmpdir)) {
             return null;
         }
-        $file = $tmpdir . 'bootstrap-cache_' . $env;
+
+        $file = $tmpdir . $name. '-cache_' . $env;
 
         return $file . '.php';
     }

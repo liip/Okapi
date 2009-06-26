@@ -41,7 +41,7 @@ class autoload {
 
         // load class file map if not yet done
         if (is_null(self::$class_file_map)) {
-            $class_file_map = API_TEMP_DIR.'class_file_map-cache.php';
+            $class_file_map = api_init::getCacheFilename('autoload_class_file_map', API_TEMP_DIR, $_SERVER['OKAPI_ENV']);
             if (!file_exists($class_file_map)) {
                 autoload::generateClassFileMap($class_file_map, API_LIBS_DIR.'vendor');
             }
