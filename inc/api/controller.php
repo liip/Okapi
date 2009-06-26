@@ -79,9 +79,9 @@ class api_controller {
         }
 
         $this->dispatcher->connect('application.request', array(
-                    $this,
-                    'requestDispatcher'
-            ));
+                $this,
+                'requestDispatcher'
+        ));
 
         $this->dispatcher->connect('application.load_controller', array(
                 $this,
