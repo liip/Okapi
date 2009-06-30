@@ -214,10 +214,9 @@ class api_init {
                 $loader->load(API_PROJECT_DIR.'conf/'.$cfg['serviceContainer']['file']);
 
                 if ($api_container_file) {
-                    $dumper = new api_sf_servicecontainerdumperphp($sc);
+                    $dumper = new sfServiceContainerDumperPhp($sc);
                     $dumper_cfg = array(
-                        'class' => $cfg['serviceContainer']['class'],
-                        'extends' => 'api_sf_servicecontainer',
+                        'class' => $cfg['serviceContainer']['class']
                     );
                     $code = $dumper->dump($dumper_cfg);
                     file_put_contents($api_container_file, $code);
@@ -232,7 +231,6 @@ class api_init {
         } else {
             $serviceContainerClass = 'api_servicecontainer';
         }
-
         return new $serviceContainerClass();
     }
 
