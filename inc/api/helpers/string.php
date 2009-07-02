@@ -8,15 +8,18 @@
  */
 class api_helpers_string {
     /**
-     * Escape string for using in JS values (apostrophe and newlines are
-     * escaped)
+     * Escape string for using in JS values :
+     * - Apostrophe
+     * - New line
+     * - Unicode LINE SEPARATOR \u2028 (HTML Entity: &#8232;)
+     * - Unicode PARAGRAPH SEPARATOR \u2029 (HTML Entity: &#8233;)
      * @param $str string: String to escape.
      * @return string: Escaped value.
      */
     static function escapeJSValue($str) {
         return str_replace(
-                array("'", "\n", "\r"),
-                array("\\'", "\\n", "\\r"),
+                array("'", "\n", "\r", "\xe2\x80\xa8", "\xe2\x80\xA9"),
+                array("\\'", "\\n", "\\r", "", ""),
                 $str);
     }
 
