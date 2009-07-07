@@ -159,7 +159,7 @@ class api_testing_case_functional extends UnitTestCase {
      */
     private function uploadFiles(&$post, &$files) {
         foreach ($post as $key => $value) {
-            if (strlen($value) >= 1 && $value[0] == '@') {
+            if (is_string($value) && strlen($value) >= 1 && $value[0] == '@') {
                 $orig_file = substr($value, 1);
                 $upload_file = '';
                 if (file_exists($orig_file)) {
