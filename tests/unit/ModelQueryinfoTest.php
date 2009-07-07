@@ -64,4 +64,19 @@ class ModelQueryinfoTest extends api_testing_case_unit {
         $this->assertText($dom, '/queryinfo/command', 'mycommand');
         $this->assertText($dom, '/queryinfo/method', 'foo');
     }
+    
+    function testPlus() {
+        $_GET = array('foo' => 'H + M');
+        $request = api_request::getInstance(true);
+        $route = array('command' => 'mycommand', 'method' => 'foo');
+        
+        $model = new api_model_queryinfo($request, $route);
+        $dom = $model->getDOM();
+        $this->assertText($dom, '/queryinfo/query/foo', 'H + M');
+        $this->assertText($dom, '/queryinfo/requestURI', 'mycommand/foo?foo=H+%2B+M');
+        $this->assertText($dom, '/queryinfo/lang', 'en');
+        $this->assertText($dom, '/queryinfo/command', 'mycommand');
+        $this->assertText($dom, '/queryinfo/method', 'foo');
+    }
+    
 }
