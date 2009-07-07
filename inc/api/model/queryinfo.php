@@ -60,7 +60,7 @@ class api_model_queryinfo extends api_model {
                 if (is_array($value)) {
                     api_helpers_xml::array2dom($value, $dom, $queryP);
                 } else {
-                    $queryP->nodeValue = htmlspecialchars(urldecode($value), ENT_QUOTES, 'UTF-8');
+                    $queryP->nodeValue = htmlspecialchars(rawurldecode($value), ENT_QUOTES, 'UTF-8');
                 }
                 $elem->appendChild($queryP);
             } catch (DOMException $e) {
