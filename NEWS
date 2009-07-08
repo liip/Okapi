@@ -1,5 +1,26 @@
 Release history of Okapi.
 
+2009-07-08 :: Version 1.1.8
+  - api_views_default: resolving issue which caused import-errors with xsl 
+    files due to clearing libxml_errors (marc & harry)
+  - api_model_array: added getData to api_model_array (chregu)
+  - api_testing_case_functional: E_STRICT warnings fix by not calling 
+    loadXML statically (lukas.smith)
+  - api_controller: Adding a getter for current command (fabian.vogler)
+  - api_request: fix parseFilename to also include more esoteric characters 
+    like ! (chregu)
+  - api_helpers_xml: Catching DOMException for invalid node names and using 
+    alternative (e.g. entry with key="123") (fabian.vogler)
+  - api_helpers_string: Adding two unicode seperators to the escapeJSValue 
+    helper because they break JS (joel)
+  - api_pam: PEAR_Auth callbacks (chregu)
+  - api_testing_case_functional: fixed bug in testing where a post with 
+    multidimensional arrays produces an array to string conversion 
+    error (pascal.helfenstein)
+  - api_model_queryinfo: prevent api_model_queryinfo from loosing proper 
+    encoded + characters (patrick.jezek)
+
+
 2009-03-10 :: Version 1.1.7
   - api_testing_case_functional: Added openInBrowser method for debugging
     (alain)
