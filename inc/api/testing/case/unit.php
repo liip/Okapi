@@ -2,7 +2,7 @@
 /**
  * Base test case class for unit tests.
  */
-class api_testing_case_unit extends UnitTestCase {
+abstract class api_testing_case_unit extends api_testing_case_phpunit {
     
     /**
      * Gets the DOM node matching the given XPath expression.

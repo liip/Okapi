@@ -4,7 +4,7 @@
  * complete Okapi request without actually doing any HTTP request.
  * Instead api_controller::process() is called directly.
  */
-class api_testing_case_functional extends UnitTestCase {
+abstract class api_testing_case_functional extends api_testing_case_phpunit {
     /** api_controller: Controller to handle requests. */
     protected $controller = null;
     /** DOMDocument: DOM returned by the previous request. */
