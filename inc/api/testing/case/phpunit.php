@@ -25,6 +25,4 @@ abstract class api_testing_case_phpunit extends PHPUnit_Framework_Testcase {
         $this->assertRegExp($pattern, $string, $msg);
     }
     
-    
-    
 }
