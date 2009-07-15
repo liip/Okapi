@@ -1,5 +1,5 @@
 <?php
-class RequestTest extends UnitTestCase {
+class RequestTest extends api_testing_case_phpunit {
     function testInit() {
         $r = api_request::getInstance();
         $this->assertIsA($r, 'api_request');

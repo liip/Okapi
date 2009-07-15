@@ -1,5 +1,4 @@
 <?php
-
 class FunctionalAssertTest extends api_testing_case_functional {
     
     function testNode() {

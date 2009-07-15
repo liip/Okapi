@@ -3,7 +3,7 @@
  * Tests the api_config class which handles reading of configuration
  * XML files.
  */
-class ConfigTest extends UnitTestCase {
+class ConfigTest extends api_testing_case_phpunit {
     function setUp() {
         unset($_SERVER['OKAPI_ENV']);
     }

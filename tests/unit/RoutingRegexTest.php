@@ -3,7 +3,7 @@
  * Tests the api_routing class which stores routing configuration and
  * allows queries on the configured routes.
  */
-class RoutingRegexTest extends UnitTestCase {
+class RoutingRegexTest extends api_testing_case_phpunit {
     function setUp() {
         // Remove all existing routes
         $m = new api_routing_regex();
