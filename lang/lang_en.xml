@@ -4,7 +4,5 @@
     <message key="autocompletionremaining">Other {remain} results omitted. Limit search further.</message>
     <message key="classifieddeactivate">Deactivate listing</message>
     <message key="chf">CHF</message>
-    
     <message key="asxmltest" asXML="yes"><![CDATA[Some <strong>XML</strong> here.]]></message>
-    
 </catalogue>

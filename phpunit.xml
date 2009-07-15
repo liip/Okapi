@@ -1,6 +1,6 @@
 <phpunit backupGlobals="true"
              backupStaticAttributes="true"
-             bootstrap="./bootstrap.php"
+             bootstrap="./tests/bootstrap.php"
              colors="true"
              convertErrorsToExceptions="true"
              convertNoticesToExceptions="true"
@@ -9,5 +9,10 @@
              stopOnFailure="fakse"
              syntaxCheck="false"
              >
+             <testsuites>
+               <testsuite name="My Test Suite">
+                 <directory>tests</directory>
+               </testsuite>
+             </testsuites>             
 </phpunit>
     
