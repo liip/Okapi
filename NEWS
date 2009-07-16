@@ -9,6 +9,9 @@ UPCOMING RELEASE
     api_model_factory at runtime, by intercepting requests made to
     it and returning a different object from the factory instead.
     (harry fuecks)
+  - Updated cache.php to use MEMCACHE_COMPRESSED constant instead
+    of a boolean - getting warning from ext/memcache since 3.0.3
+    (harry fuecks)
 
 2009-03-10 :: Version 1.1.7
   - api_testing_case_functional: Added openInBrowser method for debugging
