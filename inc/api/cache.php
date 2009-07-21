@@ -124,6 +124,7 @@ class api_cache {
      */
     public function add($key, $val, $compressed = false, $expire = 0) {
         $key = $this->normalizeKey($key);
+        $compressed = $this->compressed($compressed);
         return $this->cache->add($this->prefix.$key, $val, $compressed, $expire);
     }
 
@@ -206,6 +207,7 @@ class api_cache {
      */
     public function replace($key, $val, $compressed = false, $expire = 0) {
         $key = $this->normalizeKey($key);
+        $compressed = $this->compressed($compressed);
         return $this->cache->replace($this->prefix.$key, $val, $compressed, $expire);
     }
 
@@ -222,6 +224,7 @@ class api_cache {
      */
     public function set($key, $val, $compressed = false, $expire = 0) {
         $key = $this->normalizeKey($key);
+        $compressed = $this->compressed($compressed);
         return $this->cache->set($this->prefix.$key, $val, $compressed, $expire);
     }
 
@@ -257,5 +260,14 @@ class api_cache {
      */
     protected function normalizeKey($key) {
         return str_replace(' ', '_', $key);
+    }
+    
+    /**
+     * The compressed argument on Memcache::add, Memcache::set and Memcache::replace takes
+     * an integer not a boolean. Since pecl/memcache 3.0.3 booleans now leads to warnings like
+     * The lowest two bytes of the flags array is reserved for pecl/memcache internal use
+     */
+    protected function compressed($compressed) {
+        return $compressed == false ? 0 : MEMCACHE_COMPRESSED;
     }
 }
