@@ -15,7 +15,7 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
     protected static $zaAuth = null;
 
     /** Zend_Auth_Adapter: Active adapter which handles the user lookups. */
-    private static $zaAdapter;
+    protected static $zaAdapter;
 
     /**
      * Constructor.
@@ -31,20 +31,21 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
      * @return boolean true if authenticated successfuly
      * @see Zend_Auth_Result
      */
-    public  function checkAuth() {
+    public function checkAuth() {
         if (self::$zaAuth->hasIdentity()) {
             return true;
-        } else if (isset(self::$zaAdapter)) {
+        }
+        if (isset(self::$zaAdapter)) {
             $zaResult = self::$zaAuth->authenticate(self::$zaAdapter);
             $msg = $zaResult->getMessages();
-            if($zaResult->getCode() !== 1){
+            if ($zaResult->getCode() !== 1) {
                 throw new api_exception_Auth(api_exception::THROW_FATAL, array(), 0, $msg[0]);
             }
             if ($zaResult->isValid()) {
                 if (isset($this->opts['container']['usercol'])) {
                     $storage = self::$zaAuth->getStorage();
                     $rows = array(
-                            $this->opts['container']['usercol']
+                        $this->opts['container']['usercol']
                     );
                     if (isset($this->opts['container']['idcol'])) {
                         $rows[] = $this->opts['container']['idcol'];
@@ -62,7 +63,7 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
      *
      * @return mixed|null
      */
-    public  function getAuthData() {
+    public function getAuthData() {
         return self::$zaAuth->getIdentity();
     }
 
@@ -71,16 +72,16 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
      *
      * @return mixed|null
      */
-    public  function getUserId() {
+    public function getUserId() {
         if (self::$zaAuth->hasIdentity()) {
             if (isset($this->opts['container']['idcol'])) {
                 $idcol = $this->opts['container']['idcol'];
                 return self::$zaAuth->getIdentity()->$idcol;
-            } else if (isset($this->opts['container']['usercol'])) {
-                return $this->getUserName();
-            } else {
-                return self::$zaAuth->getIdentity();
             }
+            if (isset($this->opts['container']['usercol'])) {
+                return $this->getUserName();
+            }
+            return self::$zaAuth->getIdentity();
         }
 
         return null;
@@ -91,14 +92,13 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
      *
      * @return mixed|null
      */
-    public  function getUserName() {
+    public function getUserName() {
         if (self::$zaAuth->hasIdentity()) {
             if (isset($this->opts['container']['usercol'])) {
                 $usercol = $this->opts['container']['usercol'];
                 return self::$zaAuth->getIdentity()->$usercol;
-            } else {
-                return self::$zaAuth->getIdentity();
             }
+            return self::$zaAuth->getIdentity();
         }
 
         return null;
@@ -112,12 +112,12 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
      * @return boolean true if authenticated successfuly
      * @todo clean up the "very ugly stuff"
      */
-    public  function login($user, $pass) {
+    public function login($user, $pass) {
         self::$zaAuth->clearIdentity();
         $rgOpts = $this->opts['container'];
         $strAdapter = $rgOpts['driver'];
 
-        switch($strAdapter) {
+        switch ($strAdapter) {
             case "ldap":
                 // TODO: Omg this is very ugly
                 foreach ($rgOpts as $host => $opts) {
@@ -176,10 +176,10 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
     * @param $pass string: Database password.
     * @see http://framework.zend.com/manual/en/zend.auth.adapter.dbtable.html
     */
-    private function setZendDbTableAdapter($rgOpts, $user, $pass){
+    protected function setZendDbTableAdapter($rgOpts, $user, $pass) {
         unset($rgOpts['driver']);
         $adapter = 'Zend_Db_Adapter_'.$rgOpts['adapter'];
-        if(!class_exists($adapter)){
+        if (!class_exists($adapter)) {
             throw new api_exception_Auth(1, $rgOpts, null, 'No such thing as ' . $adapter. '. Please check config.xml');
         }
         $dbAdapter = new $adapter($rgOpts);
@@ -192,12 +192,11 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
                     ->setCredential($pass);
 
         // passtreatment id optional:
-        if(array_key_exists('passtreatment', $rgOpts)){
+        if (array_key_exists('passtreatment', $rgOpts)) {
            $authAdapter->setCredentialTreatment($rgOpts['passtreatment']);
         }
 
         self::$zaAdapter = $authAdapter;
-
     }
 
 }
