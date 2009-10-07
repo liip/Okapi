@@ -161,7 +161,6 @@ class api_controller {
     }
 
     public function view(sfEvent $event, $response) {
-
         $viewName = $this->getViewName($this->route, $this->request, $response);
         try {
             $view = $this->sc->$viewName;
@@ -226,8 +225,8 @@ class api_controller {
 
             }
             $response = $command->process();
-            if (is_callable(array($command,"postAction"))) {
-                $response = call_user_func(array($command,"postAction"), $response);
+            if (is_callable(array($command, "postAction"))) {
+                call_user_func(array($command, "postAction"));
             }
             return $response;
 
@@ -273,7 +272,7 @@ class api_controller {
      * @param $e api_exception: Thrown exception
      * @param $prms array: Additional params passed to catchException()
      */
-    private function aggregateException(api_exception $e, array $prms) {
+    protected function aggregateException(api_exception $e, array $prms) {
         if (!empty($prms)) {
             foreach ($prms as $n => $v) {
                 if (!empty($v)) {
@@ -297,7 +296,7 @@ class api_controller {
      *
      * @param   $e api_exception: Thrown exception, passed to the exceptionhandler.
      */
-    private function catchFinalException(Exception $e) {
+    protected function catchFinalException(Exception $e) {
         api_exceptionhandler::handle($e, $this);
         if ($this->response === null) {
             die();
@@ -319,7 +318,7 @@ class api_controller {
      * @param $e api_exception: Thrown exception.
      * @param $prms array: Parameters to give more context to the exception.
      */
-    private function catchException(Exception $e, $prms=array()) {
+    protected function catchException(Exception $e, $prms=array()) {
         if ($e instanceof api_exception && $e->getSeverity() === api_exception::THROW_NONE) {
             $this->aggregateException($e, $prms);
             api_exceptionhandler::log($e);
@@ -343,7 +342,7 @@ class api_controller {
      * view parameters. All parameters returned by the command
      * are written into the 'view' array of the route.
      */
-    private function initViewParams($route,$response) {
+    protected function initViewParams($route, $response) {
         $response->viewParams = array_merge($route['view'], $response->viewParams);
         return $response->viewParams;
     }

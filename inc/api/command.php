@@ -39,7 +39,7 @@ abstract class api_command {
      * string: Default Method. Gets called by api_command::process() when
      * the route does not contain a method.
      */
-    protected $defaultMethod = 'defaultRequest';
+    protected $defaultMethod = 'index';
 
     /**
      * Constructor. Initializes the object's attributes but does not have
@@ -55,10 +55,9 @@ abstract class api_command {
         $this->response->getDataCallback = array($this,'getData');
     }
 
-    public function postAction(api_response $response) {
-    
-           $response->viewParams = array_merge($response->viewParams, $this->getXslParams());
-           return $response;
+    public function postAction() {
+        $this->response->viewParams = array_merge($this->response->viewParams, $this->getXslParams());
+        return true;
     }
 
     /**
@@ -79,12 +78,13 @@ abstract class api_command {
      */
     public function process() {
         $route = $this->route->getParams();
+
         if (isset($route['method']) && $route['method'] != 'process') {
             // __call() may return false, then we go execute the default request
             if ((!method_exists($this, $route['method']) || is_callable(array($this, $route['method'])))
                 && $this->{$route['method']}()
             ) {
-                return;
+                return $this->response;
             }
         }
         $this->{$this->defaultMethod}();

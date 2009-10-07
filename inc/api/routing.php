@@ -100,7 +100,7 @@ class api_routing implements api_Irouting {
      */
     public function getRoute($request) {
         $uri = $request->getPath();
-        
+
         foreach (self::$routes as $route) {
             if ($route->match($request)) {
                 return $route;
@@ -165,7 +165,7 @@ class api_routing_route implements ArrayAccess, Countable, api_Irouting {
     }
 
     public function getParams() {
-        return $this;
+        return $this->params;
     }
 
     /**
@@ -230,7 +230,6 @@ class api_routing_route implements ArrayAccess, Countable, api_Irouting {
         if (strlen($last) && $last[0] != '*' && $last[0] != '+' && count($uriParts) > count($routeParts)) {
             return null;
         }
-
 
         // Fill in params from URL
         $params = array();

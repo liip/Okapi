@@ -190,10 +190,8 @@ class api_response {
         if ($this->setContentLengthOutput) {
             header("Content-Length: " . ob_get_length() + strlen($this->content));
         }
-        //FIXME: The mix between content and ob_* I do not really like :( see also get/setContent)
-        while (ob_get_level()) {
-            ob_end_flush();
-        }
+
+        $this->getContent();
         if ($this->content) {
             print $this->content;
         }
