@@ -27,7 +27,7 @@ class api_response_exception extends api_response {
     public function send() {
         $data = array();
         $data['exception'] = $this->getTrace($this->data);
-        ;
+        
         $this->setViewParam("xsl", $this->getXsl());
         $this->view->prepare();
         $this->view->dispatch($data);
@@ -55,14 +55,16 @@ class api_response_exception extends api_response {
                         $entry['caller'] = (int) $trace[$i - 1]['line'] - 1;
                     } else if ($i === 0) {
                         $entry['caller'] = (int) $e->getLine() - 1;
+                    } else {
+                        $entry['caller'] = null;
                     }
 
                     $start = $entry['caller'] - self::BACKTRACE_CONTEXT;
-                    if ($start < $refl->getStartLine()) {
+                    if ($start < $refl->getStartLine() || $entry['caller'] === null) {
                         $start = $refl->getStartLine() - 1;
                     }
                     $end = $entry['caller'] + self::BACKTRACE_CONTEXT;
-                    if ($end > $refl->getEndLine()) {
+                    if ($end > $refl->getEndLine() || $entry['caller'] === null) {
                         $end = $refl->getEndLine();
                     }
                     $entry['source'] = $this->getSourceFromFile($refl->getFileName(), $start, $end);
