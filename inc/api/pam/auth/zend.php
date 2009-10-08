@@ -107,12 +107,16 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
     /**
      * Trigger the Login-Process
      *
-     * @param $user string: Username
-     * @param $pass string: Password
-     * @return boolean true if authenticated successfuly
+     * @param string $user User name
+     * @param string $pass Password
+     * @param bool $persistent Whether to set a cookie for persistent login or not (aka "Remember me")
+     * @return bool whether login succeeded or not
      * @todo clean up the "very ugly stuff"
      */
-    public function login($user, $pass) {
+    public function login($user, $pass, $persistent) {
+        if ($persistent) {
+            throw new api_exception(api_exception::THROW_FATAL, null, null, 'Persistent connections are not implemented yet for this auth module');
+        }
         self::$zaAuth->clearIdentity();
         $rgOpts = $this->opts['container'];
         $strAdapter = $rgOpts['driver'];

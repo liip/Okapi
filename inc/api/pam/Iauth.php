@@ -10,10 +10,13 @@ interface api_pam_Iauth {
     /**
      * Login in with the given username and password. The authentication
      * object is responsible for handling the session state.
-     * @param $user string: User name
-     * @param $pass string: Password
+     * 
+     * @param string $user User name
+     * @param string $pass Password
+     * @param bool $persistent Whether to set a cookie for persistent login or not (aka "Remember me")
+     * @return bool whether login succeeded or not
      */
-    public function login($user, $pass);
+    public function login($user, $pass, $persistent);
 
     /**
      * Log out the currently logged in user. The authentication object

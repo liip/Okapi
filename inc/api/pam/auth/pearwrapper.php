@@ -24,7 +24,10 @@ class api_pam_auth_pearwrapper extends api_pam_common implements api_pam_Iauth {
         $this->setPearDefaults();
     }
 
-    public function login($username, $passwd) {
+    public function login($username, $passwd, $persistent) {
+        if ($persistent) {
+            throw new api_exception(api_exception::THROW_FATAL, null, null, 'Persistent connections are not implemented yet for this auth module');
+        }
         if ($this->pAuth) {
             $this->pAuth->username = $username;
             $this->pAuth->password = $passwd;

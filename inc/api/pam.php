@@ -46,8 +46,23 @@
  * @author   Silvan Zurbruegg
  */
 class api_pam {
-    /** api_pam: Instance returned by getInstance() */
+    /**
+     * api_pam: Instance returned by getInstance()
+     * @var api_pam
+     */
     private static $instance = null;
+
+    /**
+     * auth instance
+     * @var api_pam_Iauth
+     */
+    private $auth;
+
+    /**
+     * perm instance
+     * @var api_pam_Iperm
+     */
+    private $perm;
 
     /** string constant: Prefix for all class names in this package. */
     private $clsNameBase = 'api_pam';
@@ -88,14 +103,15 @@ class api_pam {
      * method on the authentication object. The authentication object
      * is responsible for handling the session state.
      *
-     * @param $user string: User name
-     * @param $pass string: Password
-     * @return bool: Return value of the authentication login method
+     * @param string $user User name
+     * @param string $pass Password
+     * @param bool $persistent Whether to set a cookie for persistent login or not (aka "Remember me")
+     * @return bool Return value of the authentication login method
      * @see api_pam_Iauth::login()
      */
-    public function login($user, $pass) {
+    public function login($user, $pass, $persistent=false) {
         if (($ao = $this->getAuthObj()) !== false) {
-            return $ao->login($user, $pass);
+            return $ao->login($user, $pass, $persistent);
         }
         return false;
     }
@@ -264,7 +280,7 @@ class api_pam {
 
     /**
      * Returns the current permission object.
-     * @return api_pam_Iperm: Permission object.
+     * @return api_pam_Iperm Permission object.
      */
     private function getPermObj() {
         return $this->perm;
@@ -272,7 +288,7 @@ class api_pam {
 
     /**
      * Returns the current authentication object.
-     * @return api_pam_Iauth: Authentication object.
+     * @return api_pam_Iauth Authentication object.
      */
     private function getAuthObj() {
         return $this->auth;
