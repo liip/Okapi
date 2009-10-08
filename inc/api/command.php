@@ -15,29 +15,34 @@ abstract class api_command {
     /**
      * api_request: Request object containing information about the current
      * request.
+     * @var api_request
      */
     protected $request = null;
 
     /**
      * api_response: Response object used to send output to the client.
+     * @var api_response
      */
     protected $response = null;
 
     /**
      * array: Route definition of the current request. This is the return
      * value of api_routing::getRoute().
+     * @var api_routing_route
      */
     protected $route = array();
 
     /**
      * array of api_model: Data objects to be passed to the XSLT
      * stylesheets.
+     * @var array
      */
     protected $data = array();
 
     /**
      * string: Default Method. Gets called by api_command::process() when
      * the route does not contain a method.
+     * @var string
      */
     protected $defaultMethod = 'index';
 
