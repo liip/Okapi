@@ -98,7 +98,7 @@ class api_init {
         if (file_exists(API_VENDOR_DIR)){
             $incPath .= PATH_SEPARATOR . API_VENDOR_DIR;
         }
-        $incPath .= PATH_SEPARATOR.ini_get("include_path");
+        $incPath .= PATH_SEPARATOR.get_include_path();
 
         // Prepend extension directories to include path
         if (is_dir(API_PROJECT_DIR . 'ext/')) {
@@ -122,7 +122,7 @@ class api_init {
         }
         $incPath = API_LOCAL_INCLUDE_DIR . PATH_SEPARATOR . $incPath;
 
-        ini_set("include_path", $incPath);
+        set_include_path($incPath);
 
         // Load and read config
 

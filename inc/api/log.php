@@ -20,163 +20,92 @@ class api_log {
     const INFO = 6; // Informational: informational messages
     const DEBUG = 7; // Debug: debug messages
 
+    protected $masks = array(
+        'EMERG' => api_log::EMERG,
+        'ALERT' => api_log::ALERT,
+        'CRIT' => api_log::CRIT,
+        'FATAL' => Zend_Log::CRIT,
+        'ERR' => api_log::ERR,
+        'ERROR' => Zend_Log::ERR,
+        'WARN' => api_log::WARN,
+        'NOTICE' => api_log::NOTICE,
+        'INFO' => api_log::INFO,
+        'DEBUG' => api_log::DEBUG
+    );
 
     /** Log: Configured logger. */
-    public static $logger = null;
-
-    /** api_log instance */
-    public static $instance = null;
+    public $logger = null;
 
     /** lowest priority **/
     protected $priority = null;
 
     /** default priority **/
-    protected static $defaultPriority = self::ERR;
+    protected $defaultPriority = self::ERR;
 
-    /** MockWriter for testing */
-    public static $mockWriter = null;
-
-    /**
-     * Log a message if a logger is configured
-     */
-    public static function log($prio) {
-        if (self::$instance === false) {
-            return false;
-        }
-
-        if (self::$instance === null) {
-            $config = api_config::getInstance()->log;
-            if (empty($config) || !(self::$instance = api_log::getInstance())) {
-                self::$instance = false;
-                return false;
-            }
-        }
-
-        $params = func_get_args();
-        array_shift($params);
-
-        return self::$instance->logMessage($params, $prio);
-    }
-
-    /**
-     * Log a message if a logger is configured without having to give a priority
-     * Only one parameter is supported, if you need more arguments, use api_log::log();
-     *
-     * @param $message The message to be logged
-     */
-    public static function dump($message) {
-        return self::log(self::$defaultPriority, $message);
-    }
     /**
      * Initialize the logger.
      */
-    public function __construct($config) {
+    public function __construct($logger, $priority = null, $global = false) {
+        $this->logger = $logger;
 
-        if (self::$logger !== null) {
-            // Already initialized
-            return;
+        $priority = is_null($priority)
+            ? $this->defaultPriority : $this->getMaskFromLevel($priority);
+        $this->logger->addFilter($priority);
+        $this->priority = $priority;
+
+        if ($global) {
+            $GLOBALS['log'] = $this;
         }
-
-        $configs = $config->log;
-
-        if (empty($configs[0]['class'])) {
-            // Logging is not activated
-            self::$logger = false;
-            return;
-        }
-
-        self::$logger = new Zend_Log();
-
-        foreach ($configs as $cfg) {
-            $log = $this->createLogObject($cfg['class'], $cfg);
-            if ($cfg['class'] == 'Writer_Mock') {
-                self::$mockWriter = $log;
-            }
-            self::$logger->addWriter($log);
-        }
-    }
-
-    /**
-     * Gets an instance of api_log.
-     * @param $forceReload bool: If true, forces instantiation of a
-     *        new instance. Used for testing.
-     * @return api_log an api_log instance;
-     */
-    public static function getInstance($forceReload = FALSE, $config = null) {
-        if (!self::$instance instanceof api_log || $forceReload) {
-            self::$logger = null;
-            self::$instance = new api_log($config);
-        }
-
-        return self::$instance;
     }
 
     public function __call($method, $params) {
-        $prio = self::getMaskFromLevel($method);
+        $prio = $this->getMaskFromLevel($method);
         $this->logMessage($params, $prio);
     }
 
     public function isLogging() {
-        return self::$instance !== false && self::$logger !== false;
+        return $this->logger !== false;
     }
 
     public function getPriority() {
         return $this->priority;
     }
 
-    protected function createLogObject($name, $config) {
-        $classname = 'Zend_Log_' . $name;
-        $params = (array) (isset($config['cfg']) ? $config['cfg'] : array());
-
-        if (empty($params)) {
-            $object = new $classname();
-        } else {
-            $class = new ReflectionClass($classname);
-            $object = $class->newInstanceArgs($params);
-        }
-
-        if (isset($config['priority'])) {
-            $prio = $this->getMaskFromLevel($config['priority']);
-            $object->addFilter(new Zend_Log_Filter_Priority($prio));
-            if ($prio > $this->priority || !$this->priority) {
-                $this->priority = $prio;
-            }
-        }
-
-        return $object;
-    }
-
     /**
      * Return a api_log mask for a string level.
      */
     protected function getMaskFromLevel($level) {
-        $masks = array(
-                'EMERG' => api_log::EMERG,
-                'ALERT' => api_log::ALERT,
-                'CRIT' => api_log::CRIT,
-                'FATAL' => Zend_Log::CRIT,
-                'ERR' => api_log::ERR,
-                'ERROR' => Zend_Log::ERR,
-                'WARN' => api_log::WARN,
-                'NOTICE' => api_log::NOTICE,
-                'INFO' => api_log::INFO,
-                'DEBUG' => api_log::DEBUG);
-        return $masks[strtoupper($level)];
+        return $this->masks[strtoupper($level)];
+    }
+
+    /**
+     * Log a message if a logger is configured
+     */
+    public function log($prio) {
+        if ($this->logger === false) {
+            return false;
+        }
+
+        $params = func_get_args();
+        array_shift($params);
+
+        return $this->logMessage($params, $prio);
     }
 
     protected function logMessage($params, $prio) {
-        if (self::$logger === false) {
+        if ($this->logger === false) {
             return false;
         }
+
         $message = array_shift($params);
         if (!empty($params)) {
             $message = vsprintf($message, $params);
         }
 
         if (!is_int($prio)) {
-            $prio = self::$defaultPriority;
+            $prio = $this->defaultPriority;
         }
 
-        return self::$logger->log($message, $prio);
+        return $this->logger->log($message, $prio);
     }
 }
