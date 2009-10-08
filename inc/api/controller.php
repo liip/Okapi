@@ -63,7 +63,7 @@ class api_controller {
      * Constructor. Gets instances of api_request and api_response
      * but doesn't yet do anything else.
      */
-    public function __construct(api_request $request, api_routing $routing, api_config $config, $filters) {
+    public function __construct(api_request $request, api_routing $routing, api_config $config, $filters = false) {
 
         $this->request = $request;
         $this->routing = $routing;
@@ -79,31 +79,31 @@ class api_controller {
         }
 
         $this->dispatcher->connect('application.request', array(
-                $this,
-                'requestDispatcher'
+            $this,
+            'requestDispatcher'
         ));
 
         $this->dispatcher->connect('application.load_controller', array(
-                $this,
-                'loadController'
+            $this,
+            'loadController'
         ));
 
         $this->dispatcher->connect('application.view', array(
-                $this,
-                'view'
+            $this,
+            'view'
         ));
 
 
         $this->dispatcher->connect('application.exception', array(
-                $this,
-                'exception'
+            $this,
+            'exception'
         ));
 
         if (isset($this->filters['response'])) {
             foreach ($this->filters['response'] as $r => $v) {
                 $this->dispatcher->connect('application.response', array(
-                        $this->sc->getService($r),
-                        'response'
+                    $this->sc->getService($r),
+                    'response'
                 ));
             }
         }
@@ -151,27 +151,29 @@ class api_controller {
         $commandName = $this->findCommandName($this->route);
         $command = $this->sc->$commandName;
         $event->setReturnValue(array(
-                array(
-                        $this,
-                        'processCommand'
-                ),
-                array($command)
+            array(
+                $this,
+                'processCommand'
+            ),
+            array($command)
         ));
         return true;
     }
 
     public function view(sfEvent $event, $response) {
         $viewName = $this->getViewName($this->route, $this->request, $response);
-        try {
-            $view = $this->sc->$viewName;
-        } catch (InvalidArgumentException $e) {
-            $view = new $viewName($this->sc->route, $this->sc->request, $this->sc->response, $this->sc->config);
+        if ($viewName) {
+            try {
+                $view = $this->sc->$viewName;
+            } catch (InvalidArgumentException $e) {
+                $view = new $viewName($this->sc->route, $this->sc->request, $this->sc->response, $this->sc->config);
+            }
+            $view->setResponse($response);
+            $view->prepare();
+            //FIXME: shouldn't we just pass the response object to the view?
+            $data = $response->getInputData();
+            $view->dispatch($data, $this->getExceptions());
         }
-        $view->setResponse($response);
-        $view->prepare();
-        //FIXME: shouldn't we just pass the response object to the view?
-        $data = $response->getInputData();
-        $view->dispatch($data, $this->getExceptions());
         return $response;
     }
 
@@ -222,20 +224,20 @@ class api_controller {
                 throw new api_exception_CommandNotAllowed("Command access not allowed: ".get_class($command));
             }
             if (is_string($allowed)) {
-                $this->route->config(array('method'=>$allowed));
+                $this->route->config(array('method' => $allowed));
             }
-            if (is_callable(array($command,"preAction"))) {
-                call_user_func(array($command,"preAction"));
+            if (is_callable(array($command, 'preAction'))) {
+                call_user_func(array($command, 'preAction'));
             }
             $response = $command->process();
-            if (is_callable(array($command, "postAction"))) {
-                call_user_func(array($command, "postAction"));
+            if (is_callable(array($command, 'postAction'))) {
+                call_user_func(array($command, 'postAction'));
             }
-            return $response;
-
         } catch(Exception $e) {
             $this->catchException($e, array('command' => $this->route['command']));
         }
+
+        return $response;
     }
 
     /**
