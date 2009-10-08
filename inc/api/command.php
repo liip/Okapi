@@ -124,7 +124,11 @@ abstract class api_command {
      * When this method returns false the controller throws a
      * api_exception_CommandNotAllowed exception.
      *
-     * @return bool
+     * You can also return a string to another method of the same command
+     * which will be called instead of the original one, this would typically
+     * be a login method that displays a login form
+     *
+     * @return bool|string
      */
     public function isAllowed() {
         return true;

@@ -217,12 +217,15 @@ class api_controller {
      */
     public function processCommand($command) {
         try {
-            if (!$command->isAllowed()) {
+            $allowed = $command->isAllowed();
+            if (!$allowed) {
                 throw new api_exception_CommandNotAllowed("Command access not allowed: ".get_class($command));
+            }
+            if (is_string($allowed)) {
+                $this->route->config(array('method'=>$allowed));
             }
             if (is_callable(array($command,"preAction"))) {
                 call_user_func(array($command,"preAction"));
-
             }
             $response = $command->process();
             if (is_callable(array($command, "postAction"))) {
