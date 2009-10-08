@@ -78,17 +78,14 @@ abstract class api_command {
      */
     public function process() {
         $route = $this->route->getParams();
-
         if (isset($route['method']) && $route['method'] != 'process') {
-            // __call() may return false, then we go execute the default request
-            if ((!method_exists($this, $route['method']) || is_callable(array($this, $route['method'])))
-                && $this->{$route['method']}()
-            ) {
+            if (method_exists($this, $route['method']) || is_callable(array($this, $route['method']))) {
+                $this->{$route['method']}();
                 return $this->response;
             }
         }
-        $this->{$this->defaultMethod}();
-        return $this->response;
+        throw new api_exception_NoMethodFound('Incorrect method name '.get_class($this).'::'.$route['method'].
+            ', you may want to implement __call or check the return value of isAllowed if you returned a custom method name');
     }
 
     /**
@@ -102,19 +99,6 @@ abstract class api_command {
      * @return void
      */
     public function defaultRequest() {
-    }
-
-    /**
-     * Safety purposes __call so that the default command is called when
-     * somebody is careless in the route configuration. So if the route
-     * configuration specifies a method which doesn't exist in the command,
-     * then this no-operation method is called.
-     * @param $name string: Method name. Passed in automatically by PHP.
-     * @param $argv array:  Method parameters. Passed in automatically by PHP.
-     * @return bool: false
-     */
-    public function __call($name, $argv) {
-        return false;
     }
 
     /**
