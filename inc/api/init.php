@@ -125,12 +125,10 @@ class api_init {
         set_include_path($incPath);
 
         // Create temporary directory
-        if (!empty($cfg['tmpdir'])) {
-            if (!is_dir($cfg['tmpdir'])) {
-                mkdir($cfg['tmpdir'], 0777, true);
-            }
-            define('API_TEMP_DIR', $cfg['tmpdir']);
-        }
+		define('API_TEMP_DIR', API_PROJECT_DIR.'tmp/');
+		if (!is_dir(API_TEMP_DIR)) {
+			mkdir(API_TEMP_DIR, 0777, true);
+		}
 
         // Load and read config
         if (!isset($_SERVER['OKAPI_ENV']) || empty($cfg[$_SERVER['OKAPI_ENV']])) {
