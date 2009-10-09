@@ -124,9 +124,15 @@ class api_init {
 
         set_include_path($incPath);
 
+        // Create temporary directory
+        if (!empty($cfg['tmpdir'])) {
+            if (!is_dir($cfg['tmpdir'])) {
+                mkdir($cfg['tmpdir'], 0777, true);
+            }
+            define('API_TEMP_DIR', $cfg['tmpdir']);
+        }
+
         // Load and read config
-
-
         if (!isset($_SERVER['OKAPI_ENV']) || empty($cfg[$_SERVER['OKAPI_ENV']])) {
             $_SERVER['OKAPI_ENV'] = 'default';
         }
@@ -144,14 +150,6 @@ class api_init {
             if ($cachefile) {
                 file_put_contents($cachefile, serialize($cfg));
             }
-        }
-
-        // Create temporary directory
-        if (!empty($cfg['tmpdir'])) {
-            if (!is_dir($cfg['tmpdir'])) {
-                mkdir($cfg['tmpdir'], 0777, true);
-            }
-            define('API_TEMP_DIR', $cfg['tmpdir']);
         }
 
         // Load autoloader
