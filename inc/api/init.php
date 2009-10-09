@@ -64,14 +64,11 @@ class api_init {
      *         "static/" directory inside API_WEBROOT but can be configured
      *         using <b>webpaths['static']</b>.
      * @define API_TEMP_DIR
-     *         Directory for temporary files on the file system. Configured
-     *         using the <b>tmpdir</b> configuration value.
+     *         Directory for temporary files on the file system. Always "tmp/"
      *
      * @config <b>webpaths['static']</b> (string): Absolute or relative URI to
      *         be used as API_WEBROOT_STATIC value. Used if the static files
      *         are located on another host than the applications.
-     * @config <b>tmpdir</b> (string): Directory to store temporary files to.
-     *         API_TEMP_DIR is set to this value.
      */
     public static function start() {
         if (self::$initialized) {
@@ -136,7 +133,7 @@ class api_init {
         }
 
         $cachefile = (defined('API_CACHE_BOOTSTRAP_YAML') && API_CACHE_BOOTSTRAP_YAML)
-            ? self::getCacheFilename('bootstrap', API_PROJECT_DIR . 'tmp/', $_SERVER['OKAPI_ENV'])
+            ? self::getCacheFilename('bootstrap', $_SERVER['OKAPI_ENV'])
             : false;
 
         if ($cachefile && file_exists($cachefile)) {
@@ -201,7 +198,7 @@ class api_init {
         if (isset($cfg['serviceContainer'])) {
             $api_container_file = empty($cfg['configCache'])
                 ? false
-                : self::getCacheFilename('servicecontainer', API_TEMP_DIR, $_SERVER['OKAPI_ENV']);
+                : self::getCacheFilename('servicecontainer', $_SERVER['OKAPI_ENV']);
 
             if (!$api_container_file || !file_exists($api_container_file)) {
                 $sc = new sfServiceContainerBuilder();
@@ -321,12 +318,12 @@ class api_init {
     /**
      * Returns the filename of the configuration cache file to be used.
      */
-    public static function getCacheFilename($name, $tmpdir, $env) {
-        if (!is_writable($tmpdir)) {
+    public static function getCacheFilename($name, $env) {
+        if (!is_writable(API_TEMP_DIR)) {
             return null;
         }
 
-        $file = $tmpdir . $name. '-cache_' . $env;
+        $file = API_TEMP_DIR . $name. '-cache_' . $env;
 
         return $file . '.php';
     }
