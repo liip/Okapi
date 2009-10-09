@@ -139,7 +139,7 @@ class api_init {
             $cfg = unserialize(file_get_contents($cachefile));
         } else {
             require_once API_LIBS_DIR.'/vendor/sfYaml/sfYaml.php';
-            $cfg = sfYaml::load(API_PROJECT_DIR . 'conf/boostrap.yml');
+            $cfg = sfYaml::load(API_PROJECT_DIR . 'conf/bootstrap.yml');
             $cfg = isset($cfg[$_SERVER['OKAPI_ENV']]) ? $cfg[$_SERVER['OKAPI_ENV']] : $cfg['default'];
             if ($cachefile) {
                 file_put_contents($cachefile, serialize($cfg));
