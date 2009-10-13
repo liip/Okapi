@@ -122,10 +122,10 @@ class api_init {
         set_include_path($incPath);
 
         // Create temporary directory
-		define('API_TEMP_DIR', API_PROJECT_DIR.'tmp/');
-		if (!is_dir(API_TEMP_DIR)) {
-			mkdir(API_TEMP_DIR, 0777, true);
-		}
+        define('API_TEMP_DIR', API_PROJECT_DIR.'tmp/');
+        if (!is_dir(API_TEMP_DIR)) {
+            mkdir(API_TEMP_DIR, 0777, true);
+        }
 
         // Load and read config
         if (!isset($_SERVER['OKAPI_ENV']) || empty($cfg[$_SERVER['OKAPI_ENV']])) {
@@ -136,7 +136,7 @@ class api_init {
             ? self::getCacheFilename('bootstrap', $_SERVER['OKAPI_ENV'])
             : false;
 
-		// TODO remove the 'false &&' statement, it is a temporary fix to disable caching
+        // TODO remove the 'false &&' statement, it is a temporary fix to disable caching
         if (false && $cachefile && file_exists($cachefile)) {
             $cfg = unserialize(file_get_contents($cachefile));
         } else {
@@ -201,7 +201,7 @@ class api_init {
                 ? false
                 : self::getCacheFilename('servicecontainer', $_SERVER['OKAPI_ENV']);
 
-			// TODO remove the 'true ||' statement, it is a temporary fix to disable caching
+            // TODO remove the 'true ||' statement, it is a temporary fix to disable caching
             if (true || !$api_container_file || !file_exists($api_container_file)) {
                 $sc = new sfServiceContainerBuilder();
                 $loader = $cfg['serviceContainer']['loader'];
