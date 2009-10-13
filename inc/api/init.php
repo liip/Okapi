@@ -114,18 +114,14 @@ class api_init {
             $_SERVER['OKAPI_ENV'] = 'default';
         }
 
-        $cachefile = (defined('API_CACHE_BOOTSTRAP_YAML') && API_CACHE_BOOTSTRAP_YAML)
-            ? self::getCacheFilename('bootstrap', $_SERVER['OKAPI_ENV'])
-            : false;
-
-        // TODO remove the 'false &&' statement, it is a temporary fix to disable caching
-        if (false && $cachefile && file_exists($cachefile)) {
+        $cachefile = self::getCacheFilename('bootstrap', $_SERVER['OKAPI_ENV']);
+        if (file_exists($cachefile)) {
             $cfg = unserialize(file_get_contents($cachefile));
         } else {
             require_once API_LIBS_DIR.'/vendor/symfony/sfYaml/sfYaml.php';
             $cfg = sfYaml::load(API_PROJECT_DIR . 'conf/bootstrap.yml');
             $cfg = isset($cfg[$_SERVER['OKAPI_ENV']]) ? $cfg[$_SERVER['OKAPI_ENV']] : $cfg['default'];
-            if ($cachefile) {
+            if (!empty($cfg['configCache'])) {
                 file_put_contents($cachefile, serialize($cfg));
             }
         }
@@ -134,6 +130,13 @@ class api_init {
         if (empty($cfg['autoload'])) {
             $autoload = API_LIBS_DIR."autoload.php";
             require_once $autoload;
+            if (empty($cfg['configCache'])) {
+                autoload::$cache = false;
+            }
+            if (isset($cfg['dirs'])) {
+                autoload::initDirs();
+                autoload::setCustomDirs($dirs);
+            }
             spl_autoload_register(array('autoload', 'load'));
         } else {
             require_once API_LOCAL_INCLUDE_DIR.$cfg['autoload'];
@@ -183,8 +186,7 @@ class api_init {
                 ? false
                 : self::getCacheFilename('servicecontainer', $_SERVER['OKAPI_ENV']);
 
-            // TODO remove the 'true ||' statement, it is a temporary fix to disable caching
-            if (true || !$api_container_file || !file_exists($api_container_file)) {
+            if (!$api_container_file || !file_exists($api_container_file)) {
                 $sc = new sfServiceContainerBuilder();
                 $loader = $cfg['serviceContainer']['loader'];
                 $loader = new $loader($sc);

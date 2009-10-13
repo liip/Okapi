@@ -13,7 +13,25 @@
  * Autoloader.
  */
 class autoload {
+    static $cache = true;
+    static $dirs = false;
     static $class_file_map;
+
+    static public function initDirs() {
+        self::$dirs = array(
+            API_LIBS_DIR.'vendor/symfony' => 'symfony',
+        );
+        foreach (glob(API_PROJECT_DIR . 'ext/*') as $dir) {
+            self::$dirs[$dir] = 'pear';
+            if (is_dir($dir."/lib")) {
+                self::$dirs[$dir."/lib"] = 'pear';
+            }
+        }
+    }
+
+    static public function setCustomDirs($dirs) {
+        self::$dirs = array_merge(self::$dirs, $dirs);
+    }
 
     /**
      * When a class is instantiated the autoloader replaces each
@@ -41,22 +59,16 @@ class autoload {
 
         // load class file map if not yet done
         if (is_null(self::$class_file_map)) {
-            $class_file_map = api_init::getCacheFilename('autoload_class_file_map', $_SERVER['OKAPI_ENV']);
-            if (!file_exists($class_file_map)) {
-                // TODO: make $dirs configurable
-                $dirs = array(
-                    API_LIBS_DIR.'vendor/symfony' => 'symfony',
-                );
-                foreach (glob(API_PROJECT_DIR . 'ext/*') as $dir) {
-                    $dirs[$dir] = 'pear';
-                    if (is_dir($dir."/lib")) {
-                        $dirs[$dir."/lib"] = 'pear';
-                    }
+            $class_file_map = self::getClassFileMapCacheName();
+            if (!self::$cache || !file_exists($class_file_map)) {
+                if (!self::$dirs) {
+                    self::initDirs();
                 }
-                autoload::generateClassFileMap($class_file_map, $dirs);
+                self::$class_file_map = autoload::generateClassFileMap($class_file_map);
+            } else {
+                $return = include $class_file_map;
+                self::$class_file_map = ($return && $mapping) ? $mapping : false;
             }
-            $return = include $class_file_map;
-            self::$class_file_map = ($return && $mapping) ? $mapping : false;
         }
 
         // check class file map
@@ -69,16 +81,18 @@ class autoload {
         return false;
     }
 
+    public static function getClassFileMapCacheName() {
+        return api_init::getCacheFilename('autoload_class_file_map', $_SERVER['OKAPI_ENV']);
+    }
+
     /**
      * Generates a file in the cache use for mapping class names to files.
      * @param $cache_file string: File name in which the class file map will be cached
      * @param $dir string: Name of the root path from which to search
      */
-    public static function generateClassFileMap($cache_file, $dirs) {
+    public static function generateClassFileMap($cache_file) {
         $mapping = array();
-        $dirs = (array)$dirs;
-
-        foreach ($dirs as $dir => $style) {
+        foreach (self::$dirs as $dir => $style) {
             // TODO: ignore .svn etc directories
             $objects = new RecursiveIteratorIterator(
                 new RecursiveDirectoryIterator($dir),
@@ -108,9 +122,15 @@ class autoload {
             }
         }
 
-        $mappingstring = empty($mapping)
-            ? '<?php return false;'
-            : '<?php $mapping = '. var_export($mapping, true).'; return true;';
-        file_put_contents($cache_file, $mappingstring);
+        if (empty($mapping)) {
+            $mapping = false;
+        }
+
+        if (self::$cache) {
+            $mappingstring = '<?php $mapping = '. var_export($mapping, true).'; return true;';
+            file_put_contents($cache_file, $mappingstring);
+        }
+
+        return $mapping;
     }
 }
