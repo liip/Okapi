@@ -74,7 +74,7 @@ class api_request {
         if (strpos($path, '?') !== FALSE) {
             $path = substr($path, 0, strpos($path, '?'));
         }
-        
+
         if (isset($_SERVER['SCRIPT_NAME']) && $_SERVER['SCRIPT_NAME'] != '/index.php') {
             $scriptpathlen = strlen($_SERVER['SCRIPT_NAME']) -10;
             $path = substr($path,$scriptpathlen);
@@ -316,19 +316,17 @@ class api_request {
         // lang is in ACCEPT_LANGUAGE
         if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) && $this->config->acceptLanguage !== false) {
             $accls = explode(",", $_SERVER['HTTP_ACCEPT_LANGUAGE']);
-            if (is_array($accls)) {
-                foreach($accls as $accl) {
-                    // Does not respect coefficient
-                    $l = substr($accl, 0, 2);
-                    if (in_array($l, $this->outputLangs)) {
-                        return array('path' => $newpath,
-                                     'lang' => $l);
-                    }
+            foreach($accls as $accl) {
+                // Does not respect coefficient
+                $l = substr($accl, 0, 2);
+                if (in_array($l, $this->outputLangs)) {
+                    return array('path' => $newpath, 'lang' => $l);
                 }
             }
         }
 
-        return array('path' => $newpath,
-                     'lang' => $this->defaultLang);
+        $lang = $this->config->forceLang ? $this->defaultLang : false;
+
+        return array('path' => $newpath, 'lang' => $lang);
     }
 }
