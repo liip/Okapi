@@ -97,23 +97,6 @@ class api_init {
         }
         $incPath .= PATH_SEPARATOR.get_include_path();
 
-        // Prepend extension directories to include path
-        if (is_dir(API_PROJECT_DIR . 'ext/')) {
-            $lib = $inc = '';
-            foreach (glob(API_PROJECT_DIR . 'ext/*') as $dir) {
-                $inc .= $dir . PATH_SEPARATOR;
-                if (is_dir($dir."/lib")) {
-                    $lib .= $dir."/lib" . PATH_SEPARATOR;
-                }
-            }
-            if ($lib) {
-                $incPath = $lib . $incPath;
-            }
-            if ($inc) {
-                $incPath = $inc . $incPath;
-            }
-        }
-
         if (file_exists(API_LOCAL_VENDOR_DIR)) {
             $incPath = API_LOCAL_VENDOR_DIR . PATH_SEPARATOR . $incPath;
         }

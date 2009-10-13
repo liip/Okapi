@@ -43,7 +43,17 @@ class autoload {
         if (is_null(self::$class_file_map)) {
             $class_file_map = api_init::getCacheFilename('autoload_class_file_map', $_SERVER['OKAPI_ENV']);
             if (!file_exists($class_file_map)) {
-                autoload::generateClassFileMap($class_file_map, API_LIBS_DIR.'vendor');
+                // TODO: make $dirs configurable
+                $dirs = array(
+                    API_LIBS_DIR.'vendor' => 'symfony',
+                );
+                foreach (glob(API_PROJECT_DIR . 'ext/*') as $dir) {
+                    $dirs[$dir] = 'pear';
+                    if (is_dir($dir."/lib")) {
+                        $dirs[$dir."/lib"] = 'pear';
+                    }
+                }
+                autoload::generateClassFileMap($class_file_map, $dirs);
             }
             $return = include $class_file_map;
             self::$class_file_map = ($return && $mapping) ? $mapping : false;
@@ -64,26 +74,37 @@ class autoload {
      * @param $cache_file string: File name in which the class file map will be cached
      * @param $dir string: Name of the root path from which to search
      */
-    public static function generateClassFileMap($cache_file, $dir) {
-        // TODO: ignore .svn etc directories
-        $objects = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($dir),
-            RecursiveIteratorIterator::SELF_FIRST
-        );
+    public static function generateClassFileMap($cache_file, $dirs) {
+        $mapping = array();
+        $dirs = (array)$dirs;
 
-        foreach($objects as $file => $object) {
-            if (substr($file, -4) !== '.php') {
-                continue;
-            }
+        foreach ($dirs as $dir => $style) {
+            // TODO: ignore .svn etc directories
+            $objects = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($dir),
+                RecursiveIteratorIterator::SELF_FIRST
+            );
 
-            $file = str_replace(DIRECTORY_SEPARATOR, '/', $file);
-            $class = basename($file, '.php');
+            foreach($objects as $file => $object) {
+                if (substr($file, -4) !== '.php') {
+                    continue;
+                }
 
-            $content = file_get_contents($file);
-            if (stripos($content, 'class '.$class) !== false
-                || stripos($content, 'interface '.$class) !== false
-            ) {
-                $mapping[$class] = $file;
+                $file = str_replace(DIRECTORY_SEPARATOR, '/', $file);
+                if ($style === 'symfony') {
+                    $class = basename($file, '.php');
+                } else {
+                    $class = str_replace('.php', '', $file);
+                    $class = str_replace($dir.DIRECTORY_SEPARATOR, '', $class);
+                    $class = str_replace(DIRECTORY_SEPARATOR, '_', $class);
+                }
+
+                $content = file_get_contents($file);
+                if (stripos($content, 'class '.$class) !== false
+                    || stripos($content, 'interface '.$class) !== false
+                ) {
+                    $mapping[$class] = $file;
+                }
             }
         }
 
