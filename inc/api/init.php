@@ -128,7 +128,7 @@ class api_init {
         }
 
         // Load and read config
-        if (!isset($_SERVER['OKAPI_ENV']) || empty($cfg[$_SERVER['OKAPI_ENV']])) {
+        if (!isset($_SERVER['OKAPI_ENV'])) {
             $_SERVER['OKAPI_ENV'] = 'default';
         }
 
