@@ -136,7 +136,8 @@ class api_init {
             ? self::getCacheFilename('bootstrap', $_SERVER['OKAPI_ENV'])
             : false;
 
-        if ($cachefile && file_exists($cachefile)) {
+		// TODO remove the 'false &&' statement, it is a temporary fix to disable caching
+        if (false && $cachefile && file_exists($cachefile)) {
             $cfg = unserialize(file_get_contents($cachefile));
         } else {
             require_once API_LIBS_DIR.'/vendor/sfYaml/sfYaml.php';
@@ -199,8 +200,9 @@ class api_init {
             $api_container_file = empty($cfg['configCache'])
                 ? false
                 : self::getCacheFilename('servicecontainer', $_SERVER['OKAPI_ENV']);
-
-            if (!$api_container_file || !file_exists($api_container_file)) {
+			
+			// TODO remove the 'true ||' statement, it is a temporary fix to disable caching
+            if (true || !$api_container_file || !file_exists($api_container_file)) {
                 $sc = new sfServiceContainerBuilder();
                 $loader = $cfg['serviceContainer']['loader'];
                 $loader = new $loader($sc);
