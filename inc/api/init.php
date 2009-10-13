@@ -200,7 +200,7 @@ class api_init {
             $api_container_file = empty($cfg['configCache'])
                 ? false
                 : self::getCacheFilename('servicecontainer', $_SERVER['OKAPI_ENV']);
-			
+
 			// TODO remove the 'true ||' statement, it is a temporary fix to disable caching
             if (true || !$api_container_file || !file_exists($api_container_file)) {
                 $sc = new sfServiceContainerBuilder();
