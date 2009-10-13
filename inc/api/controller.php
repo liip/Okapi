@@ -74,7 +74,7 @@ class api_controller {
     public function run() {
         $this->dispatcher = $this->sc->sfEventDispatcher;
 
-        if (!$this->filters || empty($this->filters['request'])) {
+        if (!is_array($this->filters) || empty($this->filters['request']['controller'])) {
             $this->filters['request']['controller'] = null;
         }
 
@@ -139,7 +139,7 @@ class api_controller {
     }
 
     public function request(sfEvent $event) {
-             $this->loadRoute($event);
+        $this->loadRoute($event);
     }
 
     protected function loadRoute(sfEvent $event) {
