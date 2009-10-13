@@ -60,7 +60,7 @@ class api_request {
             $this->outputLangs = array('en');
         }
         if (is_null($this->defaultLang)) {
-            $this->defaultLang = 'en';
+            $this->defaultLang = reset($this->outputLangs);
         }
 
         // Parse host, get SLD / TLD
