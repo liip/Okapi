@@ -45,7 +45,7 @@ class autoload {
             if (!file_exists($class_file_map)) {
                 // TODO: make $dirs configurable
                 $dirs = array(
-                    API_LIBS_DIR.'vendor' => 'symfony',
+                    API_LIBS_DIR.'vendor/symfony' => 'symfony',
                 );
                 foreach (glob(API_PROJECT_DIR . 'ext/*') as $dir) {
                     $dirs[$dir] = 'pear';

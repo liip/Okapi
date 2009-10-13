@@ -89,8 +89,7 @@ class api_init {
         define('API_VENDOR_DIR', API_INCLUDE_DIR.'lib'.DIRECTORY_SEPARATOR);
         define('API_LOCAL_VENDOR_DIR', API_LOCAL_INCLUDE_DIR.'lib'.DIRECTORY_SEPARATOR);
 
-        // Set PHP include path (localinc - localinc/lib - ext - ext/lib - inc - inc/lib - include_path)
-
+        // set PHP include path (localinc - localinc/lib - inc - inc/lib - include_path)
         $incPath = API_INCLUDE_DIR;
         if (file_exists(API_VENDOR_DIR)){
             $incPath .= PATH_SEPARATOR . API_VENDOR_DIR;
@@ -123,7 +122,7 @@ class api_init {
         if (false && $cachefile && file_exists($cachefile)) {
             $cfg = unserialize(file_get_contents($cachefile));
         } else {
-            require_once API_LIBS_DIR.'/vendor/sfYaml/sfYaml.php';
+            require_once API_LIBS_DIR.'/vendor/symfony/sfYaml/sfYaml.php';
             $cfg = sfYaml::load(API_PROJECT_DIR . 'conf/bootstrap.yml');
             $cfg = isset($cfg[$_SERVER['OKAPI_ENV']]) ? $cfg[$_SERVER['OKAPI_ENV']] : $cfg['default'];
             if ($cachefile) {
