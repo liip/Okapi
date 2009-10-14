@@ -159,7 +159,7 @@ class api_init {
                 $reqHostPath .= $hostinfo['path'];
             }
         }
-        define('API_HOST', $schema.'://' . $hostname . '/');
+        define('API_HOST', $schema.'://' . $hostname);
         define('API_WEBROOT', $reqHostPath);
         define('API_MOUNTPATH', $hostinfo['path']);
 
