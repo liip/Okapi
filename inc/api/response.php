@@ -158,8 +158,14 @@ class api_response {
         if (strpos($to, 'http://') === 0 || strpos($to, 'https://') === 0) {
             $url = $to;
         } else {
-            $schema = $_SERVER['SERVER_PORT'] == '443' ? 'https' : 'http';
-            $host = (isset($_SERVER['HTTP_HOST']) && strlen($_SERVER['HTTP_HOST'])) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'];
+            $schema = (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT']) == '443' ? 'https' : 'http';
+            if (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST']) {
+                $host = $_SERVER['HTTP_HOST'];
+            } elseif (isset($_SERVER['SERVER_NAME']) && $_SERVER['SERVER_NAME']) {
+                $host = $_SERVER['SERVER_NAME'];
+            } else {
+                $host = 'localhost';
+            }
             $to = strpos($to, '/') === 0 ? $to : '/' . $to;
             $url = "$schema://$host$to";
         }
