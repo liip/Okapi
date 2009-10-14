@@ -30,27 +30,14 @@ class api_request {
     protected $filename = '';
     /** Extension extracted from the path. */
     protected $extension = false;
-
-    /**
-     * Gets an instance of api_request.
-     * @param $forceReload bool: If true, forces instantiation of a
-     *        new instance. Used for testing.
-     */
-    public static function getInstance($forceReload = false) {
-        static $instance;
-
-        if  ($forceReload || !isset($instance) || !($instance instanceof api_request)) {
-            $instance = new api_request;
-        }
-
-        return $instance;
-    }
+    /** Default & allowed extentions */
+    protected $extensions = '';
 
     /**
      * Constructor. Parses the request and fills in all the
      * values it can.
      */
-    public function __construct($lang) {
+    public function __construct($lang, $extensions) {
         $this->host = API_HOST;
 
         $this->outputLangs = empty($lang['languages']) ? array('en') : $lang['languages'];
@@ -103,14 +90,15 @@ class api_request {
              * config file, only these extensions are valid extensions.
              * the rest is not parsed as an extension */
             preg_match("#\.([a-z]+)$#", $this->filename, $matches);
-            $aExtensions = $this->config->extensions;
+
+            $aExtensions = $extensions['allowed'];
             if (isset($matches[1]) && !empty($matches[1])) {
                 if (isset($aExtensions) && is_array($aExtensions)) {
                     if (in_array($matches[1], $aExtensions)) {
                         $this->extension = $matches[1];
                     }
                 } else {
-                    $this->extension = $matches[1];
+                    $this->extension = $extensions['default'];
                 }
             }
         }
