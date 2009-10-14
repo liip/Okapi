@@ -85,11 +85,11 @@ class api_i18n_default {
      * @param $cfg array: Relevant configuration node from the config file.
      */
     protected function openFile($lang, $cfg) {
-        $file = $cfg['dir']."/".$cfg['fileprefix']."_".$lang.".xml";
+        $file = API_PROJECT_DIR.$cfg['dir']."/".$cfg['fileprefix']."_".$lang.".xml";
 
         if (!file_exists($file)) {
             $defL = $cfg['default'];
-            $file = $cfg['dir']."/".$cfg['fileprefix']."_".$defL.".xml";
+            $file = API_PROJECT_DIR.$cfg['dir']."/".$cfg['fileprefix']."_".$defL.".xml";
         }
 
         if (!file_exists($file)) {
@@ -97,7 +97,7 @@ class api_i18n_default {
         }
 
         $dom = new DOMDocument();
-        if (! $dom->load($file)) {
+        if (!$dom->load($file)) {
             die("Could not load language file: $file\n");
         }
 
