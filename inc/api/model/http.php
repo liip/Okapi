@@ -69,7 +69,8 @@ class api_model_http extends api_model {
                 "Got a bad HTTP status: " . $status);
         }
 
-        $dom = DOMDocument::loadXML($xmls);
+        $dom = new DOMDocument();
+        $dom->loadXML($xmls);
         if ($dom === false) {
             throw new api_exception_XmlParseError(api_exception::THROW_FATAL, $this->url);
         }
