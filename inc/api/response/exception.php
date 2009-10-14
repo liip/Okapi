@@ -25,9 +25,17 @@ class api_response_exception extends api_response {
     }
 
     public function send() {
+// TODO remove this hack and make the exception handler return some nicer thingy but maybe not depending on the xsl but rather on the current view or something
+$data = $this->getTrace($this->data);
+echo '<h1>Exception ('.$data['name'].'): '.$data['message'].' (#'.$data['code'].')</h1>thrown in file '.$data['file'].' at line '.$data['line'].'<br/>backtrace:<br/>';
+foreach ($data['backtrace'] as $i=>$line) {
+    echo '<p>#'.($i+1).' '.@$line['class'].@$line['type'].@$line['function'].' called in file '.@$line['file'].' at line '.@$line['line'].'</p>';
+}
+die;
+
         $data = array();
         $data['exception'] = $this->getTrace($this->data);
-        
+
         $this->setViewParam("xsl", $this->getXsl());
         $this->view->prepare();
         $this->view->dispatch($data);
@@ -125,4 +133,3 @@ class api_response_exception extends api_response {
         return array();
     }
 }
-
