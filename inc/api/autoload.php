@@ -104,13 +104,13 @@ class autoload {
                     continue;
                 }
 
-                $file = str_replace(DIRECTORY_SEPARATOR, '/', $file);
+                $file = strtr($file, '\\', '/');
                 if ($style === 'symfony') {
                     $class = basename($file, '.php');
                 } else {
                     $class = str_replace('.php', '', $file);
-                    $class = str_replace($dir.DIRECTORY_SEPARATOR, '', $class);
-                    $class = str_replace(DIRECTORY_SEPARATOR, '_', $class);
+                    $class = str_replace(strtr($dir, '\\', '/').'/', '', $class);
+                    $class = str_replace('/', '_', $class);
                 }
 
                 $content = file_get_contents($file);
