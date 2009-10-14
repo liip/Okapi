@@ -41,7 +41,8 @@ class I18nTest extends api_testing_case_unit {
      */
     function testText() {
         $i18n = api_i18n::getInstance('en');
-        $doc = DOMDocument::loadXML('<root><i18n:text xmlns:i18n="http://apache.org/cocoon/i18n/2.1">Associate</i18n:text></root>');
+        $doc = new DOMDocument();
+        $doc->loadXML('<root><i18n:text xmlns:i18n="http://apache.org/cocoon/i18n/2.1">Associate</i18n:text></root>');
         $i18n->i18n($doc);
         
         $this->assertEqual('root', $doc->documentElement->tagName);
@@ -54,7 +55,8 @@ class I18nTest extends api_testing_case_unit {
      */
     function testTranslate() {
         $i18n = api_i18n::getInstance('en');
-        $doc = DOMDocument::loadXML('
+        $doc = new DOMDocument();
+        $doc->loadXML('
             <root><i18n:translate xmlns:i18n="http://apache.org/cocoon/i18n/2.1">
                     <i18n:text>AutocompletionRemaining</i18n:text>
                     <i18n:param name="remain">99</i18n:param>
@@ -72,7 +74,8 @@ class I18nTest extends api_testing_case_unit {
      */
     function testTranslateI18nParam() {
         $i18n = api_i18n::getInstance('en');
-        $doc = DOMDocument::loadXML('
+        $doc = new DOMDocument();
+        $doc->loadXML('
             <root><i18n:translate xmlns:i18n="http://apache.org/cocoon/i18n/2.1">
                     <i18n:text>AutocompletionRemaining</i18n:text>
                     <i18n:param name="remain"><i18n:text>Associate</i18n:text></i18n:param>
@@ -89,7 +92,8 @@ class I18nTest extends api_testing_case_unit {
      */
     function testTranslateI18nCleartext() {
         $i18n = api_i18n::getInstance('en');
-        $doc = DOMDocument::loadXML('
+        $doc = new DOMDocument();
+        $doc->loadXML('
             <root><i18n:cleartext xmlns:i18n="http://apache.org/cocoon/i18n/2.1">
                     <i18n:text>ClassifiedDeactivate</i18n:text>
                 </i18n:cleartext></root>');
@@ -105,7 +109,8 @@ class I18nTest extends api_testing_case_unit {
      */
     function testTranslateI18nCleartextAppendString() {
         $i18n = api_i18n::getInstance('en');
-        $doc = DOMDocument::loadXML('
+        $doc = new DOMDocument();
+        $doc->loadXML('
             <root><i18n:cleartext xmlns:i18n="http://apache.org/cocoon/i18n/2.1">
                     <i18n:text>ClassifiedDeactivate</i18n:text>
                     <i18n:append> appended.</i18n:append>
@@ -122,7 +127,8 @@ class I18nTest extends api_testing_case_unit {
      */
     function testTranslateI18nCleartextPrependString() {
         $i18n = api_i18n::getInstance('en');
-        $doc = DOMDocument::loadXML('
+        $doc = new DOMDocument();
+        $doc->loadXML('
             <root><i18n:cleartext xmlns:i18n="http://apache.org/cocoon/i18n/2.1">
                     <i18n:text>ClassifiedDeactivate</i18n:text>
                     <i18n:prepend> - this one is prepended - </i18n:prepend>
@@ -139,7 +145,8 @@ class I18nTest extends api_testing_case_unit {
      */
     function testTranslateI18nCleartextAppendPrependString() {
         $i18n = api_i18n::getInstance('en');
-        $doc = DOMDocument::loadXML('
+        $doc = new DOMDocument();
+        $doc->loadXML('
             <root><i18n:cleartext xmlns:i18n="http://apache.org/cocoon/i18n/2.1">
                     <i18n:text>ClassifiedDeactivate</i18n:text>
                     <i18n:append> (suffix)</i18n:append>
@@ -158,7 +165,8 @@ class I18nTest extends api_testing_case_unit {
      */
     function testTranslateI18nCleartextAppendI18n() {
         $i18n = api_i18n::getInstance('en');
-        $doc = DOMDocument::loadXML('
+        $doc = new DOMDocument();
+        $doc->loadXML('
             <root><i18n:cleartext xmlns:i18n="http://apache.org/cocoon/i18n/2.1">
                     <i18n:text>ClassifiedDeactivate</i18n:text>
                     <i18n:append><i18n:text>chf</i18n:text></i18n:append>
@@ -177,7 +185,8 @@ class I18nTest extends api_testing_case_unit {
      */
     function testTranslateI18nCleartextAppendI18nAndString() {
         $i18n = api_i18n::getInstance('en');
-        $doc = DOMDocument::loadXML('
+        $doc = new DOMDocument();
+        $doc->loadXML('
             <root><i18n:cleartext xmlns:i18n="http://apache.org/cocoon/i18n/2.1">
                     <i18n:text>ClassifiedDeactivate</i18n:text>
                     <i18n:append> <i18n:text>chf</i18n:text></i18n:append>
@@ -195,7 +204,8 @@ class I18nTest extends api_testing_case_unit {
      */
     function testTranslateI18nCleartextPrependI18n() {
         $i18n = api_i18n::getInstance('en');
-        $doc = DOMDocument::loadXML('
+        $doc = new DOMDocument();
+        $doc->loadXML('
             <root><i18n:cleartext xmlns:i18n="http://apache.org/cocoon/i18n/2.1">
                     <i18n:text>ClassifiedDeactivate</i18n:text>
                     <i18n:prepend><i18n:text>chf</i18n:text></i18n:prepend>
@@ -214,7 +224,8 @@ class I18nTest extends api_testing_case_unit {
      */
     function testTranslateI18nCleartextPrependI18nAndString() {
         $i18n = api_i18n::getInstance('en');
-        $doc = DOMDocument::loadXML('
+        $doc = new DOMDocument();
+        $doc->loadXML('
             <root><i18n:cleartext xmlns:i18n="http://apache.org/cocoon/i18n/2.1">
                     <i18n:text>ClassifiedDeactivate</i18n:text>
                     <i18n:prepend><i18n:text>chf</i18n:text>: </i18n:prepend>
@@ -232,7 +243,8 @@ class I18nTest extends api_testing_case_unit {
      */
     function testGetXMLFragment() {
         $i18n = api_i18n::getInstance('en');
-        $doc = DOMDocument::loadXML('<div><i18n:text xmlns:i18n="http://apache.org/cocoon/i18n/2.1">asxmltest</i18n:text></div>');
+        $doc = new DOMDocument();
+        $doc->loadXML('<div><i18n:text xmlns:i18n="http://apache.org/cocoon/i18n/2.1">asxmltest</i18n:text></div>');
         $i18n->i18n($doc);
         
         $this->assertEqual('div', $doc->documentElement->tagName);
