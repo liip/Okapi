@@ -144,24 +144,19 @@ class api_init {
 
         // Construct URL for Web home (root of current host)
         $hostname = (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '');
-        $hostinfo = empty($cfg['hosts']) ? null : self::getHostConfig($cfg['hosts'], $hostname);
         $schema = (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == '443') ? 'https' : 'http';
         $reqHostPath = '/';
         if ($hostname != '') {
             $reqHostPath = $schema.'://'.$hostname;
-            if (is_null($hostinfo)) {
-               if (isset($_SERVER['SCRIPT_NAME']) && $_SERVER['SCRIPT_NAME'] != '/index.php') {
-                  $reqHostPath .= substr($_SERVER['SCRIPT_NAME'],0,-9);
-               }  else {
-                   $reqHostPath .= '/';
-               }
-            } else {
-                $reqHostPath .= $hostinfo['path'];
+            if (isset($_SERVER['SCRIPT_NAME']) && $_SERVER['SCRIPT_NAME'] != '/index.php') {
+               $reqHostPath .= substr($_SERVER['SCRIPT_NAME'],0,-9);
+            }  else {
+                $reqHostPath .= '/';
             }
         }
         define('API_HOST', $schema.'://' . $hostname);
         define('API_WEBROOT', $reqHostPath);
-        define('API_MOUNTPATH', $hostinfo['path']);
+        define('API_MOUNTPATH', '/');
 
         // Define webrootStatic constant. From config file or computed
         // from webroot.
@@ -211,94 +206,6 @@ class api_init {
             $serviceContainerClass = 'api_servicecontainer';
         }
         return new $serviceContainerClass();
-    }
-
-    /**
-     * Use the given host name to find it's corresponding configuration
-     * in the configuration file.
-     *
-     * If the host is not found in the configuration, null is returned.
-     *
-     * Returns an associative array with the following keys:
-     * @retval host string: The host name to be used for lookups in the
-     *         commandmap. This is one of the following values from the
-     *         configuration in that order: `host', `sld', hash key.
-     * @retval sld string: Subdomain as specified in the config using `sld'.
-     * @retval tld string: Topdomain as specified in the config using `tld'.
-     *         If tld is not specified but the sld is, then the tld is
-     *         extracted from the hostname automatically.
-     * @retval path string: Path as specified in the config. Can be used to
-     *         "mount" the application at the specified point. Stored in
-     *         the global constants API_MOUNTPATH.
-     *
-     * @config <b>hosts</b> (hash): Contains all host configurations. The
-     *         hash keys specify the host name.
-     * @config <b>host-><em>hostname</em>->host</b> (string):
-     *         Overwrite the host name from the key.
-     * @config <b>host-><em>hostname</em>->sld</b> (string):
-     *         Specify a sublevel domain for this host. This value can be
-     *         accessed using api_request::getSld().
-     * @config <b>host-><em>hostname</em>->tld</b> (string):
-     *         Specify a top-level domain for this host. This value can be
-     *         accessed using api_request::getTld(). If sld is specified but
-     *         the value isn't, then the tld is computed automatically.
-     * @config <b>host-><em>hostname</em>->path</b> (string):
-     *         Path where this application is mounted on. This has
-     *         implications for the routing engine (see api_routing). Defaults
-     *         to "/".
-     * @param $hostname: Host name to return config for.
-     */
-    public static function getHostConfig($hosts, $hostname) {
-        $host = null;
-
-        // Read config
-        if ($hosts) {
-            foreach ($hosts as $key => &$hostconfig) {
-                $lookupName = $key;
-                if (isset($hostconfig['host'])) {
-                    $lookupName = $hostconfig['host'];
-                } else if (isset($hostconfig['sld'])) {
-                    $lookupName = $hostconfig['sld'];
-                }
-                $hostconfig['host'] = $lookupName;
-
-                if ($key == $hostname) {
-                    $host = $hostconfig;
-                    break;
-                } else if (api_helpers_string::matchWildcard($key, $hostname)) {
-                    $host = $hostconfig;
-                    if ($lookupName == $key) {
-                        // Replace host with current hostname
-                        $host['host'] = $hostname;
-                    }
-                    break;
-                }
-            }
-        }
-
-        // Host not found
-        if (is_null($host)) {
-            return null;
-        }
-
-        // Calculate tld from hostname if sld is set.
-        if (isset($host['sld']) && !isset($host['tld'])) {
-            if (strpos($hostname, $host['sld'] . '.') === 0) {
-                // Hostname starts with sld
-                $host['tld'] = substr($hostname, strlen($host['sld'])+1);
-            }
-        }
-
-        // Return values
-        $path = (!empty($host['path'])) ? $host['path'] : '/';
-        if ($path[0] !== '/') {
-            $path = '/' . $path;
-        }
-
-        return array('host' => $host['host'],
-                     'tld'  => @$host['tld'],
-                     'sld'  => @$host['sld'],
-                     'path' => $path);
     }
 
     /**

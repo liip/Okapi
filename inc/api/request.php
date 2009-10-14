@@ -50,25 +50,13 @@ class api_request {
      * Constructor. Parses the request and fills in all the
      * values it can.
      */
-    public function __construct($config) {
-        $this->config = $config;
-        $this->host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
+    public function __construct($lang) {
+        $this->host = API_HOST;
 
-        $this->outputLangs = $this->config->lang['languages'];
-        $this->defaultLang = $this->config->lang['default'];
-        if (is_null($this->outputLangs)) {
-            $this->outputLangs = array('en');
-        }
-        if (is_null($this->defaultLang)) {
-            $this->defaultLang = reset($this->outputLangs);
-        }
-
-        // Parse host, get SLD / TLD
-        $hostinfo = api_init::getHostConfig($this->config, $this->host);
-        if ($hostinfo) {
-            $this->sld = $hostinfo['sld'];
-            $this->tld = $hostinfo['tld'];
-        }
+        $this->outputLangs = empty($lang['languages']) ? array('en') : $lang['languages'];
+        $this->defaultLang = empty($lang['default']) ? reset($this->outputLangs) : $lang['default'];
+        $this->forceLang = !empty($lang['forceLang']);
+        $this->acceptBrowserLang = !empty($lang['acceptBrowserLang']);
 
         $path = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
         if (strpos($path, '?') !== FALSE) {
@@ -84,16 +72,6 @@ class api_request {
         if ($lang !== null) {
             $this->lang = $lang['lang'];
             $path = $lang['path'];
-        }
-
-        // Strip out path prefix from path
-        if (isset($hostinfo['path'])) {
-            if (strpos($path, $hostinfo['path']) === 0) {
-                $path = substr($path, strlen($hostinfo['path']));
-            }
-            if (substr($path, 0, 1) !== '/') {
-                $path = '/' . $path;
-            }
         }
 
         // HTTP verb - assume GET as default
@@ -143,22 +121,6 @@ class api_request {
      */
     public function getHost() {
         return $this->host;
-    }
-
-    /**
-     * Returns the subdomain of the current request's hostname.
-     * @see api_init::getHostConfig()
-     */
-    public function getSld() {
-        return $this->sld;
-    }
-
-    /**
-     * Returns the top domain of the current request's hostname.
-     * @see api_init::getHostConfig()
-     */
-    public function getTld() {
-        return $this->tld;
     }
 
     /**
@@ -317,7 +279,7 @@ class api_request {
         }
 
         // lang is in ACCEPT_LANGUAGE
-        if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) && $this->config->acceptLanguage !== false) {
+        if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) && $this->acceptBrowserLang) {
             $accls = explode(",", $_SERVER['HTTP_ACCEPT_LANGUAGE']);
             foreach($accls as $accl) {
                 // Does not respect coefficient
@@ -328,7 +290,7 @@ class api_request {
             }
         }
 
-        $lang = $this->config->forceLang ? $this->defaultLang : false;
+        $lang = $this->forceLang ? $this->defaultLang : false;
 
         return array('path' => $newpath, 'lang' => $lang);
     }
