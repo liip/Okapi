@@ -35,8 +35,8 @@ class api_response {
     /**
      * Constructor. Turns on output buffering.
      */
-    public function __construct($buffer = true) {
-        $this->buffer = $buffer;
+    public function __construct($buffer = null) {
+        $this->buffer = is_null($buffer) ? PHP_SAPI !== 'cli' : $buffer;
         if ($this->buffer) {
             ob_start();
         }
