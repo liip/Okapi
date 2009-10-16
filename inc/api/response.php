@@ -35,8 +35,11 @@ class api_response {
     /**
      * Constructor. Turns on output buffering.
      */
-    public function __construct() {
-        ob_start();
+    public function __construct($buffer = true) {
+        $this->buffer = $buffer;
+        if ($this->buffer) {
+            ob_start();
+        }
     }
 
     /**
@@ -193,7 +196,7 @@ class api_response {
             header("Set-Cookie: $cookie=$value", false);
         }
 
-        if ($this->setContentLengthOutput) {
+        if ($this->setContentLengthOutput && $this->buffer) {
             header("Content-Length: " . ob_get_length() + strlen($this->content));
         }
 
@@ -239,10 +242,13 @@ class api_response {
     }
 
     public function getContent() {
-        $content = "";
-        while (ob_get_level()) {
-            $content .=  ob_get_contents();
-            ob_end_clean();
+        $content = '';
+        if ($this->buffer) {
+            while (ob_get_level()) {
+                $content .=  ob_get_contents();
+                ob_end_clean();
+            }
+            $this->buffer = false;
         }
         $this->content = $this->content . $content;
         return $this->content;
@@ -251,8 +257,11 @@ class api_response {
 
     public function setContent($content) {
         //clear flush
-        while (ob_get_level()) {
-            ob_end_clean();
+        if ($this->buffer) {
+            while (ob_get_level()) {
+                ob_end_clean();
+            }
+            $this->buffer = false;
         }
         $this->content = $content;
     }
