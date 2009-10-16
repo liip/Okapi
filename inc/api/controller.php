@@ -3,15 +3,6 @@
  * See the LICENSE and NOTICE file for further information
  */
 
-// Including all the needed stuff by the framework
-// TODO: Remove _once
-require_once API_LIBS_DIR."request.php";
-require_once API_LIBS_DIR."view.php";
-require_once API_LIBS_DIR."i18n.php";
-require_once API_LIBS_DIR."command.php";
-require_once API_LIBS_DIR."model.php";
-
-
 /**
  * Used in views to indicate that the view has been prepared and
  * can be used now.
