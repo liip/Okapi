@@ -107,6 +107,7 @@ class autoload {
                 $file = strtr($file, '\\', '/');
                 if ($style === 'symfony') {
                     $class = basename($file, '.php');
+                    $class = basename($class, '.class');
                 } else {
                     $class = str_replace('.php', '', $file);
                     $class = str_replace(strtr($dir, '\\', '/').'/', '', $class);
