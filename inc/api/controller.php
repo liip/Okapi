@@ -134,7 +134,7 @@ class api_controller {
     }
 
     protected function loadRoute(sfEvent $event) {
-        $this->route = $this->routing->getRoute($event['request']);
+        $this->route = $this->routing->matchRoute($event['request']);
         $this->sc->setService('route', $this->route);
     }
 
