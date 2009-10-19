@@ -8,11 +8,21 @@
  */
 class api_routing extends sfPatternRouting {
 
-    protected $routing;
-
+    /**
+     * @var api_routing_route
+     */
     protected $route = false;
 
-    public function __construct($dispatcher) {
+    /**
+     * @var api_request
+     */
+    protected $request;
+
+    public function __construct($dispatcher, $request = null) {
+        $this->request = $request;
+        $this->options['context']['prefix'] = API_HOST;
+        $this->options['context']['host'] = (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '');
+        $this->options['context']['is_secure'] = (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == '443') ? true : false;
         parent::__construct($dispatcher);
     }
 
@@ -30,6 +40,13 @@ class api_routing extends sfPatternRouting {
      */
     public function getRoute() {
         return $this->route;
+    }
+
+    public function gen($name, $params = array(), $absolute = false) {
+        $url = $this->generate($name, $params, $absolute);
+
+        // TODO make it optional somehow and handle the left|right positioning by reading api_request settings
+        return '/'.$this->request->getLang().$url;
     }
 
     /**
