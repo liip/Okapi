@@ -68,6 +68,7 @@ class api_exceptionhandler {
      *        exception handlers to handle XSLT output.
      */
     public static function log(api_exception $e, $context = null) {
+return;
         $handler = self::getInstance($e, $context);
         if ($handler instanceof api_exceptionhandler_base) {
             $handler->log($e);
