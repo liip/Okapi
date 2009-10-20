@@ -32,6 +32,8 @@ class api_request {
     protected $extension = false;
     /** Default & allowed extentions */
     protected $extensions = '';
+    /** Matched route */
+    protected $route;
 
     /**
      * Constructor. Parses the request and fills in all the
@@ -105,6 +107,13 @@ class api_request {
     }
 
     /**
+     * Set the matched route.
+     */
+    public function setRoute($route) {
+        return $this->route = $route;
+    }
+
+    /**
      * Returns the hostname of the current request.
      */
     public function getHost() {
@@ -175,7 +184,10 @@ class api_request {
      * Returns the request parameters.
      */
     public function getParameters() {
-        return $this->params;
+        if (empty($this->route)) {
+            return $this->params;
+        }
+        return array_merge($this->route->getParams(), $this->params);
     }
 
     /**
@@ -208,9 +220,10 @@ class api_request {
     public function getParam($param, $default = null) {
         if (isset($this->params[$param])) {
             return $this->params[$param];
-        } else {
-            return $default;
+        } else if (isset($this->route[$param])) {
+            return $this->route[$param];
         }
+        return $default;
     }
 
     /**
