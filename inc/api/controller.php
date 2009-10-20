@@ -209,25 +209,20 @@ class api_controller {
      *
      */
     public function processCommand($command) {
-        try {
-            $allowed = $command->isAllowed();
-            if (!$allowed) {
-                throw new api_exception_CommandNotAllowed("Command access not allowed: ".get_class($command));
-            }
-            if (is_string($allowed)) {
-                $this->route->config(array('method' => $allowed));
-            }
-            if (is_callable(array($command, 'preAction'))) {
-                call_user_func(array($command, 'preAction'));
-            }
-            $response = $command->process();
-            if (is_callable(array($command, 'postAction'))) {
-                call_user_func(array($command, 'postAction'));
-            }
-        } catch(Exception $e) {
-            $this->catchException($e, array('command' => $this->route['command']));
+        $allowed = $command->isAllowed();
+        if (!$allowed) {
+            throw new api_exception_CommandNotAllowed("Command access not allowed: ".get_class($command));
         }
-
+        if (is_string($allowed)) {
+            $this->route->config(array('method' => $allowed));
+        }
+        if (is_callable(array($command, 'preAction'))) {
+            call_user_func(array($command, 'preAction'));
+        }
+        $response = $command->process();
+        if (is_callable(array($command, 'postAction'))) {
+            call_user_func(array($command, 'postAction'));
+        }
         return $response;
     }
 
@@ -240,7 +235,7 @@ class api_controller {
      *    - api_controller::prepare()
      *    - api_controller::dispatch()
      */
-    public function getViewName($route,$request,$response) {
+    public function getViewName($route, $request, $response) {
         $viewParams = $this->initViewParams($route, $response);
         //FIXME: needed BC? getViewName needs $route['namespace'] and $route['view']['omitextension']
         $route['view'] = $viewParams;
