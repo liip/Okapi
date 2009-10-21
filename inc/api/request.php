@@ -250,10 +250,10 @@ class api_request {
      */
     private function getLanguageFromPath($path) {
         // Path
-        preg_match("#^\/([a-z]{2})\/#", $path, $matches);
+        preg_match("#^\/([a-z]{2})(\/|$)#", $path, $matches);
         if (isset($matches[1]) && in_array($matches[1], $this->outputLangs)) {
             $lang = $matches[1];
-            $newpath = substr($path, 3);
+            $newpath = (string) substr($path, 3);
             return array('path' => $newpath,
                          'lang' => $lang);
         }
