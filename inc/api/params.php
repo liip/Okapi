@@ -13,7 +13,10 @@ class api_params extends ArrayObject {
     private $post = array();
 
     /** Hash with all GET parameters. */
-    private $get  = array();
+    private $get = array();
+
+    /** Hash with all route parameters. */
+    private $route = array();
 
     /**
      * Constructor. Initializes the array object.
@@ -42,15 +45,24 @@ class api_params extends ArrayObject {
     }
 
     /**
+     * Set the route parameters.
+     * @param $array hash: Associative array with all route parameters.
+     */
+    public function setRoute($array) {
+        $this->route = $array;
+        $this->exchangearray(array_merge($array, $this->getArrayCopy()));
+    }
+
+    /**
      * Returns a POST parameter with the given key. Returns the whole
      * POST array if no param is given.
      * @param $param string: Key of the POST parameter to return.
      * @return mixed: Individual POST param or whole POST hash.
      */
-    public function post($param = null) {
+    public function post($param = null, $default = null) {
         if (isset($param)) {
             if (!isset($this->post[$param])) {
-                return null;
+                return $default;
             }
 
             return $this->post[$param];
@@ -64,13 +76,29 @@ class api_params extends ArrayObject {
      * @param $param string: Key of the GET parameter to return.
      * @return mixed: Individual GET param or whole GET hash.
      */
-    public function get($param = null) {
+    public function get($param = null, $default = null) {
         if (isset($param)) {
             if (!isset($this->get[$param])) {
-                return null;
+                return $default;
             }
             return $this->get[$param];
         }
         return $this->get;
+    }
+
+    /**
+     * Returns a route parameter with the given key. Returns the whole
+     * route array if no param is given.
+     * @param $param string: Key of the route parameter to return.
+     * @return mixed: Individual route param or whole route hash.
+     */
+    public function route($param = null, $default = null) {
+        if (isset($param)) {
+            if (!isset($this->route[$param])) {
+                return $default;
+            }
+            return $this->route[$param];
+        }
+        return $this->route;
     }
 }

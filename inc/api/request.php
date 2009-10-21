@@ -32,7 +32,10 @@ class api_request {
     protected $extension = false;
     /** Default & allowed extentions */
     protected $extensions = '';
-    /** Matched route */
+    /**
+     * Matched route
+     * @var api_routing_route
+     */
     protected $route;
 
     /**
@@ -110,7 +113,8 @@ class api_request {
      * Set the matched route.
      */
     public function setRoute($route) {
-        return $this->route = $route;
+        $this->route = $route;
+        $this->params->setRoute($this->route->getParams());
     }
 
     /**
@@ -184,10 +188,7 @@ class api_request {
      * Returns the request parameters.
      */
     public function getParameters() {
-        if (empty($this->route)) {
-            return $this->params;
-        }
-        return array_merge($this->route->getParams(), $this->params);
+        return $this->params;
     }
 
     /**
@@ -220,8 +221,6 @@ class api_request {
     public function getParam($param, $default = null) {
         if (isset($this->params[$param])) {
             return $this->params[$param];
-        } else if (isset($this->route[$param])) {
-            return $this->route[$param];
         }
         return $default;
     }
