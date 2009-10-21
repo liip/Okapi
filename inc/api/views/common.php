@@ -9,24 +9,26 @@
  * @author   Silvan Zurbruegg
  */
 abstract class api_views_common {
-    /** api_response: Response object. */
-    protected $response = null;
-    /** api_request: Request object. */
-    protected $request = null;
-    /** Route parameters. */
+    /** @var api_response response object */
+    protected $response;
+    /** @var api_request request object */
+    protected $request;
+    /** @var api_routing_route matched route */
     protected $route = array();
+    /** @var api_routing routing object */
+    protected $routing;
 
     /**
      * Constructor.
-     * @param $route hash: Route parameters.
+     * @param $routing api_routing routing instance
      */
-    public function __construct($route, $request, $response, $config = null, $i18n = null) {
-        $this->route = $route;
+    public function __construct($routing, $request, $response, $config = null, $i18n = null) {
+        $this->route = $routing->getRoute();
+        $this->routing = $routing;
         $this->request = $request;
         $this->response = $response;
         $this->config = $config;
         $this->i18n = $i18n;
-
     }
 
     /**

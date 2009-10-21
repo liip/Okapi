@@ -33,8 +33,8 @@ class api_views_default extends api_views_common {
     /** string: XSLT file used for transforming the output. */
     protected $xslfile = '';
 
-    public function __construct($route, $request, $response, $config, $i18n = null) {
-        parent::__construct($route, $request, $response, $config, $i18n);
+    public function __construct($routing, $request, $response, $config, $i18n = null) {
+        parent::__construct($routing, $request, $response, $config, $i18n);
         $this->dumpDom = $this->parseDumpDomConfig($config);
     }
 

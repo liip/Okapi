@@ -82,10 +82,10 @@ class api_routing extends sfPatternRouting {
         $match = $this->parse($uri);
         if ($match) {
             $match = $match['_sf_route'];
+            $match->mergeProperties();
         }
         $this->route = $match;
         $this->request->setRoute($this->route);
-        $match->mergeProperties();
         return $match;
     }
 
