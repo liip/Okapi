@@ -157,7 +157,7 @@ class api_controller {
             try {
                 $view = $this->sc->$viewName;
             } catch (InvalidArgumentException $e) {
-                $view = new $viewName($this->sc->route, $this->sc->request, $this->sc->response, $this->sc->config);
+                $view = new $viewName($this->sc->routing, $this->sc->request, $this->sc->response, $this->sc->config);
             }
             $view->setResponse($response);
             $view->prepare();

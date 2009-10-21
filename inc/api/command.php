@@ -26,6 +26,11 @@ abstract class api_command {
     protected $response = null;
 
     /**
+     * @var api_routing
+     */
+    protected $routing;
+
+    /**
      * array: Route definition of the current request. This is the return
      * value of api_routing::getRoute().
      * @var api_routing_route
@@ -52,8 +57,9 @@ abstract class api_command {
      * @param    $route array: The attributes as returned by
      *                         api_routing::getRoute().
      */
-    public function __construct(api_routing_route $route, api_request $request, api_response $response, $config) {
-        $this->route = $route;
+    public function __construct(api_routing $routing, api_request $request, api_response $response, $config) {
+        $this->routing = $routing;
+        $this->route = $routing->getRoute();
         $this->request = $request;
         $this->response = $response;
         $this->config = $config;
