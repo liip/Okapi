@@ -157,6 +157,19 @@ class api_pam {
     }
 
     /**
+     * Sets a new password on an arbitrary user
+     * @param int $id user id to alter
+     * @param string $password new user password
+     * @return bool success
+     */
+    public function setPassword($userid, $password) {
+        if (($ao = $this->getAuthObj()) !== false) {
+            return $ao->setPassword($userid, $password);
+        }
+        return false;
+    }
+
+    /**
      * Gets the user name of the currently logged in user. Calls the
      * getUserName() method of the authentication object.
      * @return string: User name

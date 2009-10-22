@@ -10,7 +10,7 @@ interface api_pam_Iauth {
     /**
      * Login in with the given username and password. The authentication
      * object is responsible for handling the session state.
-     * 
+     *
      * @param string $user User name
      * @param string $pass Password
      * @param bool $persistent Whether to set a cookie for persistent login or not (aka "Remember me")
@@ -50,4 +50,17 @@ interface api_pam_Iauth {
      * @return hash: Information key/value pair
      */
     public function getAuthData();
+
+    /**
+     * Sets a new password on an arbitrary user
+     *
+     * This is implemented by the auth since the auth can handle all the salting
+     * and password hashing that way, upon registration just create the user with
+     * an empty password and then use setPassword to alter it
+     *
+     * @param int $id user id to alter
+     * @param string $password new user password
+     * @return bool success
+     */
+    public function setPassword($userid, $password);
 }
