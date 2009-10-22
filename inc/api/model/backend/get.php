@@ -107,9 +107,9 @@ class api_model_backend_get extends api_model_http {
      * Additionally all attributes defined by setNodeAttributes() are
      * added.
      *
-     * @exception api_exception_Backend if the response was empty or
+     * @exception api_exception_backend if the response was empty or
      *            returned a status code different to 200.
-     * @exception api_exception_XmlParseError if the response can't be
+     * @exception api_exception_xmlParseError if the response can't be
      *            parsed as XML.
      * @return DOMDocument: XML Document
      */
@@ -145,11 +145,11 @@ class api_model_backend_get extends api_model_http {
         $cfg = api_config::getInstance()->backend;
         $cmd = $this->getBackendConfig($cfg[$server], $command);
         if (is_null($cmd)) {
-            throw new api_exception_Backend(api_exception::THROW_FATAL,
-                array('server' => $server, 'command' => $command),
+            throw new api_exception_backend(
+                "Command $server/$command not found in backend configuration.",
                 1,
-                "Command $server/$command not found in backend configuration.");
-            return null;
+                array('server' => $server, 'command' => $command)
+            );
         }
 
         $host = $cmd['host'];
@@ -158,11 +158,11 @@ class api_model_backend_get extends api_model_http {
         $defaultParams = $cmd['params'];
 
         if (empty($host) || empty($path)) {
-            throw new api_exception_Backend(api_exception::THROW_FATAL,
-                array('server' => $server, 'command' => $command),
+            throw new api_exception_backend(
+                "Command $server/$command does not specify host or path.",
                 2,
-                "Command $server/$command does not specify host or path.");
-            return null;
+                array('server' => $server, 'command' => $command)
+            );
         }
 
         if (isset($cmd['protocol'])) {

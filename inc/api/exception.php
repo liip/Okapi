@@ -21,13 +21,13 @@ class api_exception extends Exception {
     /**
      * Constructor.
      *
-     * @param $severity int: Indicates whether the exception is fatal or not.
+     * @param string $message Human-readable information about the exception.
+     * @param int $code Exception code.
+     * @param array $params Parameters giving details about the exception.
+     * @param int $severity Indicates whether the exception is fatal or not.
      *        Use api_exception::THROW_NONE or api_exception::THROW_FATAL.
-     * @param $params array: Parameters giving details about the exception.
-     * @param $code int: Exception code.
-     * @param $message string: Human-readable information about the exception.
      */
-    public function __construct($severity=self::THROW_FATAL, $params=array(), $code=0, $message='') {
+    public function __construct($message, $code=0, $params=array(), $severity=self::THROW_FATAL) {
         parent::__construct($message, $code);
         $this->severity  = $severity;
         $this->params    = $params;
@@ -35,7 +35,7 @@ class api_exception extends Exception {
 
     /**
      * Sets a different human-readable message for this exception.
-     * @param $message string: Human-readable information about the exception.
+     * @param string $message Human-readable information about the exception.
      */
     public function setMessage($message) {
         $this->message = $message;
@@ -43,15 +43,15 @@ class api_exception extends Exception {
 
     /**
      * Get the base name of this exception.
-     * @return string: Base name
+     * @return string Base name
      */
     public function getName() {
-        return api_helpers_class::getBaseName($this);;
+        return api_helpers_class::getBaseName($this);
     }
 
     /**
      * Sets a different exception code.
-     * @param $code int: Exception code.
+     * @param int $code Exception code.
      */
     public function setCode($code) {
         $this->code = $code;
@@ -59,7 +59,7 @@ class api_exception extends Exception {
 
     /**
      * Gets the severity.
-     * @return int: Severity. api_exception::THROW_NONE or api_exception::THROW_FATAL
+     * @return int Severity. api_exception::THROW_NONE or api_exception::THROW_FATAL
      */
     public function getSeverity() {
         return $this->severity;
@@ -67,7 +67,7 @@ class api_exception extends Exception {
 
     /**
      * Sets a different severity.
-     * @param $severity int: Indicates whether the exception is fatal or not.
+     * @param int $severity Indicates whether the exception is fatal or not.
      *        Use api_exception::THROW_NONE or api_exception::THROW_FATAL.
      */
     public function setSeverity($severity) {
@@ -76,7 +76,7 @@ class api_exception extends Exception {
 
     /**
      * Returns all params currently set.
-     * @return array: Parameters with details about the exception.
+     * @return array Parameters with details about the exception.
      */
     public function getParams() {
         return $this->params;
@@ -84,7 +84,7 @@ class api_exception extends Exception {
 
     /**
      * Sets a new param array.
-     * @param $params array: Parameters giving details about the exception.
+     * @param array $params Parameters giving details about the exception.
      */
     public function setParams($params) {
         $this->params = $params;
@@ -92,8 +92,8 @@ class api_exception extends Exception {
 
     /**
      * Sets one param.
-     * @param $name string: Key of the param to set.
-     * @param $value string: Value of the param to set.
+     * @param string $name Key of the param to set.
+     * @param string $value Value of the param to set.
      */
     public function setParam($name, $value) {
         $this->params[$name] = $value;

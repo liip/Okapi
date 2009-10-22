@@ -178,7 +178,7 @@ class api_controller {
      * The instance variables command and route are set to the command
      * object and the route returned by api_routing respectively.
      *
-     * @exception api_exception_NoCommandFound if no route matched the
+     * @exception api_exception_noCommandFound if no route matched the
      *            current request or if the command class doesn't exist.
      *
      * \deprecated The naming of commands has been renamed on 2008-02-25
@@ -188,7 +188,7 @@ class api_controller {
      */
     public function findCommandName($route) {
         if (!($route instanceOf api_routing_route)) {
-            throw new api_exception_NoCommandFound();
+            throw new api_exception_noCommandFound();
         }
 
         if (isset($route['namespace'])) {
@@ -204,14 +204,14 @@ class api_controller {
      * Calls the api_command::isAllowed() method to check if the command
      * can be executed. Then api_command::process() is called.
      *
-     * @exception api_exception_CommandNotAllowed if api_command::isAllowed()
+     * @exception api_exception_commandNotAllowed if api_command::isAllowed()
      *            returns false.
      *
      */
     public function processCommand($command) {
         $allowed = $command->isAllowed();
         if (!$allowed) {
-            throw new api_exception_CommandNotAllowed("Command access not allowed: ".get_class($command));
+            throw new api_exception_commandNotAllowed("Command access not allowed: ".get_class($command));
         }
         if (is_string($allowed)) {
             $this->route->config(array('method' => $allowed));

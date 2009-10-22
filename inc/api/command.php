@@ -95,7 +95,7 @@ abstract class api_command {
                 return $this->response;
             }
         }
-        throw new api_exception_NoMethodFound('Incorrect method name '.get_class($this).'::'.$route['method'].
+        throw new api_exception_noMethodFound('Incorrect method name '.get_class($this).'::'.$route['method'].
             ', you may want to implement __call or check the return value of isAllowed if you returned a custom method name');
     }
 
@@ -117,7 +117,7 @@ abstract class api_command {
      * command has to redirect the user somewhere else in this method.
      *
      * When this method returns false the controller throws a
-     * api_exception_CommandNotAllowed exception.
+     * api_exception_commandNotAllowed exception.
      *
      * You can also return a string to another method of the same command
      * which will be called instead of the original one, this would typically

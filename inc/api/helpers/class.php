@@ -11,12 +11,12 @@ class api_helpers_class {
      * Returns the base name of a class. The base name is the element
      * after the last underline.
      *
-     * @param $class string|object: Name of the class to get the
+     * @param string|object $class Name of the class to get the
      *               base name from or an object.
-     * @return string: Base name
+     * @return string Base name
      */
     public static function getBaseName($class) {
-        if (! is_string($class)) {
+        if (!is_string($class)) {
             $class = get_class($class);
         }
 

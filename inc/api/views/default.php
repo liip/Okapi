@@ -65,7 +65,7 @@ class api_views_default extends api_views_common {
      *
      * @param $data mixed: See api_views_default::getDom()
      * @param $exceptions array: Array of exceptions merged into the DOM.
-     * @exception api_exception_XsltParseError if the XSLT transformation
+     * @exception api_exception_xsltParseError if the XSLT transformation
      *            did not return a valid XML document.
      */
     public function dispatch($data, $exceptions = null) {
@@ -97,7 +97,7 @@ class api_views_default extends api_views_common {
             echo $this->getOuputFromDom($xml);
             return;
         } else {
-            throw new api_exception_XsltParseError(api_exception::THROW_FATAL, $this->xslfile, $xslt_errors);
+            throw new api_exception_xsltParseError('Parse error in : "'.$this->xslfile.'"', 0, array('errors' => $xslt_errors));
         }
     }
 
@@ -145,9 +145,9 @@ class api_views_default extends api_views_common {
     /**
      * Prepares for the XSLT transformation. Loads the XSLT stylesheet.
      *
-     * @exception api_exception_FileNotFound if the XSLT stylesheet does
+     * @exception api_exception_fileNotFound if the XSLT stylesheet does
      *            not exist.
-     * @exception api_exception_XmlParseError if the XSLT stylesheet
+     * @exception api_exception_xmlParseError if the XSLT stylesheet
      *            does not contain valid XML.
      */
     public function prepare() {
@@ -161,7 +161,7 @@ class api_views_default extends api_views_common {
         $attrib = array_merge($defaults, $this->response->viewParams);
 
         if (!isset($attrib['xsl'])) {
-            throw new api_exception_NoXsltFound("No XSLT stylesheet was specified for this route.");
+            throw new api_exception_noXsltFound("No XSLT stylesheet was specified for this route.");
         }
 
         if (isset($attrib['contenttype']) && !empty($attrib['contenttype'])) {
@@ -191,9 +191,9 @@ class api_views_default extends api_views_common {
         $this->xsldom = new DOMDocument();
         if(!$this->xsldom->load($this->xslfile)) {
             if(!file_exists($this->xslfile)) {
-                throw new api_exception_FileNotFound(api_exception::THROW_FATAL, $this->xslfile);
+                throw new api_exception_fileNotFound('File not found: '.$this->xslfile);
             }
-            throw new api_exception_XmlParseError(api_exception::THROW_FATAL, $this->xslfile);
+            throw new api_exception_xmlParseError('XML parse error in file: '.$this->xslfile);
         }
 
         if ($this->xsldom instanceof DOMDocument) {

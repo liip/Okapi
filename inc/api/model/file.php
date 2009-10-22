@@ -17,19 +17,19 @@ class api_model_file extends api_model {
      * Create a new data object which returns a file as DOM.
      *
      * @param $file string: Full name of the file to load on the file system.
-     * @exception api_exception_FileNotFound if the file doesn't exist.
-     * @exception api_exception_XmlParseError if the file can't be parsed
+     * @exception api_exception_fileNotFound if the file doesn't exist.
+     * @exception api_exception_xmlParseError if the file can't be parsed
      *            as XML.
      */
     public function __construct($file) {
         if (! file_exists($file)) {
-            throw new api_exception_FileNotFound(api_exception::THROW_FATAL, $file);
+            throw new api_exception_fileNotFound('File not found: '.$file);
             return false;
         }
 
         $this->dom = DOMDocument::load($file);
         if ($this->dom === false) {
-            throw new api_exception_XmlParseError(api_exception::THROW_FATAL, $file);
+            throw new api_exception_xmlParseError('XML parse error in '.$file);
         }
     }
 

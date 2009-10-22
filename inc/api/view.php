@@ -56,7 +56,7 @@ class api_view {
             }
         }
 
-        throw new api_exception_NoViewFound("View " . $name . " not found");
+        throw new api_exception_noViewFound("View " . $name . " not found");
     }
 
     /**

@@ -23,7 +23,7 @@ class api_model_http extends api_model {
      * Create a new data object which returns a HTTP response as DOM.
      *
      * @param $url string: URL to request.
-     * @exception api_exception_Backend if the CURL resource can't be
+     * @exception api_exception_backend if the CURL resource can't be
      *            initialized.
      */
     public function __construct($url) {
@@ -38,9 +38,9 @@ class api_model_http extends api_model {
     /**
      * Read the CURL response and return it in a DOM.
      *
-     * @exception api_exception_Backend if the response was empty or
+     * @exception api_exception_backend if the response was empty or
      *            returned a status code different to 200.
-     * @exception api_exception_XmlParseError if the response can't be
+     * @exception api_exception_xmlParseError if the response can't be
      *            parsed as XML.
      * @return DOMDocument: XML Document
      */
@@ -56,22 +56,20 @@ class api_model_http extends api_model {
 
         $status = (isset($info['http_code'])) ? $info['http_code'] : 0;
         if (empty($xmls)) {
-            throw new api_exception_Backend(
-                api_exception::THROW_FATAL,
-                array('url' => $this->url),
+            throw new api_exception_backend(
+                "Empty response returned.",
                 0,
-                "Empty response returned.");
+                array('url' => $this->url));
         } else if ($status != 200) {
-            throw new api_exception_Backend(
-                api_exception::THROW_FATAL,
-                array('url' => $this->url),
+            throw new api_exception_backend(
+                "Got a bad HTTP status: " . $status,
                 0,
-                "Got a bad HTTP status: " . $status);
+                array('url' => $this->url));
         }
 
         $dom = DOMDocument::loadXML($xmls);
         if ($dom === false) {
-            throw new api_exception_XmlParseError(api_exception::THROW_FATAL, $this->url);
+            throw new api_exception_xmlParseError('XML parse error in file : '.$this->url);
         }
 
         return $dom;
@@ -82,18 +80,17 @@ class api_model_http extends api_model {
      *
      * @param $url string: URL to request.
      * @return resource: CURL resource.
-     * @exception api_exception_Backend if the CURL resource can't be
+     * @exception api_exception_backend if the CURL resource can't be
      *            initialized.
      * @see http://www.php.net/manual/en/function.curl-init.php
      */
     protected function prepareCurl($url) {
         $curl = curl_init();
         if (!$curl) {
-            throw new api_exception_Backend(
-                api_exception::THROW_FATAL,
-                array('url' => $this->url),
+            throw new api_exception_backend(
+                "Could not initialize CURL object",
                 0,
-                "Could not initialize CURL object");
+                array('url' => $this->url));
         }
 
         curl_setopt($curl, CURLOPT_URL, $url);

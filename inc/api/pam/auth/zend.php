@@ -39,7 +39,7 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
             $zaResult = self::$zaAuth->authenticate(self::$zaAdapter);
             $msg = $zaResult->getMessages();
             if ($zaResult->getCode() !== 1) {
-                throw new api_exception_Auth(api_exception::THROW_FATAL, array(), 0, $msg[0]);
+                throw new api_exception_auth($msg[0]);
             }
             if ($zaResult->isValid()) {
                 if (isset($this->opts['container']['usercol'])) {
@@ -184,7 +184,7 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
         unset($rgOpts['driver']);
         $adapter = 'Zend_Db_Adapter_'.$rgOpts['adapter'];
         if (!class_exists($adapter)) {
-            throw new api_exception_Auth(1, $rgOpts, null, 'No such thing as ' . $adapter. '. Please check config.xml');
+            throw new api_exception_auth('No such thing as ' . $adapter. '. Please check config.xml', 1, $rgOpts);
         }
         $dbAdapter = new $adapter($rgOpts);
 
