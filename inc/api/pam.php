@@ -185,14 +185,16 @@ class api_pam {
     /**
      * Gets the additional meta information about the currently logged in
      * user. Calls the getAuthData() method of the authentication object.
-     * @return hash: Information key/value pair
+     * @param string $attribute an optional attribute value
+     * @return array|mixed Information key/value pair or only one value if 
+     * $attribute is given
      * @see api_pam_Iauth::getAuthData()
      */
-    public function getAuthData() {
+    public function getAuthData($attribute = null) {
         if (($ao = $this->getAuthObj()) !== false) {
-            return $ao->getAuthData();
+            return $ao->getAuthData($attribute);
         }
-        return "";
+        return null;
     }
 
     /**

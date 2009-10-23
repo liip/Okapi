@@ -46,10 +46,13 @@ interface api_pam_Iauth {
 
     /**
      * Gets the additional meta information about the currently logged in
-     * user.
-     * @return hash: Information key/value pair
+     * user. Or just one value of the data if $attribute is passed
+     *
+     * @param string $attribute an optional attribute value
+     * @return array|mixed Information key/value pair or only one value if 
+     * $attribute is given
      */
-    public function getAuthData();
+    public function getAuthData($attribute = null);
 
     /**
      * Sets a new password on an arbitrary user

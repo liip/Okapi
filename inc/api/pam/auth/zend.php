@@ -63,8 +63,15 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
      *
      * @return mixed|null
      */
-    public function getAuthData() {
-        return self::$zaAuth->getIdentity();
+    public function getAuthData($attribute = null) {
+        if (!$attribute) {
+            return self::$zaAuth->getIdentity();
+        }
+        $data = self::$zaAuth->getIdentity();
+        if ($data && isset($data->$attribute)) {
+            return $data->$attribute;
+        }
+        return null;
     }
 
     /**
@@ -83,7 +90,6 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
             }
             return self::$zaAuth->getIdentity();
         }
-
         return null;
     }
 
