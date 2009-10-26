@@ -22,7 +22,7 @@ class api_routing extends sfPatternRouting {
         $this->request = $request;
         $this->options['context']['prefix'] = API_HOST;
         $this->options['context']['host'] = (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '');
-        $this->options['context']['is_secure'] = (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == '443') ? true : false;
+        $this->options['context']['is_secure'] = isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == '443';
         parent::__construct($dispatcher);
     }
 
@@ -45,6 +45,9 @@ class api_routing extends sfPatternRouting {
     public function gen($name, $params = array(), $absolute = false) {
         $url = $this->generate($name, $params, $absolute);
 
+        if ($this->routes[$name]['ssl'] && substr(API_HOST, 0, 5) !== 'https') {
+            return str_replace('http://', 'https://', API_HOST).'/'.$this->request->getLang().$url;
+        }
         // TODO make it optional somehow and handle the left|right positioning by reading api_request settings
         return '/'.$this->request->getLang().$url;
     }
@@ -127,6 +130,11 @@ class api_routing extends sfPatternRouting {
     }
 }
 
+/**
+ * config values:
+ *   bool optionalextension : makes the .xx extension optional
+ *   bool ssl : forces ssl on that route
+ */
 class api_routing_route extends sfRoute implements ArrayAccess, Countable {
 
     public function getParams() {
