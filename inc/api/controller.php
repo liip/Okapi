@@ -65,8 +65,12 @@ class api_controller {
     public function run() {
         $this->dispatcher = $this->sc->sfEventDispatcher;
 
-        if (!is_array($this->filters) || empty($this->filters['request']['controller'])) {
-            $this->filters['request']['controller'] = null;
+        if (!is_array($this->filters)) {
+            $this->filters = array('request'=>array('controller' => null));
+        } elseif (!isset($this->filters['request'])) {
+            $this->filters['request'] = array('controller' => null);
+        } elseif (!isset($this->filters['request']['controller'])) {
+            $this->filters['request'] = array_merge(array('controller'=> null), $this->filters['request']);
         }
 
         $this->dispatcher->connect('application.request', array(
