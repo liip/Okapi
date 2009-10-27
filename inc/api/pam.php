@@ -91,11 +91,9 @@ class api_pam {
     /**
      * Constructor. Loads the PAM configuration.
      */
-    public function __construct($config, $auth, $perm) {
-        $pamConf = $config->pam;
+    public function construct($auth, $perm) {
         $this->auth = $auth;
         $this->perm = $perm;
-        $this->pamLoadConfig($pamConf);
     }
 
     /**
@@ -348,44 +346,5 @@ class api_pam {
             return $obj;
         }
         return false;
-    }
-
-    /**
-     * Loads the configuration from the configuration file.
-     * @param $pamConf hash: PAM configuration from api_config
-     */
-    private function pamLoadConfig($pamConf) {
-        if (isset($pamConf['auth'])) {
-            $this->authConf = $this->pamLoadComponentConfig($pamConf['auth']);
-        }
-
-        if (isset($pamConf['perm'])) {
-            $this->permConf = $this->pamLoadComponentConfig($pamConf['perm']);
-        }
-    }
-
-    /**
-     * Loads the configuration for an individual component (authentication
-     * or permission) from the configuration file. Splits the configuration
-     * into the configured schemes.
-     * @param $compArr hash: Component configuration from the configuration
-     * @return hash: Component configurations, scheme names are the keys.
-     */
-    private function pamLoadComponentConfig($compArr) {
-        $cfg = array();
-
-
-        if (isset($compArr[0]) && is_array($compArr[0])) {
-            foreach($compArr as $conf) {
-                $confName = (isset($conf['name'])) ? $conf['name'] : $this->confDefaultName;
-                $cfg[$confName] = $conf;
-            }
-        } else {
-            $confName = (isset($compArr['name'])) ? $compArr['name'] : $this->confDefaultName;
-            $cfg[$confName] = $compArr;
-        }
-
-
-        return $cfg;
     }
 }
