@@ -66,7 +66,9 @@ class autoload {
                 }
                 self::$class_file_map = autoload::generateClassFileMap($class_file_map);
             } else {
-                self::$class_file_map = include $class_file_map;
+                if (include $class_file_map) {
+                    self::$class_file_map = $mapping;
+                }
             }
         }
 
