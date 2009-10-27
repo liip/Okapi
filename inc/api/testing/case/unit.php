@@ -2,43 +2,43 @@
 /**
  * Base test case class for unit tests.
  */
-class api_testing_case_unit extends UnitTestCase {
-    
+abstract class api_testing_case_unit extends api_testing_case_phpunit {
+
     /**
      * Gets the DOM node matching the given XPath expression.
      */
     protected function getNode($dom, $xpath) {
         return api_helpers_xpath::getNode($dom, $xpath);
     }
-    
+
     /**
      * Asserts that the given node exists.
      */
     public function assertNode($dom, $xpath) {
         $this->assertNotNull($this->getNode($dom, $xpath), "No node found for $xpath");
     }
-    
+
     /**
      * Asserts that the given node does not exist.
      */
     public function assertNotNode($dom, $xpath) {
         $this->assertNull($this->getNode($dom, $xpath), "Node found for $xpath but none was expected.");
     }
-    
+
     /**
      * Gets the first result of the current page by XPath.
      */
     public function getText($dom, $xpath) {
         return api_helpers_xpath::getText($dom, $xpath);
     }
-    
+
     /**
      * Asserts that the text retrieved by an XPath expression matches.
      */
     public function assertText($dom, $xpath, $expected, $message = '%s') {
         return $this->assertEqual($expected, $this->getText($dom, $xpath), $message);
     }
-    
+
     /**
      * Asserts that the texts retrieved by an XPath expression matches.
      * The expected values are an array of texts, which have to match the
@@ -51,21 +51,21 @@ class api_testing_case_unit extends UnitTestCase {
         }
         return true;
     }
-    
+
     /**
      * Gets the first result of the current page by XPath.
      */
     public function getAttribute($dom, $xpath) {
         return api_helpers_xpath::getAttribute($dom, $xpath);
     }
-    
+
     /**
      * Asserts that the attribute retrieved by an XPath expression matches.
      */
     public function assertAttribute($dom, $xpath, $expected, $message = '%s') {
         return $this->assertEqual($expected, $this->getAttribute($dom, $xpath), $message);
     }
-    
+
     /**
      * Returns a DOM document loaded from the given fixture file.
      * $file can be:
