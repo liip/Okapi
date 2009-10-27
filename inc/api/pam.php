@@ -91,7 +91,7 @@ class api_pam {
     /**
      * Constructor. Loads the PAM configuration.
      */
-    public function construct($auth, $perm) {
+    public function __construct($auth, $perm) {
         $this->auth = $auth;
         $this->perm = $perm;
     }
