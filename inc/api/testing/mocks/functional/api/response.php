@@ -18,6 +18,13 @@ class api_response {
     protected $code = null;
     
     /**
+     * Constructor. Turns on output buffering.
+     */
+    public function __construct() {
+        ob_start();
+    }
+
+    /**
      * Re-implements send of api_response with a no-op.
      */
     public function send() {
@@ -36,26 +43,6 @@ class api_response {
      */
     public function redirect($to, $status=301) {
         throw new api_testing_exception("Redirect $status => $to");
-    }
-    
-    /**
-     * Gets an instance of api_response.
-     * @param $forceReload bool: If true, forces instantiation of a new
-     *        instance. Used for testing.
-     */
-    public static function getInstance($forceReload = false) {
-        static $instance;
-        if ((!isset($instance) || !($instance instanceof api_response)) || $forceReload) {
-            $instance = new api_response();
-        }
-        return $instance;
-    }
-    
-    /**
-     * Constructor. Turns on output buffering.
-     */
-    public function __construct() {
-        ob_start();
     }
     
     /**
