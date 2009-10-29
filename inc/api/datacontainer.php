@@ -4,7 +4,11 @@
  */
 
 class api_datacontainer implements ArrayAccess {
-    protected $data = array();
+    protected $data;
+
+    public function __construct($data = array()) {
+        $this->data = $data;
+    }
 
     /**
      * returns an array containing all the data of this node, and converts all
