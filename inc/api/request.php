@@ -32,6 +32,9 @@ class api_request {
     protected $extension = false;
     /** Default & allowed extentions */
     protected $extensions = '';
+    /** Copy of the $_COOKIES array to allow easier testing */
+    protected $cookies;
+
     /**
      * Matched route
      * @var api_routing_route
@@ -49,16 +52,18 @@ class api_request {
         $this->defaultLang = empty($lang['default']) ? reset($this->outputLangs) : $lang['default'];
         $this->forceLang = !empty($lang['forceLang']);
         $this->acceptBrowserLang = !empty($lang['acceptBrowserLang']);
+        $this->cookies = $_COOKIE;
 
         $path = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
         if (strpos($path, '?') !== FALSE) {
             $path = substr($path, 0, strpos($path, '?'));
         }
 
+        /* TODO restore if declared useful by anyone
         if (isset($_SERVER['SCRIPT_NAME']) && $_SERVER['SCRIPT_NAME'] != '/index.php') {
             $scriptpathlen = strlen($_SERVER['SCRIPT_NAME']) -10;
             $path = substr($path,$scriptpathlen);
-        }
+        }*/
         // Get language from the beginning of the URL
         $lang = $this->getLanguageFromPath($path);
         if ($lang !== null) {
@@ -221,6 +226,20 @@ class api_request {
     public function getParam($param, $default = null) {
         if (isset($this->params[$param])) {
             return $this->params[$param];
+        }
+        return $default;
+    }
+
+    /**
+     * returns a cookie value, it allows for easier testing
+     * to wrap cookies in the request
+     * @param string $name cookie name
+     * @param string $default default value
+     * @return string
+     */
+    public function getCookie($name, $default = null) {
+        if (isset($this->cookies[$name])) {
+            return $this->cookies[$name];
         }
         return $default;
     }
