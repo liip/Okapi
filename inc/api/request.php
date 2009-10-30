@@ -45,9 +45,9 @@ class api_request {
      * Constructor. Parses the request and fills in all the
      * values it can.
      */
-    public function __construct($lang, $extensions) {
+    public function __construct($lang, $extensions, $mockSAPI = false) {
         $this->host = API_HOST;
-
+        $this->mockSAPI = $mockSAPI;
         $this->outputLangs = empty($lang['languages']) ? array('en') : $lang['languages'];
         $this->defaultLang = empty($lang['default']) ? reset($this->outputLangs) : $lang['default'];
         $this->forceLang = !empty($lang['forceLang']);
@@ -312,5 +312,12 @@ class api_request {
         $lang = $this->forceLang ? $this->defaultLang : false;
 
         return array('path' => $newpath, 'lang' => $lang);
+    }
+
+    public function getSapi() {
+        if ($this->mockSAPI) {
+            return $this->mockSAPI;
+        }
+        return PHP_SAPI;
     }
 }
