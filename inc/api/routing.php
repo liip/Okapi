@@ -43,6 +43,9 @@ class api_routing extends sfPatternRouting {
     }
 
     public function gen($name, $params = array(), $absolute = false) {
+        if ($name === null) {
+            return '/'.$this->request->getLang().$this->request->getPath();
+        }
         $url = $this->generate($name, $params, $absolute);
 
         if ($this->routes[$name]['ssl'] && substr(API_HOST, 0, 5) !== 'https') {
@@ -100,8 +103,11 @@ class api_routing extends sfPatternRouting {
     {
         /** -- added code -- */
         $ext = $this->request->getExtension();
-        if ($ext != '') {
-            $urlNoExt = substr($url, 0, -(strlen($ext)+1));
+        $len = strlen($ext);
+        if (substr($url, -$len-1) == '.'.$ext) {
+            $urlNoExt = substr($url, 0, -$len-1);
+        } else {
+            $urlNoExt = $url;
         }
         $baseUrl = $url;
         /** -- end -- */
@@ -112,7 +118,7 @@ class api_routing extends sfPatternRouting {
 
             /** -- added code -- */
             // Remove the extension if the user wished so
-            if ($ext != '' && isset($route['optionalextension']) && $route['optionalextension']) {
+            if (isset($route['optionalextension']) && $route['optionalextension']) {
                 $url = $urlNoExt;
             } else {
                 $url = $baseUrl;
@@ -187,4 +193,7 @@ class api_routing_route extends sfRoute implements ArrayAccess, Countable {
     public function count() {
         return count($this->options);
     }
+}
+
+class sfConfigurationException extends api_exception {
 }
