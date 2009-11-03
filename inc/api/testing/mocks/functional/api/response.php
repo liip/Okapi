@@ -32,13 +32,6 @@ class api_response {
     }
     
     /**
-     * Returns the output data.
-     */
-    public function getContents() {
-        return ob_get_clean();
-    }
-    
-    /**
      * Catch redirects and thrown a testing exception for that.
      */
     public function redirect($to, $status=301) {
@@ -168,4 +161,28 @@ class api_response {
     public function setContentLengthOutput($cl) {
         $this->setContentLengthOutput = $cl;
     }
+
+    public function getContent() {
+        $content = '';
+        while (ob_get_level()) {
+            $content .=  ob_get_contents();
+            ob_end_clean();
+        }
+        $this->content = $this->content . $content;
+        return $this->content;
+
+    }
+
+    public function setContent($content) {
+        //clear flush
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+        $this->content = $content;
+    }
+
+    public function addContent($content) {
+        $this->content .= $content;
+    }
+
 }
