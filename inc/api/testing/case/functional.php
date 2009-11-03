@@ -6,9 +6,14 @@
  */
 abstract class api_testing_case_functional extends api_testing_case_phpunit {
     /** api_controller: Controller to handle requests. */
-    protected $controller = null;
-    /** DOMDocument: DOM returned by the previous request. */
-    protected $responseDom = null;
+    protected $controller;
+    /** @var DOMDocument DOM instance containing the response if it's not json. */
+    protected $responseDom;
+    /** @var api_response response object */
+    protected $response;
+    /** @var string response content */
+    protected $responseText;
+    
     /** string: Original include path before setUp() was called. Used to
         recover the include path in the tearDown() method. */
     protected $includepathOriginal = '';
@@ -41,70 +46,71 @@ abstract class api_testing_case_functional extends api_testing_case_phpunit {
 
     /**
      * Executes the given request internally using the GET method.
-     * @param $path string: Path relative to the application root to
-     *                      request. This path is passed to the routing
-     *                      engine. Path can include query string parameters.
+     * @param string $route the route name to call
+     * @param array $params the route parameters
      */
-    protected function get($path) {
+    protected function get($route, $params=array(), $extension=null) {
         $_SERVER['REQUEST_METHOD'] = 'GET';
-        $this->request($path, array());
+        $this->request($route, $params, array(), $extension);
     }
 
     /**
      * Executes the given request internally using the HEAD method.
-     * @param $path string: Path relative to the application root to
-     *                      request. This path is passed to the routing
-     *                      engine. Path can include query string parameters.
+     * @param string $route the route name to call
+     * @param array $params the route parameters
      */
-    protected function head($path) {
+    protected function head($route, $params=array(), $extension=null) {
         $_SERVER['REQUEST_METHOD'] = 'HEAD';
-        $this->request($path, array());
+        $this->request($route, $params, array(), $extension);
     }
 
     /**
      * Executes the given request internally using the POST method.
-     * @param $path string: Path relative to the application root to
-     *                      request. This path is passed to the routing
-     *                      engine. Path can include query string parameters.
-     * @param $params array: POST parameters to pass to the request.
+     * @param string $route the route name to call
+     * @param array $params the route parameters
+     * @param array $post POST parameters to pass to the request.
      */
-    protected function post($path, $params) {
+    protected function post($route, $params=array(), $post=array(), $extension=null) {
         $_SERVER['REQUEST_METHOD'] = 'POST';
-        $this->request($path, $params);
+        $this->request($route, $params, $post, $extension);
     }
 
     /**
      * Executes the given request internally using the PUT method.
-     * @param $path string: Path relative to the application root to
-     *                      request. This path is passed to the routing
-     *                      engine. Path can include query string parameters.
-     * @param $params array: POST parameters to pass to the request.
+     * @param string $route the route name to call
+     * @param array $params the route parameters
+     * @param array $post POST parameters to pass to the request.
      */
-    protected function put($path, $params) {
+    protected function put($route, $params=array(), $post=array(), $extension=null) {
         $_SERVER['REQUEST_METHOD'] = 'PUT';
-        $this->request($path, $params);
+        $this->request($route, $params, $post, $extension);
     }
 
     /**
      * Executes the given request internally using the DELETE method.
-     * @param $path string: Path relative to the application root to
-     *                      request. This path is passed to the routing
-     *                      engine. Path can include query string parameters.
-     * @param $params array: POST parameters to pass to the request.
+     * @param string $route the route name to call
+     * @param array $params the route parameters
      */
-    protected function delete($path) {
+    protected function delete($route, $params=array(), $extension=null) {
         $_SERVER['REQUEST_METHOD'] = 'DELETE';
-        $this->request($path, array());
+        $this->request($route, $params, array(), $extension);
     }
 
     /**
      * Common request handling for get/post.
-     * @param $path string: Path relative to the application root to
-     *                      request. This path is passed to the routing
-     *                      engine. Path can include query string parameters.
-     * @param $params array: POST parameters to pass to the request.
+     * @param string $route the route name to call
+     * @param array $routeParams the route parameters
+     * @param array $params POST parameters to pass to the request.
      */
-    private function request($path, $params) {
+    private function request($route, $routeParams, $params=array(), $extension=null) {
+        $sc = api_init::start();
+        $path = $sc->routing->gen($route, $routeParams);
+
+        // append extension at the end or before get params
+        if ($extension) {
+            $path = preg_replace('{(\?.*$|$)}', '.'.$extension.'$1', $path);
+        }
+        
         $_SERVER["REQUEST_URI"] = $path;
         $components = parse_url($path);
         $_GET = $_POST = $_REQUEST = $_FILES = array();
@@ -118,11 +124,22 @@ abstract class api_testing_case_functional extends api_testing_case_phpunit {
         $this->uploadFiles($_POST, $_FILES);
         $_REQUEST = array_merge($_GET, $_POST);
 
-        api_request::getInstance(true);
-        api_response::getInstance(true);
-        $this->controller = new api_controller();
-        $this->controller->process();
-        $this->loadResponse();
+        $request = $sc->request;
+        $response = new api_response();
+
+        $sc->routing->matchRoute($request);
+        $route = $sc->routing->getRoute();
+
+        $this->command = $this->getCommand($route['command'], array(), $request, $response);
+        $this->command->{$route['method']}();
+        $ext = isset($route['view']['class'])
+            ? $route['view']['class'] : $request->getExtension();
+
+        $view = $sc->$ext;
+        $view->setResponse($response);
+        $view->dispatch($this->command->getData());
+
+        $this->loadResponse($response, $ext);
         $this->removeUploadedFiles();
     }
 
@@ -131,13 +148,16 @@ abstract class api_testing_case_functional extends api_testing_case_phpunit {
      * May be overwritten in implementations where the response
      * is not expected to be XML.
      */
-    protected function loadResponse() {
-        $response = api_response::getInstance();
-        $resp = $response->getContents();
-        $this->responseDom = new DOMDocument();
-        $this->responseDom->loadXML($resp);
-        $this->assertIsA($this->responseDom, 'DOMDocument',
-            "The view didn't output valid XML. (%s)");
+    protected function loadResponse($response, $extension = "xml") {
+        $resp = $response->getContent();
+        $this->responseText = $resp;
+        if ($extension == 'xml' || $extension == 'html') {
+            $this->responseDom = new DOMDocument();
+            $method = 'load'.$extension;
+            $this->responseDom->$method($resp);
+            $this->assertIsA($this->responseDom, 'DOMDocument',
+                "The view didn't output valid XML. (%s)");
+        }
     }
 
     /**
@@ -147,7 +167,7 @@ abstract class api_testing_case_functional extends api_testing_case_phpunit {
      *
      * Example usage with file uploads:
      * \code
-     * $this->post('/test', array(
+     * $this->post('test', array(), array(
      *     'Type' => 'IMAGE',
      *     'File' => '@vw_golf.jpg',
      * ));
