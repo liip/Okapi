@@ -13,6 +13,11 @@ class api_init {
     /** bool: True if Okapi has been initialized already. Used so that
       * api_init::start() can be called repeatedly without problems. */
     private static $initialized = false;
+    
+    /**
+     * @var sfServiceContainer
+     */
+    private static $sc;
 
     /**
      * Sets up the Okapi environment.
@@ -72,7 +77,7 @@ class api_init {
      */
     public static function start() {
         if (self::$initialized) {
-            return;
+            return self::$sc;
         }
         if (!defined('DEVEL')) {
             define('DEVEL',0);
@@ -149,8 +154,8 @@ class api_init {
         if ($hostname != '') {
             $reqHostPath = $schema.'://'.$hostname;
             if (isset($_SERVER['SCRIPT_NAME']) && $_SERVER['SCRIPT_NAME'] != '/index.php') {
-               $reqHostPath .= substr($_SERVER['SCRIPT_NAME'],0,-9);
-            }  else {
+                $reqHostPath .= substr($_SERVER['SCRIPT_NAME'],0,-9);
+            } else {
                 $reqHostPath .= '/';
             }
         }
@@ -197,6 +202,7 @@ class api_init {
                 }
 
                 self::$initialized = true;
+                self::$sc = $sc;
                 return $sc;
             }
 
@@ -205,7 +211,8 @@ class api_init {
         } else {
             $serviceContainerClass = 'api_servicecontainer';
         }
-        return new $serviceContainerClass();
+        self::$sc = new $serviceContainerClass();
+        return self::$sc;
     }
 
     /**
