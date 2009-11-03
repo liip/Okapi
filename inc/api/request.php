@@ -45,9 +45,8 @@ class api_request {
      * Constructor. Parses the request and fills in all the
      * values it can.
      */
-    public function __construct($lang, $extensions, $mockSAPI = false) {
+    public function __construct($lang, $extensions) {
         $this->host = API_HOST;
-        $this->mockSAPI = $mockSAPI;
         $this->outputLangs = empty($lang['languages']) ? array('en') : $lang['languages'];
         $this->defaultLang = empty($lang['default']) ? reset($this->outputLangs) : $lang['default'];
         $this->forceLang = !empty($lang['forceLang']);
@@ -99,18 +98,16 @@ class api_request {
             /* if you set an extension: [xml, foo, rss, html] node in your
              * config file, only these extensions are valid extensions.
              * the rest is not parsed as an extension */
-            preg_match("#\.([a-z]+)$#", $this->filename, $matches);
-
             $aExtensions = $extensions['allowed'];
-            if (isset($matches[1]) && !empty($matches[1])) {
-                if (isset($aExtensions) && is_array($aExtensions)) {
-                    if (in_array($matches[1], $aExtensions)) {
-                        $this->extension = $matches[1];
-                    }
-                } else {
-                    $this->extension = $extensions['default'];
+
+            if (preg_match("#\.([a-z]+)$#", $this->filename, $matches)) {
+                if (is_array($aExtensions) && in_array($matches[1], $aExtensions)) {
+                    $this->extension = $matches[1];
                 }
             }
+        }
+        if (!$this->extension) {
+            $this->extension = $extensions['default'];
         }
     }
 
@@ -315,9 +312,6 @@ class api_request {
     }
 
     public function getSapi() {
-        if ($this->mockSAPI) {
-            return $this->mockSAPI;
-        }
         return PHP_SAPI;
     }
 }
