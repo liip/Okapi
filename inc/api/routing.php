@@ -90,6 +90,15 @@ class api_routing extends sfPatternRouting {
             $match = $match['_sf_route'];
             $match->mergeProperties();
         }
+        // reparse without trailing slash if we hit the home
+        // because /foo/ doesn't match /foo/:optionalparam for example
+        if ($match == $this->routes['default'] && $uri !== '/' && $uri !== '') {
+            $match = $this->parse(rtrim($uri, '/'));
+            if ($match) {
+                $match = $match['_sf_route'];
+                $match->mergeProperties();
+            }
+        }
         $this->route = $match;
         $this->request->setRoute($this->route);
         return $match;
