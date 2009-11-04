@@ -13,7 +13,7 @@ abstract class api_testing_case_functional extends api_testing_case_phpunit {
     protected $response;
     /** @var string response content */
     protected $responseText;
-    
+
     /** string: Original include path before setUp() was called. Used to
         recover the include path in the tearDown() method. */
     protected $includepathOriginal = '';
@@ -104,13 +104,13 @@ abstract class api_testing_case_functional extends api_testing_case_phpunit {
      */
     private function request($route, $routeParams, $params=array(), $extension=null) {
         $sc = api_init::start();
-        $path = $sc->routing->gen($route, $routeParams);
+        $path = $sc->routing->gen($route, (array) $routeParams);
 
         // append extension at the end or before get params
         if ($extension) {
             $path = preg_replace('{(\?.*$|$)}', '.'.$extension.'$1', $path);
         }
-        
+
         $_SERVER["REQUEST_URI"] = $path;
         $components = parse_url($path);
         $_GET = $_POST = $_REQUEST = $_FILES = array();
@@ -120,7 +120,7 @@ abstract class api_testing_case_functional extends api_testing_case_phpunit {
             parse_str($components['query'], $query);
             $_GET = $query;
         }
-        $_POST = $params;
+        $_POST = (array) $params;
         $this->uploadFiles($_POST, $_FILES);
         $_REQUEST = array_merge($_GET, $_POST);
 
