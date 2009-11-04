@@ -68,7 +68,7 @@ class api_routing extends sfPatternRouting {
     /**
      * @return api_routing_route the created route object
      */
-    public function route($name, $pattern, $options = array(), $requirements = array(), $defaults = array()) {
+    public function route($name, $pattern, $options = array(), $defaults = array(), $requirements = array()) {
         $route = new api_routing_route($pattern, $defaults, $requirements, $options);
         $this->appendRoute($name, $route);
         return $route;
