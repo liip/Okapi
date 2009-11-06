@@ -5,8 +5,6 @@
  * Instead api_controller::process() is called directly.
  */
 abstract class api_testing_case_functional extends api_testing_case_phpunit {
-    /** api_controller: Controller to handle requests. */
-    protected $controller;
     /** @var DOMDocument DOM instance containing the response if it's not json. */
     protected $responseDom;
     /** @var api_response response object */
@@ -14,54 +12,34 @@ abstract class api_testing_case_functional extends api_testing_case_phpunit {
     /** @var string response content */
     protected $responseText;
 
-    /** string: Original include path before setUp() was called. Used to
-        recover the include path in the tearDown() method. */
-    protected $includepathOriginal = '';
-
     /**
-     * Sets up the testing environment for the functional tests.
-     * Prepends the directory mocks/functional to the include
-     * path to make sure that the mock api_model_factory and
-     * api_response are used in all functional tests.
+     * @param string $name name of the command to create
+     * @param api_request $request instance of a request to use
+     * @param api_response $response response object, a default one will be created if not provided
+     * @return api_command
      */
-    function setUp() {
-        api_init::start();
-
-        // Set include path to include mock objects.
-        $this->includepathOriginal = get_include_path();
-        set_include_path(dirname(__FILE__).'/../mocks/functional/' .
-            PATH_SEPARATOR . get_include_path());
-        api_model_factory::reset();
-
-        parent::setUp();
-    }
-
-    /**
-     * Resets the testing environment. Reverts to the original include path.
-     */
-    function tearDown() {
-        set_include_path($this->includepathOriginal);
-        parent::tearDown();
-    }
+    abstract function getCommand($name, $request = null, $response = null);
 
     /**
      * Executes the given request internally using the GET method.
      * @param string $route the route name to call
      * @param array $params the route parameters
+     * @return string|array response text or command's data property if ext is json
      */
     protected function get($route, $params=array(), $extension=null) {
         $_SERVER['REQUEST_METHOD'] = 'GET';
-        $this->request($route, $params, array(), $extension);
+        return $this->request($route, $params, array(), $extension);
     }
 
     /**
      * Executes the given request internally using the HEAD method.
      * @param string $route the route name to call
      * @param array $params the route parameters
+     * @return string|array response text or command's data property if ext is json
      */
     protected function head($route, $params=array(), $extension=null) {
         $_SERVER['REQUEST_METHOD'] = 'HEAD';
-        $this->request($route, $params, array(), $extension);
+        return $this->request($route, $params, array(), $extension);
     }
 
     /**
@@ -69,10 +47,11 @@ abstract class api_testing_case_functional extends api_testing_case_phpunit {
      * @param string $route the route name to call
      * @param array $params the route parameters
      * @param array $post POST parameters to pass to the request.
+     * @return string|array response text or command's data property if ext is json
      */
     protected function post($route, $params=array(), $post=array(), $extension=null) {
         $_SERVER['REQUEST_METHOD'] = 'POST';
-        $this->request($route, $params, $post, $extension);
+        return $this->request($route, $params, $post, $extension);
     }
 
     /**
@@ -80,20 +59,22 @@ abstract class api_testing_case_functional extends api_testing_case_phpunit {
      * @param string $route the route name to call
      * @param array $params the route parameters
      * @param array $post POST parameters to pass to the request.
+     * @return string|array response text or command's data property if ext is json
      */
     protected function put($route, $params=array(), $post=array(), $extension=null) {
         $_SERVER['REQUEST_METHOD'] = 'PUT';
-        $this->request($route, $params, $post, $extension);
+        return $this->request($route, $params, $post, $extension);
     }
 
     /**
      * Executes the given request internally using the DELETE method.
      * @param string $route the route name to call
      * @param array $params the route parameters
+     * @return string|array response text or command's data property if ext is json
      */
     protected function delete($route, $params=array(), $extension=null) {
         $_SERVER['REQUEST_METHOD'] = 'DELETE';
-        $this->request($route, $params, array(), $extension);
+        return $this->request($route, $params, array(), $extension);
     }
 
     /**
@@ -101,6 +82,7 @@ abstract class api_testing_case_functional extends api_testing_case_phpunit {
      * @param string $route the route name to call
      * @param array $routeParams the route parameters
      * @param array $params POST parameters to pass to the request.
+     * @return string|array response text or command's data property if ext is json
      */
     private function request($route, $routeParams, $params=array(), $extension=null) {
         $sc = api_init::start();
@@ -111,14 +93,18 @@ abstract class api_testing_case_functional extends api_testing_case_phpunit {
             $path = preg_replace('{(\?.*$|$)}', '.'.$extension.'$1', $path);
         }
 
-        $_SERVER["REQUEST_URI"] = $path;
         $components = parse_url($path);
         $_GET = $_POST = $_REQUEST = $_FILES = array();
+        $_SERVER["REQUEST_URI"] = $components['path'];
 
         if (isset($components['query'])) {
+            $_SERVER['REQUEST_URI'] .= '?'.$components['query'];
             $query = array();
             parse_str($components['query'], $query);
             $_GET = $query;
+        }
+        if (isset($compoenents['fragment'])) {
+            $_SERVER['REQUEST_URI'] .= '#'.$components['fragment'];
         }
         $_POST = (array) $params;
         $this->uploadFiles($_POST, $_FILES);
@@ -130,8 +116,16 @@ abstract class api_testing_case_functional extends api_testing_case_phpunit {
         $sc->routing->matchRoute($request);
         $route = $sc->routing->getRoute();
 
-        $this->command = $this->getCommand($route['command'], array(), $request, $response);
-        $this->command->{$route['method']}();
+        $this->command = $this->getCommand($route['command'], $request, $response);
+        $method = $route['method'];
+        $allowed = $this->command->isAllowed();
+        if (!$allowed) {
+            throw new Exception('Calling this command was not allowed, isAllowed() returned false');
+        }
+        if (is_string($allowed)) {
+            $method = $allowed;
+        }
+        $this->command->{$method}();
         $ext = isset($route['view']['class'])
             ? $route['view']['class'] : $request->getExtension();
 
@@ -139,14 +133,17 @@ abstract class api_testing_case_functional extends api_testing_case_phpunit {
         $view->setResponse($response);
         $view->dispatch($this->command->getData());
 
-        $this->loadResponse($response, $ext);
         $this->removeUploadedFiles();
+        return $this->loadResponse($response, $ext);
     }
 
     /**
      * Loads the response into the DOM.
      * May be overwritten in implementations where the response
      * is not expected to be XML.
+     * @param api_response $response
+     * @param string $extension
+     * @return string|array response text or command's data property if ext is json
      */
     protected function loadResponse($response, $extension = "xml") {
         $resp = $response->getContent();
@@ -158,6 +155,10 @@ abstract class api_testing_case_functional extends api_testing_case_phpunit {
             $this->assertIsA($this->responseDom, 'DOMDocument',
                 "The view didn't output valid XML. (%s)");
         }
+        if ($extension == 'json') {
+            return $this->command->getData();
+        }
+        return $this->responseText;
     }
 
     /**
@@ -229,6 +230,20 @@ abstract class api_testing_case_functional extends api_testing_case_phpunit {
      */
     protected function getURI($route, $lang = 'de') {
         return API_HOST . $lang . API_MOUNTPATH . substr($route, 1);
+    }
+
+    /**
+     * Evaluates an xpath expression and returns the result or a DOMNodeList of all the matched nodes
+     */
+    protected function evaluateXPath($xpath) {
+        return api_helpers_xpath::evaluate($this->responseDom, $xpath);
+    }
+
+    /**
+     * Evaluates whether an xpath expression returns true
+     */
+    protected function assertXPathTrue($xpath, $message = null) {
+        $this->assertTrue($this->evaluateXPath($xpath), $message);
     }
 
     /**
@@ -317,22 +332,6 @@ abstract class api_testing_case_functional extends api_testing_case_phpunit {
      */
     public function assertAttribute($xpath, $expected, $message = '%s') {
         return $this->assertEqual($expected, $this->getAttribute($xpath), $message);
-    }
-
-    /**
-     * Expect the next request to redirect to the given page.
-     * @param $path string: Path to the page where the redirect should go to.
-     * @param $absolute bool: True if the given path is absolute. Otherwise
-     *                 the redirect is assumed to be inside the current
-     *                 application relative to the application root.
-     * @param $lang string: Language to which the redirect is expected. Only
-     *                      relevant is $absolute=false.
-     */
-    public function expectRedirect($path, $absolute = false, $lang = 'de') {
-        if (!$absolute) {
-            $path = '/' . $lang . API_MOUNTPATH . substr($path, 1);
-        }
-        $this->expectException(new api_testing_exception("Redirect 301 => $path"));
     }
 
     /**
