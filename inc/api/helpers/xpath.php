@@ -27,6 +27,17 @@ class api_helpers_xpath {
     }
 
     /**
+     * Evaluates an xpath expression and returns the result or a DOMNodeList of all the matched nodes
+     */
+    public static function evaluate($dom, $xpath) {
+        $xp = new DOMXPath($dom);
+        $xp->registerNamespace('x', 'http://www.w3.org/1999/xhtml');
+        $xp->registerNamespace('xhtml', 'http://www.w3.org/1999/xhtml');
+        $xp->registerNamespace('i18n', 'http://apache.org/cocoon/i18n/2.1');
+        return $xp->evaluate($xpath);
+    }
+
+    /**
      * Gets the node value of the first node found with the given XPath.
      * @param $dom DOMDocument: DOM to search in
      * @param $xpath string: XPath expression to search in DOM
