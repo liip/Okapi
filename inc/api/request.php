@@ -24,6 +24,8 @@ class api_request {
     protected $verb = '';
     /** Language for the current request. */
     protected $lang = '';
+    /** if the default language was used or not */
+    protected $langDefaultUsed = false;
     /** api_params: Request parameters. */
     protected $params = null;
     /** Filename extracted from the path. */
@@ -34,7 +36,6 @@ class api_request {
     protected $extensions = '';
     /** Copy of the $_COOKIES array to allow easier testing */
     protected $cookies;
-
     /**
      * Matched route
      * @var api_routing_route
@@ -45,11 +46,11 @@ class api_request {
      * Constructor. Parses the request and fills in all the
      * values it can.
      */
-    public function __construct($lang, $extensions) {
+    public function __construct($lang = null, $extensions = null) {
         $this->host = API_HOST;
         $this->outputLangs = empty($lang['languages']) ? array('en') : $lang['languages'];
         $this->defaultLang = empty($lang['default']) ? reset($this->outputLangs) : $lang['default'];
-        $this->forceLang = !empty($lang['forceLang']);
+        $this->forceLang = isset($lang['forceLang']) ? (bool)$lang['forceLang'] : true;
         $this->acceptBrowserLang = !empty($lang['acceptBrowserLang']);
         $this->cookies = $_COOKIE;
 
@@ -67,6 +68,7 @@ class api_request {
         $lang = $this->getLanguageFromPath($path);
         if ($lang !== null) {
             $this->lang = $lang['lang'];
+            $this->langDefaultUsed = $lang['defaultUsed'];
             $path = $lang['path'];
         }
 
@@ -82,6 +84,7 @@ class api_request {
         if ($this->lang === '') {
             $lang = $this->parseLanguage($path);
             $this->lang = $lang['lang'];
+            $this->langDefaultUsed = $lang['defaultUsed'];
             $path = $lang['path'];
         }
 
@@ -107,7 +110,7 @@ class api_request {
             }
         }
         if (!$this->extension) {
-            $this->extension = $extensions['default'];
+            $this->extension = isset($extensions['default']) ? $extensions['default'] : 'html';
         }
     }
 
@@ -117,6 +120,13 @@ class api_request {
     public function setRoute($route) {
         $this->route = $route;
         $this->params->setRoute($this->route->getParams());
+    }
+
+    /**
+     * Returns if the default lang was used
+     */
+    public function getLangDefaultUsed() {
+        return $this->langDefaultUsed;
     }
 
     /**
@@ -199,11 +209,13 @@ class api_request {
      * X-Cluster-Client-IP header.
      */
     public function getClientIp() {
-        $headers = array('HTTP_X_FORWARDED_FOR', 'HTTP_X_CLUSTER_CLIENT_IP',
-                         'HTTP_FORWARDED_FOR', 'HTTP_X_FORWARDED',
-                         'HTTP_FORWARDED', 'HTTP_VIA', 'HTTP_X_COMING_FROM',
-                         'HTTP_X_COMING_FROM', 'HTTP_COMING_FROM',
-                         'REMOTE_ADDR');
+        $headers = array(
+            'HTTP_X_FORWARDED_FOR', 'HTTP_X_CLUSTER_CLIENT_IP',
+            'HTTP_FORWARDED_FOR', 'HTTP_X_FORWARDED',
+            'HTTP_FORWARDED', 'HTTP_VIA', 'HTTP_X_COMING_FROM',
+            'HTTP_X_COMING_FROM', 'HTTP_COMING_FROM',
+            'REMOTE_ADDR'
+        );
         foreach ($headers as $header) {
             if (isset($_SERVER[$header])) {
                 return $_SERVER[$header];
@@ -270,8 +282,11 @@ class api_request {
         if (isset($matches[1]) && in_array($matches[1], $this->outputLangs)) {
             $lang = $matches[1];
             $newpath = (string) substr($path, 3);
-            return array('path' => $newpath,
-                         'lang' => $lang);
+            return array(
+                'path' => $newpath,
+                'lang' => $lang,
+                'defaultUsed' => false
+            );
         }
 
         return null;
@@ -299,16 +314,16 @@ class api_request {
             $accls = explode(",", $_SERVER['HTTP_ACCEPT_LANGUAGE']);
             foreach($accls as $accl) {
                 // Does not respect coefficient
-                $l = substr($accl, 0, 2);
-                if (in_array($l, $this->outputLangs)) {
-                    return array('path' => $newpath, 'lang' => $l);
+                $lang = substr($accl, 0, 2);
+                if (in_array($lang, $this->outputLangs)) {
+                    return array('path' => $newpath, 'lang' => $lang, 'defaultUsed' => false);
                 }
             }
         }
 
-        $lang = $this->forceLang ? $this->defaultLang : false;
+        $lang = $this->defaultLang;
 
-        return array('path' => $newpath, 'lang' => $lang);
+        return array('path' => $newpath, 'lang' => $lang, 'defaultUsed' => true);
     }
 
     public function getSapi() {
