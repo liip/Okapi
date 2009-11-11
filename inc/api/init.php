@@ -15,9 +15,9 @@ class api_init {
     private static $initialized = false;
 
     /**
-     * @var sfServiceContainer
+     * @var array bootstrap config array
      */
-    private static $sc;
+    private static $cfg;
 
     /**
      * Sets up the Okapi environment.
@@ -77,7 +77,7 @@ class api_init {
      */
     public static function start() {
         if (self::$initialized) {
-            return self::$sc;
+            return self::$cfg;
         }
         if (!defined('DEVEL')) {
             define('DEVEL',0);
@@ -180,6 +180,17 @@ class api_init {
         // Enable libxml internal errors
         libxml_use_internal_errors(true);
 
+        self::$initialized = true;
+        self::$cfg = $cfg;
+
+        return $cfg;
+    }
+
+    public static function createServiceContainer($cfg = null) {
+        if (is_null($cfg)) {
+            $cfg = self::start();
+        }
+
         // Create ServiceContainer
         if (isset($cfg['serviceContainer'])) {
             $api_container_file = empty($cfg['configCache'])
@@ -201,8 +212,6 @@ class api_init {
                     file_put_contents($api_container_file, $code);
                 }
 
-                self::$initialized = true;
-                self::$sc = $sc;
                 return $sc;
             }
 
@@ -211,8 +220,9 @@ class api_init {
         } else {
             $serviceContainerClass = 'api_servicecontainer';
         }
-        self::$sc = new $serviceContainerClass();
-        return self::$sc;
+
+        $sc = new $serviceContainerClass();
+        return $sc;
     }
 
     /**
