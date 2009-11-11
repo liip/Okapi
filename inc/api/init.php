@@ -13,7 +13,7 @@ class api_init {
     /** bool: True if Okapi has been initialized already. Used so that
       * api_init::start() can be called repeatedly without problems. */
     private static $initialized = false;
-    
+
     /**
      * @var sfServiceContainer
      */
@@ -150,18 +150,18 @@ class api_init {
         // Construct URL for Web home (root of current host)
         $hostname = (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '');
         $schema = (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == '443') ? 'https' : 'http';
-        $reqHostPath = '/';
+        define('API_HOST', $schema.'://' . $hostname);
+        // FIXME: this would be needed to support okapi installs inside a subdir of a domain
+        define('API_MOUNTPATH', '/');
+
+        $reqHostPath = '';
         if ($hostname != '') {
-            $reqHostPath = $schema.'://'.$hostname;
+            $reqHostPath = API_HOST;
             if (isset($_SERVER['SCRIPT_NAME']) && $_SERVER['SCRIPT_NAME'] != '/index.php') {
                 $reqHostPath .= substr($_SERVER['SCRIPT_NAME'],0,-9);
-            } else {
-                $reqHostPath .= '/';
             }
         }
-        define('API_HOST', $schema.'://' . $hostname);
-        define('API_WEBROOT', $reqHostPath);
-        define('API_MOUNTPATH', '/');
+        define('API_WEBROOT', $reqHostPath.'/');
 
         // Define webrootStatic constant. From config file or computed
         // from webroot.
