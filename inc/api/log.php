@@ -4,10 +4,13 @@
  */
 
 /**
- * Wrapper class for Zend_Log which reads configuration from api_config
- * and creates the corresponding Log objects.
+ * Wrapper class for Zend_Log
  *
- * The configured logger is available through api_log::$logger.
+ * Usage examples:
+ * $log->warn('message: %s', $someError)
+ * $log->log(api_log::WARN, 'message: %s', $someError)
+ * @see __call()
+ * @see log()
  */
 class api_log {
 
@@ -21,16 +24,16 @@ class api_log {
     const DEBUG = 7; // Debug: debug messages
 
     protected $masks = array(
-        'EMERG' => api_log::EMERG,
-        'ALERT' => api_log::ALERT,
-        'CRIT' => api_log::CRIT,
-        'FATAL' => Zend_Log::CRIT,
-        'ERR' => api_log::ERR,
-        'ERROR' => Zend_Log::ERR,
-        'WARN' => api_log::WARN,
-        'NOTICE' => api_log::NOTICE,
-        'INFO' => api_log::INFO,
-        'DEBUG' => api_log::DEBUG
+        'EMERG' => self::EMERG,
+        'ALERT' => self::ALERT,
+        'CRIT' => self::CRIT,
+        'FATAL' => self::CRIT,
+        'ERR' => self::ERR,
+        'ERROR' => self::ERR,
+        'WARN' => self::WARN,
+        'NOTICE' => self::NOTICE,
+        'INFO' => self::INFO,
+        'DEBUG' => self::DEBUG
     );
 
     /** Log: Configured logger. */
@@ -58,9 +61,17 @@ class api_log {
         }
     }
 
+    /**
+     * call this class with any of the defined constants as the method
+     * name to easily log a message with that priority level
+     *
+     * i.e. $log->warn('message: %s', $someError) equals $log->log(api_log::WARN, 'message: %s', $someError)
+     *
+     * any extra parameter following the message will be used to inject data in the message through vsprintf
+     */
     public function __call($method, $params) {
-        $prio = $this->getMaskFromLevel($method);
-        $this->logMessage($params, $prio);
+        $priority = $this->getMaskFromLevel($method);
+        $this->logMessage($priority, $params);
     }
 
     public function isLogging() {
@@ -80,8 +91,13 @@ class api_log {
 
     /**
      * Log a message if a logger is configured
+     *
+     * @param int $priority one of the api_log constants defining the logging priority or a string (see __call)
+     * @param string $message the message value
+     * @param mixed $rest any other parameter will be used to inject data in the message through vsprintf
+     * @return bool success
      */
-    public function log($prio) {
+    public function log($priority, $message = "") {
         if ($this->logger === false) {
             return false;
         }
@@ -89,10 +105,16 @@ class api_log {
         $params = func_get_args();
         array_shift($params);
 
-        return $this->logMessage($params, $prio);
+        if (is_string($priority)) {
+            $priority = $this->getMaskFromLevel($priority);
+        }
+        return $this->logMessage($priority, $params);
     }
 
-    protected function logMessage($params, $prio) {
+    /**
+     * sends the message to the internal logger instance
+     */
+    protected function logMessage($priority, $params) {
         if ($this->logger === false) {
             return false;
         }
@@ -102,10 +124,10 @@ class api_log {
             $message = vsprintf($message, $params);
         }
 
-        if (!is_int($prio)) {
-            $prio = $this->defaultPriority;
+        if (!is_int($priority)) {
+            $priority = $this->defaultPriority;
         }
 
-        return $this->logger->log($message, $prio);
+        return $this->logger->log($message, $priority);
     }
 }
