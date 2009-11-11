@@ -11,14 +11,18 @@ abstract class api_testing_case_functional extends api_testing_case_phpunit {
     protected $response;
     /** @var string response content */
     protected $responseText;
+    /** @var sfServiceContainer service container instance */
+    protected $sc;
 
     /**
-     * @param string $name name of the command to create
-     * @param api_request $request instance of a request to use
-     * @param api_response $response response object, a default one will be created if not provided
-     * @return api_command
+     * Set mocked services
      */
-    abstract function getCommand($name, $request = null, $response = null);
+    abstract function setMockedServices($sc = null);
+
+    public function tearDown() {
+        unset($this->sc);
+        parent::tearDown();
+    }
 
     /**
      * Executes the given request internally using the GET method.
@@ -85,8 +89,9 @@ abstract class api_testing_case_functional extends api_testing_case_phpunit {
      * @return string|array response text or command's data property if ext is json
      */
     private function request($route, $routeParams, $params=array(), $extension=null) {
-        $sc = api_init::start();
-        $path = $sc->routing->gen($route, (array) $routeParams);
+        $this->sc = api_init::createServiceContainer();
+        $this->sc->routingcontainer;
+        $path = $this->sc->routing->gen($route, (array) $routeParams);
 
         // append extension at the end or before get params
         if ($extension) {
@@ -110,13 +115,16 @@ abstract class api_testing_case_functional extends api_testing_case_phpunit {
         $this->uploadFiles($_POST, $_FILES);
         $_REQUEST = array_merge($_GET, $_POST);
 
-        $request = $sc->request;
-        $response = new api_response();
+        $this->sc = api_init::createServiceContainer();
+        $this->sc->routingcontainer;
 
-        $sc->routing->matchRoute($request);
-        $route = $sc->routing->getRoute();
+        $request = $this->sc->request;
 
-        $this->command = $this->getCommand($route['command'], $request, $response);
+        $this->sc->routing->matchRoute($request);
+        $route = $this->sc->routing->getRoute();
+
+        $this->setMockedServices($this->sc);
+        $this->command = $this->sc->getService('api_command_'.$route['command']);
         $method = $route['method'];
         $allowed = $this->command->isAllowed();
         if (!$allowed) {
@@ -129,12 +137,12 @@ abstract class api_testing_case_functional extends api_testing_case_phpunit {
         $ext = isset($route['view']['class'])
             ? $route['view']['class'] : $request->getExtension();
 
-        $view = $sc->$ext;
-        $view->setResponse($response);
+        $view = $this->sc->$ext;
+        $view->setResponse($this->sc->response);
         $view->dispatch($this->command->getData());
 
         $this->removeUploadedFiles();
-        return $this->loadResponse($response, $ext);
+        return $this->loadResponse($this->sc->response, $ext);
     }
 
     /**
