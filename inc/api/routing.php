@@ -161,6 +161,10 @@ class api_routing_route extends sfRoute implements ArrayAccess, Countable {
         return $this;
     }
 
+    public function setViewParam($param, $value) {
+        $this->options['view'][$param] = $value;
+    }
+
     /**
      * merges the parsed parameters from the url into the options array so we
      * can read from one place, shouldn't be called except from api_routing
