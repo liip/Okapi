@@ -241,15 +241,14 @@ class api_controller {
      */
     public function getViewName($route, $request, $response) {
         $viewParams = $this->initViewParams($route, $response);
-        //FIXME: needed BC? getViewName needs $route['namespace'] and $route['view']['omitextension']
         $route['view'] = $viewParams;
-        if (empty($viewParams) || (empty($viewParams['ignore']))) {
-            if (isset($viewParams) && isset($viewParams['class'])) {
+        if (empty($viewParams) || empty($viewParams['ignore'])) {
+            if (isset($viewParams['class'])) {
                 $viewName = $viewParams['class'];
             } else {
-                $viewName = 'default';
+                $viewName = $request->getExtension();
             }
-            return api_view::getViewName($viewName, $request, $route);
+            return $viewName;
         }
 
         // Ignore view
