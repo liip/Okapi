@@ -63,7 +63,9 @@ abstract class api_command {
         $this->request = $request;
         $this->response = $response;
         $this->config = $config;
+        $this->response->command = $this;
         $this->response->getDataCallback = array($this,'getData');
+        $this->command = api_helpers_class::getBaseName($this);
     }
 
     public function postAction() {
@@ -141,9 +143,8 @@ abstract class api_command {
     public function getData() {
         $dom = new DOMDocument();
         $dom->loadXML("<command/>");
-        $commandname = api_helpers_class::getBaseName($this);
         $cmdNode = $dom->documentElement;
-        $cmdNode->setAttribute("name", $commandname);
+        $cmdNode->setAttribute("name", $this->command);
 
         foreach ($this->data as $d) {
             $dataDom = $d->getDOM();
