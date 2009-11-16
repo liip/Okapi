@@ -17,7 +17,14 @@ abstract class api_testing_case_functional extends api_testing_case_phpunit {
     /**
      * Set mocked services
      */
-    abstract function setMockedServices($sc = null);
+    public function setMockedServices($sc, $mocks = array()) {
+        if (!is_array($mocks)) {
+            return;
+        }
+        foreach ($mocks as $service => $object) {
+            $sc->setService($service, $object);
+        }
+    }
 
     public function tearDown() {
         unset($this->sc);
@@ -30,20 +37,22 @@ abstract class api_testing_case_functional extends api_testing_case_phpunit {
      * @param array $params the route parameters
      * @return string|array response text or command's data property if ext is json
      */
-    protected function get($route, $params=array(), $extension=null) {
+    protected function get($route, $params=array(), $mocks=array(), $extension=null) {
         $_SERVER['REQUEST_METHOD'] = 'GET';
-        return $this->request($route, $params, array(), $extension);
+        return $this->request($route, $params, array(), $mocks, $extension);
     }
 
     /**
      * Executes the given request internally using the HEAD method.
      * @param string $route the route name to call
      * @param array $params the route parameters
+     * @param array $mocks mocked services that will be injected into the service container before execution
+     * @param string $extension allows the query's extension to be specified
      * @return string|array response text or command's data property if ext is json
      */
-    protected function head($route, $params=array(), $extension=null) {
+    protected function head($route, $params=array(), $mocks=array(), $extension=null) {
         $_SERVER['REQUEST_METHOD'] = 'HEAD';
-        return $this->request($route, $params, array(), $extension);
+        return $this->request($route, $params, array(), $mocks, $extension);
     }
 
     /**
@@ -51,11 +60,13 @@ abstract class api_testing_case_functional extends api_testing_case_phpunit {
      * @param string $route the route name to call
      * @param array $params the route parameters
      * @param array $post POST parameters to pass to the request.
+     * @param array $mocks mocked services that will be injected into the service container before execution
+     * @param string $extension allows the query's extension to be specified
      * @return string|array response text or command's data property if ext is json
      */
-    protected function post($route, $params=array(), $post=array(), $extension=null) {
+    protected function post($route, $params=array(), $post=array(), $mocks=array(), $extension=null) {
         $_SERVER['REQUEST_METHOD'] = 'POST';
-        return $this->request($route, $params, $post, $extension);
+        return $this->request($route, $params, $post, $mocks, $extension);
     }
 
     /**
@@ -63,22 +74,26 @@ abstract class api_testing_case_functional extends api_testing_case_phpunit {
      * @param string $route the route name to call
      * @param array $params the route parameters
      * @param array $post POST parameters to pass to the request.
+     * @param array $mocks mocked services that will be injected into the service container before execution
+     * @param string $extension allows the query's extension to be specified
      * @return string|array response text or command's data property if ext is json
      */
-    protected function put($route, $params=array(), $post=array(), $extension=null) {
+    protected function put($route, $params=array(), $post=array(), $mocks=array(), $extension=null) {
         $_SERVER['REQUEST_METHOD'] = 'PUT';
-        return $this->request($route, $params, $post, $extension);
+        return $this->request($route, $params, $post, $mocks, $extension);
     }
 
     /**
      * Executes the given request internally using the DELETE method.
      * @param string $route the route name to call
      * @param array $params the route parameters
+     * @param array $mocks mocked services that will be injected into the service container before execution
+     * @param string $extension allows the query's extension to be specified
      * @return string|array response text or command's data property if ext is json
      */
-    protected function delete($route, $params=array(), $extension=null) {
+    protected function delete($route, $params=array(), $mocks=array(), $extension=null) {
         $_SERVER['REQUEST_METHOD'] = 'DELETE';
-        return $this->request($route, $params, array(), $extension);
+        return $this->request($route, $params, array(), $mocks, $extension);
     }
 
     /**
@@ -86,9 +101,11 @@ abstract class api_testing_case_functional extends api_testing_case_phpunit {
      * @param string $route the route name to call
      * @param array $routeParams the route parameters
      * @param array $params POST parameters to pass to the request.
+     * @param array $mocks mocked services that will be injected into the service container before execution
+     * @param string $extension allows the query's extension to be specified
      * @return string|array response text or command's data property if ext is json
      */
-    private function request($route, $routeParams, $params=array(), $extension=null) {
+    private function request($route, $routeParams, $params=array(), $mocks=array(), $extension=null) {
         $this->sc = api_init::createServiceContainer();
         $this->sc->routingcontainer;
         $path = $this->sc->routing->gen($route, (array) $routeParams);
@@ -123,7 +140,7 @@ abstract class api_testing_case_functional extends api_testing_case_phpunit {
         $this->sc->routing->matchRoute($request);
         $route = $this->sc->routing->getRoute();
 
-        $this->setMockedServices($this->sc);
+        $this->setMockedServices($this->sc, $mocks);
         $this->command = $this->sc->getService('api_command_'.$route['command']);
         $method = $route['method'];
         $allowed = $this->command->isAllowed();
