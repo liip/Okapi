@@ -40,4 +40,12 @@ abstract class api_testing_case_phpunit extends PHPUnit_Framework_Testcase {
         }
         $this->expectException(new api_testing_exception("Redirect $code => $path"));
     }
+
+
+    protected function prepareTemplate(PHPUnit_Util_Template $template) {
+        parent::prepareTemplate($template);
+        // use custom process-isolation template
+        $template->setFile(dirname(__FILE__).'/template.tpl');
+        $template->setVar(array('bootstrap' => API_PROJECT_DIR . 'tests/bootstrap.php'));
+    }
 }
