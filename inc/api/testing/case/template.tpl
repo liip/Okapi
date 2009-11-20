@@ -1,7 +1,5 @@
 <?php
 set_include_path('{include_path}');
-
-require_once '{bootstrap}';
 require_once 'PHPUnit/Framework.php';
 ob_start();
 
@@ -32,6 +30,7 @@ function __phpunit_run_isolated_test()
     ob_start();
 }
 
+$loadSC = true;
 if (isset($GLOBALS['__PHPUNIT_BOOTSTRAP'])) {
     require_once $GLOBALS['__PHPUNIT_BOOTSTRAP'];
     unset($GLOBALS['__PHPUNIT_BOOTSTRAP']);

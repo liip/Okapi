@@ -46,6 +46,5 @@ abstract class api_testing_case_phpunit extends PHPUnit_Framework_Testcase {
         parent::prepareTemplate($template);
         // use custom process-isolation template
         $template->setFile(dirname(__FILE__).'/template.tpl');
-        $template->setVar(array('bootstrap' => API_PROJECT_DIR . 'tests/bootstrap.php'));
     }
 }
