@@ -51,10 +51,10 @@ class autoload {
         <lsmith> ich glaube jetzt iterieren sie ueber den include path
         */
 
-        $incFile = str_replace("_", DIRECTORY_SEPARATOR, $class).".php";
-        if (@fopen($incFile, "r", true)) {
-            include($incFile);
-            return $incFile;
+        $inc_file = str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
+        if (@fopen($inc_file, 'r', true)) {
+            include($inc_file);
+            return $inc_file;
         }
 
         // load class file map if not yet done
@@ -63,17 +63,15 @@ class autoload {
             if (!self::$cache || !file_exists($class_file_map)) {
                 self::$class_file_map = autoload::generateClassFileMap($class_file_map);
             } else {
-                if (include $class_file_map) {
-                    self::$class_file_map = $mapping;
-                }
+                self::$class_file_map = include $class_file_map;
             }
         }
 
         // check class file map
         if (self::$class_file_map && isset(self::$class_file_map[$class])) {
-            $incFile = self::$class_file_map[$class];
-            include($incFile);
-            return $incFile;
+            $inc_file = self::$class_file_map[$class];
+            include $inc_file;
+            return $inc_file;
         }
 
         return false;
@@ -130,7 +128,7 @@ class autoload {
         }
 
         if (self::$cache) {
-            $mappingstring = '<?php $mapping = '. var_export($mapping, true).'; return true;';
+            $mappingstring = '<?php return '. var_export($mapping, true).';';
             file_put_contents($cache_file, $mappingstring);
         }
 
