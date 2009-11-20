@@ -136,6 +136,7 @@ abstract class api_testing_case_functional extends api_testing_case_phpunit {
         $this->sc->routingcontainer;
 
         $request = $this->sc->request;
+        $response = $this->sc->response;
 
         $this->sc->routing->matchRoute($request);
         $route = $this->sc->routing->getRoute();
@@ -153,13 +154,14 @@ abstract class api_testing_case_functional extends api_testing_case_phpunit {
         $this->command->{$method}();
         $ext = isset($route['view']['class'])
             ? $route['view']['class'] : $request->getExtension();
+        $response->viewParams = array_merge($route['view'], $response->viewParams);
 
         $view = $this->sc->$ext;
-        $view->setResponse($this->sc->response);
+        $view->setResponse($response);
         $view->dispatch($this->command->getData());
 
         $this->removeUploadedFiles();
-        return $this->loadResponse($this->sc->response, $ext);
+        return $this->loadResponse($response, $ext);
     }
 
     /**
