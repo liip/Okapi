@@ -61,9 +61,6 @@ class autoload {
         if (is_null(self::$class_file_map)) {
             $class_file_map = self::getClassFileMapCacheName();
             if (!self::$cache || !file_exists($class_file_map)) {
-                if (!self::$dirs) {
-                    self::initDirs();
-                }
                 self::$class_file_map = autoload::generateClassFileMap($class_file_map);
             } else {
                 if (include $class_file_map) {
@@ -92,6 +89,10 @@ class autoload {
      * @param $dir string: Name of the root path from which to search
      */
     public static function generateClassFileMap($cache_file) {
+        if (!self::$dirs) {
+            self::initDirs();
+        }
+
         $mapping = array();
         foreach (self::$dirs as $dir => $style) {
             // TODO: ignore .svn etc directories
