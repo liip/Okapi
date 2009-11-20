@@ -244,13 +244,10 @@ class api_response {
     public function getContent() {
         $content = '';
         if ($this->buffer) {
-            while (ob_get_level()) {
-                $content .=  ob_get_contents();
-                ob_end_clean();
-            }
+            $content .=  ob_get_clean();
             $this->buffer = false;
         }
-        $this->content = $this->content . $content;
+        $this->content .= $content;
         return $this->content;
 
     }
@@ -258,9 +255,7 @@ class api_response {
     public function setContent($content) {
         //clear flush
         if ($this->buffer) {
-            while (ob_get_level()) {
-                ob_end_clean();
-            }
+            ob_end_clean();
             $this->buffer = false;
         }
         $this->content = $content;
