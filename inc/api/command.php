@@ -92,6 +92,13 @@ abstract class api_command {
     public function process() {
         $route = $this->route->getParams();
         if (isset($route['method']) && $route['method'] != 'process') {
+            $method = 'execute'.ucfirst($route['method']);
+            if (method_exists($this, $method) || is_callable(array($this, $method))) {
+                $this->$method();
+                return $this->response;
+            }
+            // TODO: remove BC hack
+            trigger_error('Please update '.$this->command.'::'.$route['method'].' to be prefixed with "execute"', E_USER_NOTICE);
             if (method_exists($this, $route['method']) || is_callable(array($this, $route['method']))) {
                 $this->{$route['method']}();
                 return $this->response;

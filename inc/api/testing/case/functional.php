@@ -151,6 +151,7 @@ abstract class api_testing_case_functional extends api_testing_case_phpunit {
         if (is_string($allowed)) {
             $method = $allowed;
         }
+        $method = 'execute'.ucfirst($method);
         $this->command->{$method}();
         $ext = isset($route['view']['class'])
             ? $route['view']['class'] : $request->getExtension();
