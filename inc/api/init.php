@@ -122,11 +122,18 @@ class api_init {
         $cachefile = self::getCacheFilename('bootstrap', $_SERVER['OKAPI_ENV']);
         if (file_exists($cachefile)) {
             $cfg = unserialize(file_get_contents($cachefile));
-        } else {
+            if ($cfg['configCache'] === 'auto'
+                && $cfg['cachetime'] < filemtime(API_PROJECT_DIR . 'conf/bootstrap.yml')
+            ) {
+                unset($cfg);
+            }
+        }
+        if (empty($cfg)) {
             require_once API_LIBS_DIR.'/vendor/symfony/sfYaml/sfYaml.php';
             $cfg = sfYaml::load(API_PROJECT_DIR . 'conf/bootstrap.yml');
             $cfg = isset($cfg[$_SERVER['OKAPI_ENV']]) ? $cfg[$_SERVER['OKAPI_ENV']] : $cfg['default'];
             if (!empty($cfg['configCache'])) {
+                $cfg['cachetime'] = $_SERVER['REQUEST_TIME'];
                 file_put_contents($cachefile, serialize($cfg));
             }
         }
