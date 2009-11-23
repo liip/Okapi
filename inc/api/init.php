@@ -201,7 +201,10 @@ class api_init {
                 $sc = new sfServiceContainerBuilder();
                 $loader = $cfg['serviceContainer']['loader'];
                 $loader = new $loader($sc);
-                $loader->load(API_PROJECT_DIR.'conf/'.$cfg['serviceContainer']['file']);
+                $file = isset($cfg['serviceContainer']['file'])
+                    ? $cfg['serviceContainer']['file'] : $_SERVER['OKAPI_ENV'];
+                $file.= $cfg['serviceContainer']['extension'];
+                $loader->load(API_PROJECT_DIR.'conf/servicecontainer/'.$file);
 
                 if ($api_container_file) {
                     $dumper = new sfServiceContainerDumperPhp($sc);
