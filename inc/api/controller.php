@@ -54,11 +54,10 @@ class api_controller {
      * Constructor. Gets instances of api_request and api_response
      * but doesn't yet do anything else.
      */
-    public function __construct(api_request $request, api_routing $routing, api_config $config, $filters = false) {
+    public function __construct(api_request $request, api_routing $routing, $filters = false) {
 
         $this->request = $request;
         $this->routing = $routing;
-        $this->config = $config;
         $this->filters = $filters;
     }
 
@@ -200,7 +199,7 @@ class api_controller {
         } else {
             $route['namespace'] = API_NAMESPACE;
         }
-        $this->config->load($route['command']);
+
         return $route['namespace'].'_command_' . $route['command'];
     }
 
@@ -217,9 +216,7 @@ class api_controller {
         if (!$allowed) {
             throw new api_exception_commandNotAllowed("Command access not allowed: ".get_class($command));
         }
-        if (is_string($allowed)) {
-            $this->route->config(array('method' => $allowed));
-        }
+
         if (is_callable(array($command, 'preAction'))) {
             call_user_func(array($command, 'preAction'));
         }
