@@ -16,6 +16,7 @@ class autoload {
     static $cache = true;
     static $dirs = false;
     static $class_file_map;
+    static $reloaded = false;
 
     static public function initDirs() {
         self::$dirs = array(
@@ -40,18 +41,12 @@ class autoload {
      * @param $class string: Name of class to load.
      */
     public static function load($class) {
+        $inc_file = str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
+
         /*
         * Well, we could prevent a fatal error with checking if the file exists..
         * This would result in a nice fatal error exception page.. do we want this?
         */
-
-        /*  TODO: Look into fopen use:
-        <lsmith> chregu: jo .. Wez meinte das kann zu race conditions, locking problemen etc fuehren
-        <lsmith> ZF hat das frueher auch so gemacht
-        <lsmith> ich glaube jetzt iterieren sie ueber den include path
-        */
-
-        $inc_file = str_replace('_', DIRECTORY_SEPARATOR, $class).'.php';
         if (@fopen($inc_file, 'r', true)) {
             include($inc_file);
             return $inc_file;
@@ -74,6 +69,18 @@ class autoload {
             return $inc_file;
         }
 
+        if (!self::$reloaded) {
+            self::$reloaded = true;
+            if (self::$cache === 'auto') {
+                $class_file_map = self::getClassFileMapCacheName();
+                if (file_exists($class_file_map)) {
+                    self::$class_file_map = null;
+                    unlink($class_file_map);
+                    self::load($class);
+                }
+            }
+        }
+
         return false;
     }
 
@@ -87,6 +94,8 @@ class autoload {
      * @param $dir string: Name of the root path from which to search
      */
     public static function generateClassFileMap($cache_file) {
+        self::$reloaded = true;
+
         if (!self::$dirs) {
             self::initDirs();
         }

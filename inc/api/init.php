@@ -135,9 +135,7 @@ class api_init {
         if (empty($cfg['autoload'])) {
             $autoload = API_LIBS_DIR."autoload.php";
             require_once $autoload;
-            if (empty($cfg['configCache'])) {
-                autoload::$cache = false;
-            }
+            autoload::$cache = empty($cfg['configCache']) ? false : $cfg['configCache'];
             if (isset($cfg['dirs'])) {
                 autoload::initDirs();
                 autoload::setCustomDirs($dirs);
