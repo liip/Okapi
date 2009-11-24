@@ -202,7 +202,8 @@ class api_init {
                 ? false
                 : self::getCacheFilename('servicecontainer', $_SERVER['OKAPI_ENV']);
 
-            if (!$api_container_file || !file_exists($api_container_file)) {
+            // TODO: reenable config caching once we have a fix for http://trac.symfony-project.org/ticket/7677
+            if (true || !$api_container_file || !file_exists($api_container_file)) {
                 $sc = new sfServiceContainerBuilder();
                 $loader = $cfg['serviceContainer']['loader'];
                 $loader = new $loader($sc);
