@@ -50,26 +50,24 @@ class api_controller {
 
     protected $dispatcher = null;
 
+    protected $requestFilters = array();
+
     /**
      * Constructor. Gets instances of api_request and api_response
      * but doesn't yet do anything else.
      */
-    public function __construct(api_request $request, api_routing $routing, $filters = false) {
-
+    public function __construct(api_request $request, api_routing $routing, array $events = array()) {
         $this->request = $request;
         $this->routing = $routing;
-        $this->filters = $filters;
+        $this->events = $events;
     }
 
     public function run() {
-        $this->dispatcher = $this->sc->sfEventDispatcher;
+        $this->dispatcher = $this->sc->dispatcher;
 
-        if (!is_array($this->filters)) {
-            $this->filters = array('request'=>array('controller' => null));
-        } elseif (!isset($this->filters['request'])) {
-            $this->filters['request'] = array('controller' => null);
-        } elseif (!isset($this->filters['request']['controller'])) {
-            $this->filters['request'] = array_merge(array('controller'=> null), $this->filters['request']);
+        if (isset($this->events['application.request'])) {
+            $this->requestFilters = $this->events['application.request'];
+            unset($this->events['application.request']);
         }
 
         $this->dispatcher->connect('application.request', array(
@@ -93,16 +91,23 @@ class api_controller {
             'exception'
         ));
 
-        if (isset($this->filters['response'])) {
-            foreach ($this->filters['response'] as $r => $v) {
-                $this->dispatcher->connect('application.response', array(
-                    $this->sc->getService($r),
-                    'response'
+        foreach ($this->events as $event => $handler) {
+            $controller_connected = false;
+            foreach ($handler as $callable) {
+                if (is_string($callable['service'])) {
+                    $callable['service'] = $this->sc->getService($callable['service']);
+                }
+                if (!$controller_connected && $callable['service'] === $this) {
+                    $controller_connected = true;
+                }
+                $this->dispatcher->connect($event, array(
+                    $callable['service'],
+                    $callable['method']
                 ));
             }
         }
 
-        $handler = $this->sc->sfRequestHandler;
+        $handler = $this->sc->requesthandler;
         $response = $handler->handle($this->request);
         return $response;
     }
@@ -114,7 +119,7 @@ class api_controller {
     public function exception(sfEvent $event) {
 
         //FIXME: This is another approach than we took in Okapi1.
-        // I'm not sure it's better, but it usess the exceptionhandler of sfRequestHandler
+        // I'm not sure it's better, but it uses the exceptionhandler of sfRequestHandler
         // Maybe we should mix it
         $r = $this->sc->response_exception;
         $r->data = $event['exception'];
@@ -124,11 +129,12 @@ class api_controller {
     }
 
     public function requestDispatcher(sfEvent $event) {
-        while ($current = array_splice($this->filters['request'], 0, 1)) {
-            $class = $this->sc->getService(key($current));
-            if ($class->request($event)) {
-                return true;
+        foreach ($this->requestFilters as $callable) {
+            if (is_string($callable['service'])) {
+                $callable['service'] = $callable['service'] === ' controller'
+                    ? $this : $this->sc->getService($callable['service']);
             }
+            $callable['service']->{$callable['method']}($event);
         }
     }
 
