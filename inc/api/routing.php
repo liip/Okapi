@@ -51,7 +51,8 @@ class api_routing extends sfPatternRouting {
         if ($this->routes[$name]['ssl'] && substr(API_HOST, 0, 5) !== 'https') {
             return str_replace('http://', 'https://', API_HOST).'/'.$this->request->getLang().$url;
         }
-        // TODO make it optional somehow and handle the left|right positioning by reading api_request settings
+
+        // TODO make this optional and handle the left|right positioning by reading api_request settings
         return '/'.$this->request->getLang().$url;
     }
 
@@ -110,29 +111,18 @@ class api_routing extends sfPatternRouting {
      */
     protected function getRouteThatMatchesUrl($url)
     {
-        /** -- added code -- */
         $ext = $this->request->getExtension();
         $len = strlen($ext);
-        if (substr($url, -$len-1) == '.'.$ext) {
-            $urlNoExt = substr($url, 0, -$len-1);
-        } else {
-            $urlNoExt = $url;
-        }
+        $urlNoExt = substr($url, -$len-1) == '.'.$ext
+            ? substr($url, 0, -$len-1) : $url;
         $baseUrl = $url;
-        /** -- end -- */
 
-        foreach ($this->routes as $name => $route)
-        {
+        foreach ($this->routes as $name => $route) {
             $route->setDefaultParameters($this->defaultParameters);
 
-            /** -- added code -- */
             // Remove the extension if the user wished so
-            if (isset($route['optionalextension']) && $route['optionalextension']) {
-                $url = $urlNoExt;
-            } else {
-                $url = $baseUrl;
-            }
-            /** -- end -- */
+            $url = (isset($route['optionalextension']) && $route['optionalextension'])
+                ? $urlNoExt : $baseUrl;
 
             if (false === $parameters = $route->matchesUrl($url, $this->options['context'])) {
                 continue;
