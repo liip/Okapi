@@ -34,7 +34,7 @@ class api_helpers_string {
             }
         } else {
             $str = self::ensureUtf8($str);
-            $str = str_replace(array("\t", "\n", "\r", NULL, "\x00"), " ", $str);
+            $str = str_replace(array("\t", "\n", "\r", "\x00"), " ", $str);
             $str = preg_replace('/\p{Cc}/u', '', $str);
         }
         return $str;
