@@ -13,7 +13,7 @@ class api_helpers_string {
      * @param $str string: String to escape.
      * @return string: Escaped value.
      */
-    static function escapeJSValue($str) {
+    public static function escapeJSValue($str) {
         return str_replace(
                 array("'", "\n", "\r"),
                 array("\\'", "\\n", "\\r"),
@@ -27,7 +27,7 @@ class api_helpers_string {
      * @param $str mixed: String or array to process.
      * @return mixed: Converted input value.
      */
-    static function clearControlChars($str) {
+    public static function clearControlChars($str) {
         if (is_array($str)) {
             foreach($str as $key => $value) {
                 $str[$key] = self::clearControlChars($value);
@@ -65,14 +65,13 @@ class api_helpers_string {
      * @param $str string: String to convert.
      * @return string: Converted input string.
      */
-    static function ensureUtf8($str) {
+    public static function ensureUtf8($str) {
         if (self::isUtf8($str)) {
             return $str;
-        } else {
-            $str = iconv("ISO-8859-1", "UTF-8//ignore", $str);
-            $str = preg_replace('/\p{Cc}/u', '', $str);
-            return $str;
         }
+        $str = iconv("ISO-8859-1", "UTF-8//ignore", $str);
+        $str = preg_replace('/\p{Cc}/u', '', $str);
+        return $str;
     }
 
     /**
@@ -81,7 +80,7 @@ class api_helpers_string {
      * @param $str string: String to clean.
      * @return string: Cleaned input string.
      */
-    static function clean($str) {
+    public static function clean($str) {
         return preg_replace("/[^\w^\d^_^-]*/", "", $str);
     }
 
@@ -90,7 +89,7 @@ class api_helpers_string {
      * @param $str string: String to convert.
      * @return string: Converted string.
      */
-    static function removeDoubleSlashes($str) {
+    public static function removeDoubleSlashes($str) {
         return preg_replace('#/{2,}#', '/', $str);
     }
 
