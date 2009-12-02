@@ -103,12 +103,11 @@ class api_helpers_string {
      * @param $input string: Input to compare against the pattern.
      */
     public static function matchWildcard($pattern, $input) {
-        if (strpos($pattern, '*') !== false) {
-            // Wildcard match
-            $pattern = str_replace('\\*', '.*', preg_quote($pattern));
-            return (preg_match('/' . $pattern . '/', $input) > 0);
-        } else {
-            return ($pattern == $input);
+        if (strpos($pattern, '*') === false) {
+            return $pattern == $input;
         }
+        // Wildcard match
+        $pattern = str_replace('\\*', '.*', preg_quote($pattern));
+        return (preg_match('/^' . $pattern . '$/', $input) > 0);
     }
 }
