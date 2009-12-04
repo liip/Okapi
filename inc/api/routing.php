@@ -14,6 +14,12 @@ class api_routing extends sfPatternRouting {
     protected $route = false;
 
     /**
+     * caches the current route name to avoid many lookups in the routes array
+     * @var string
+     */
+    protected $routeName;
+
+    /**
      * @var api_request
      */
     protected $request;
@@ -34,12 +40,24 @@ class api_routing extends sfPatternRouting {
     }
 
     /**
-     * return the last matched route, this is typically the current page's route
+     * return the last matched route, this is typically the current
+     * page's route, or a route by name if a name is provided
      *
+     * @param string $name route name only if required
      * @return api_routing_route|false
      */
-    public function getRoute() {
-        return $this->route;
+    public function getRoute($name = null) {
+        if ($name === null) {
+            return $this->route;
+        }
+        return $this->routes[$name];
+    }
+
+    public function getRouteName() {
+        if (!$this->routeName) {
+            $this->routeName = array_search($this->route, $this->routes);
+        }
+        return $this->routeName;
     }
 
     public function gen($name, $params = array(), $absolute = false) {
@@ -101,6 +119,7 @@ class api_routing extends sfPatternRouting {
             }
         }
         $this->route = $match;
+        $this->routeName = null;
         $this->request->setRoute($this->route);
         return $match;
     }
