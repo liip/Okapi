@@ -67,6 +67,10 @@ abstract class api_command {
         $this->command = api_helpers_class::getBaseName($this);
     }
 
+    public function preAction() {
+        return true;
+    }
+
     public function postAction() {
         $this->response->viewParams = array_merge($this->response->viewParams, $this->getXslParams());
         return true;
