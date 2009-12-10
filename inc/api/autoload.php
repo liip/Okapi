@@ -103,8 +103,9 @@ class autoload {
         $mapping = array();
         foreach (self::$dirs as $dir => $style) {
             // TODO: ignore .svn etc directories
+            // RecursiveDirectoryIterator::FOLLOW_SYMLINKS == 0x00000200 was only added in 5.3.1
             $objects = new RecursiveIteratorIterator(
-                new RecursiveDirectoryIterator($dir,RecursiveDirectoryIterator::FOLLOW_SYMLINKS),
+                new RecursiveDirectoryIterator($dir,0x00000200),
                 RecursiveIteratorIterator::SELF_FIRST
             );
 
