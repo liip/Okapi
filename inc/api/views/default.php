@@ -136,7 +136,6 @@ class api_views_default extends api_views_common {
         // Strip namespaces
         $xmlstr = preg_replace('#(<[^>]*)xmlns=""#', "$1", $xmlstr);
         $xmlstr = preg_replace('#(<[^>]*)xmlns:i18n[0-9]*="http://apache.org/cocoon/i18n/2.1"#', "$1", $xmlstr);
-        $xmlstr = preg_replace('#(<[^>]*)xmlns="http://www.w3.org/1999/xhtml"#', "$1", $xmlstr);
         $xmlstr = preg_replace('#(<[^>]*)i18n[0-9]*:attr="[^"]+"#', "$1", $xmlstr);
 
         return trim($xmlstr);
