@@ -22,13 +22,13 @@ abstract class api_views_common {
      * Constructor.
      * @param $routing api_routing routing instance
      */
-    public function __construct($routing, $request, $response, $config = null, $i18n = null) {
+    public function __construct($routing, $request, $response,  $i18n = null, $i18ntransform = true) {
         $this->route = $routing->getRoute();
         $this->routing = $routing;
         $this->request = $request;
         $this->response = $response;
-        $this->config = $config;
         $this->i18n = $i18n;
+        $this->i18ntransform = $i18ntransform;
     }
 
     /**
@@ -70,15 +70,12 @@ abstract class api_views_common {
      *
      * @param $lang string: Language to translate to.
      * @param $xmlDoc DOMDocument: DOM to translate.
-     * @config <b>lang['i18ntransform']</b> (bool): If set to false,
-     *         no transformations are done. Defaults to true.
      */
     protected function transformI18n($lang, $xmlDoc) {
-         $cfg = $this->config->lang;
-        if(isset($cfg['i18ntransform']) && $cfg['i18ntransform'] === false){
+
+        if ($this->i18ntransform === false) {
             return;
         }
-
         $i = $this->i18n->getInstance($lang);
         $i->i18n($xmlDoc);
     }

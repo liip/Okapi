@@ -8,7 +8,7 @@ class api_i18n_dispatcher {
     protected  $retrieverName = null;
 
     public function __construct($config) {
-        $this->config = $config->lang;
+        $this->config = $config;
     }
 
     /**
