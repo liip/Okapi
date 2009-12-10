@@ -104,7 +104,7 @@ class autoload {
         foreach (self::$dirs as $dir => $style) {
             // TODO: ignore .svn etc directories
             $objects = new RecursiveIteratorIterator(
-                new RecursiveDirectoryIterator($dir),
+                new RecursiveDirectoryIterator($dir,RecursiveDirectoryIterator::FOLLOW_SYMLINKS),
                 RecursiveIteratorIterator::SELF_FIRST
             );
 
