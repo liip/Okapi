@@ -222,7 +222,9 @@ class api_controller {
         if (!$allowed) {
             throw new api_exception_commandNotAllowed("Command access not allowed: ".get_class($command));
         }
-
+        if (is_string($allowed)) {
+            $this->route->config(array('method' => $allowed));
+        }
         if (is_callable(array($command, 'preAction'))) {
             call_user_func(array($command, 'preAction'));
         }
