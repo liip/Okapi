@@ -166,17 +166,17 @@ class api_init {
                 $reqHostPath .= substr($_SERVER['SCRIPT_NAME'],0,-9);
             }
         }
-        define('API_WEBROOT', $reqHostPath.'/');
+        define('API_WEBROOT', $reqHostPath.API_MOUNTPATH);
 
         // Define webrootStatic constant. From config file or computed
         // from webroot.
         if (!empty($cfg['static_path'])) {
             if (strpos($cfg['static_path'], 'http://') === 0 || strpos($cfg['static_path'], '/') === 0) {
                 // Complete URI or Absolute URL
-                define('API_WEBROOT_STATIC', $cfg['static_path']);
+                define('API_WEBROOT_STATIC', rtrim($cfg['static_path'], '/') . '/');
             } else {
                 // Relative URL
-                define('API_WEBROOT_STATIC', API_WEBROOT . $cfg['static_path']);
+                define('API_WEBROOT_STATIC', API_WEBROOT . trim($cfg['static_path'], '/'). '/');
             }
         } else {
             define('API_WEBROOT_STATIC', API_WEBROOT.'static/');
