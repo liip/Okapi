@@ -153,28 +153,21 @@ class api_response {
      * Calls the api_response::send() method to force output of all
      * headers set so far.
      *
-     * @param $to string: Location to redirect to.
+     * @param $to string: Location to redirect to, if empty it redirects back to the referring page.
      * @param $status int: HTTP status code to set. Use one of the following: 301, 302, 303.
      * @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3.2 HTTP status codes
      */
-    public function redirect($to, $status=301) {
-        if (strpos($to, 'http://') === 0 || strpos($to, 'https://') === 0) {
-            $url = $to;
-        } else {
-            $schema = (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT']) == '443' ? 'https' : 'http';
-            if (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST']) {
-                $host = $_SERVER['HTTP_HOST'];
-            } elseif (isset($_SERVER['SERVER_NAME']) && $_SERVER['SERVER_NAME']) {
-                $host = $_SERVER['SERVER_NAME'];
+    public function redirect($to=null, $status=301) {
+        if ($to === null) {
+            if (isset($_SERVER['HTTP_REFERER'])) {
+                $to = $_SERVER['HTTP_REFERER'];
             } else {
-                $host = 'localhost';
+                $to = API_HOST . API_MOUNTPATH;
             }
-            $to = strpos($to, '/') === 0 ? $to : '/' . $to;
-            $url = "$schema://$host$to";
         }
 
         $this->setCode($status);
-        $this->setHeader('Location', $url);
+        $this->setHeader('Location', $to);
         $this->send();
         exit();
     }
