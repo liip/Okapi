@@ -15,11 +15,13 @@ class api_views_xml extends api_views_common {
      * @todo Output exceptions as well.
      */
     public function dispatch($data, $exceptions = null) {
+        if (!is_array($data)) {
+            throw new api_exception('Command\'s $data should be an array');
+        }
+
         $data = $this->getDom($data, $exceptions);
 
         $this->setXMLHeaders();
-        $this->response->send();
-        echo $data->saveXML();
-        return;
+        $this->response->addContent($data->saveXML());
     }
 }
