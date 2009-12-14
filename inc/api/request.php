@@ -101,11 +101,13 @@ class api_request {
             /* if you set an extension: [xml, foo, rss, html] node in your
              * config file, only these extensions are valid extensions.
              * the rest is not parsed as an extension */
-            $aExtensions = $extensions['allowed'];
-
-            if (preg_match("#\.([a-z]+)$#", $this->filename, $matches)) {
-                if (is_array($aExtensions) && in_array($matches[1], $aExtensions)) {
-                    $this->extension = $matches[1];
+            if (isset($extensions['allowed'])) {
+                $aExtensions = $extensions['allowed'];
+                
+                if (preg_match("#\.([a-z]+)$#", $this->filename, $matches)) {
+                    if (is_array($aExtensions) && in_array($matches[1], $aExtensions)) {
+                        $this->extension = $matches[1];
+                    }
                 }
             }
         }
