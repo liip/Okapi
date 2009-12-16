@@ -1,7 +1,7 @@
 Release history of Okapi.
 
-upcoming release
-
+2009-12-16 :: Version 1.2.0
+  - Made an config option to use ext/memcached instead of memache
   - Updated cache.php to use MEMCACHE_COMPRESSED constant instead
     of a boolean - getting warning from ext/memcache since 3.0.3
     (harry fuecks)
