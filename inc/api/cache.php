@@ -58,7 +58,7 @@ class api_cache {
      * memcached daemons.
      */
     private function __construct() {
-        $this->cache = new Memcache();
+        $this->setupCache();
 
         $this->prefix = api_config::getInstance()->revision;
         $servers = api_config::getInstance()->memcache;
@@ -68,11 +68,7 @@ class api_cache {
         }
 
         if ($servers && is_array($servers['host'])) {
-            foreach($servers['host'] as $host) {
-                if ($host) {
-                    $this->connect($host);
-                }
-            }
+            $this->addServers($servers['host']);
         } else if ($servers && $servers['host']) {
             $this->connect($servers['host']);
         } else {
@@ -86,10 +82,27 @@ class api_cache {
      */
     public static function getInstance() {
         if (!isset(self::$instance)) {
-            self::$instance = new api_cache;
+            $cfg = api_config::getInstance();
+            if ( isset($cfg->memcache['client']) &&
+                'memcached' == $cfg->memcache['client'] &&
+                    extension_loaded('memcached') ) {
+                self::$instance = new api_cache2;
+            } else {
+                self::$instance = new api_cache;
+            }
         }
-
+        
         return self::$instance;
+    }
+    
+    protected function setupCache() {
+        $this->cache = new Memcache();
+    }
+    
+    protected function addServers($servers) {
+        foreach ( array_filter($servers) as $host ) {
+            $this->connect($host);
+        }
     }
 
     /**
@@ -261,7 +274,7 @@ class api_cache {
     protected function normalizeKey($key) {
         return str_replace(' ', '_', $key);
     }
-    
+
     /**
      * The compressed argument on Memcache::add, Memcache::set and Memcache::replace takes
      * an integer not a boolean. Since pecl/memcache 3.0.3 booleans now leads to warnings like
@@ -270,4 +283,62 @@ class api_cache {
     protected function compressed($compressed) {
         return $compressed == false ? 0 : MEMCACHE_COMPRESSED;
     }
+}
+
+
+/**
+ * Cache implementation that uses the new php memcached extension
+ * from Andrei Zmievski
+ */
+class api_cache2 extends api_cache {
+    
+    protected function setupCache() {
+        $this->cache = new Memcached();
+    }
+    
+    protected function addServers($hosts) {
+        $servers = array();
+        
+        foreach ( array_filter($hosts) as $host ) {
+            $server = array($host, 11211);
+            $servers[] = $server;
+        }
+        
+        return $this->cache->addServers($servers);
+    }
+    
+    /**
+     * Set an memcached option
+     */
+    public function setOption($option, $value) {
+        $this->cache->setOption($option, $value);
+    }
+    
+    /**
+     * Get the current value of a memcached option
+     */
+    public function getOption($option) {
+        return $this->cache->getOption($option);
+    }
+    
+    public function connect($server, $port = 11211, $per = true, $weight = 1) {
+        return $this->cache->addServer($server, $port, $weight);
+    }
+    
+    public function add($key, $val, $compressed = false, $expire = 0) {
+        return $this->cache->add($this->prefix.$this->normalizeKey($key), $val, $expire);
+    }
+
+    public function replace($key, $val, $compressed = false, $expire = 0) {
+        return $this->cache->replace($this->prefix.$this->normalizeKey($key), $val, $expire);
+    }
+
+    public function set($key, $val, $compressed = false, $expire = 0) {
+        return $this->cache->set($this->prefix.$this->normalizeKey($key), $val, $expire);
+    }
+
+    public function getExtendedStats() {
+        return $this->cache->getStats();
+    }
+    
 }
