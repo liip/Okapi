@@ -1,0 +1,178 @@
+Release history of Okapi.
+
+2009-12-16 :: Version 1.2.1
+  - Fix bug found in new memcached wrapper api_cache2
+    (harry fuecks)
+
+2009-12-16 :: Version 1.2.0
+  - Made an config option to use ext/memcached instead of memache
+  - Updated cache.php to use MEMCACHE_COMPRESSED constant instead
+    of a boolean - getting warning from ext/memcache since 3.0.3
+    (harry fuecks)
+
+
+2009-07-08 :: Version 1.1.8
+  - api_views_default: resolving issue which caused import-errors with xsl 
+    files due to clearing libxml_errors (marc & harry)
+  - api_model_array: added getData to api_model_array (chregu)
+  - api_testing_case_functional: E_STRICT warnings fix by not calling 
+    loadXML statically (lukas.smith)
+  - api_controller: Adding a getter for current command (fabian.vogler)
+  - api_request: fix parseFilename to also include more esoteric characters 
+    like ! (chregu)
+  - api_helpers_xml: Catching DOMException for invalid node names and using 
+    alternative (e.g. entry with key="123") (fabian.vogler)
+  - api_helpers_string: Adding two unicode seperators to the escapeJSValue 
+    helper because they break JS (joel)
+  - api_pam: PEAR_Auth callbacks (chregu)
+  - api_testing_case_functional: fixed bug in testing where a post with 
+    multidimensional arrays produces an array to string conversion 
+    error (pascal.helfenstein)
+  - api_model_queryinfo: prevent api_model_queryinfo from loosing proper 
+    encoded + characters (patrick.jezek)
+
+
+2009-03-10 :: Version 1.1.7
+  - api_testing_case_functional: Added openInBrowser method for debugging
+    (alain)
+  - api_init: Only define API_PROJECT_DIR if it's not defined, yet. 
+    Needed to the inc/ folder can be a symlink to some central location.
+    (pneff)
+  - api_exceptionhandler_default: Check if 'line' is a valid index (marc /
+    harry fuecks)
+
+2009-01-15 :: Version 1.1.6
+  - api_routing_regex: Fix E_NOTICE when mappings where not defined. (marc)
+  - api_db: Use databases without DSN. (jordi.boggiano)
+  - api_controller: processCommand is now public to bootstrap okapi in testing
+    environments. (marc)
+  - api_model_factory (testing/mocks/functional/): made $DEFAULTS publicly 
+    accessible for testing purpose. (patrick.jezek)
+
+2008-11-26 :: Version 1.1.5
+  - api_config: Fix writing of cache files as they were written to incorrect
+    paths. (pneff)
+  - api_exceptionhandler: Remove type hinting which makes Okapi compatible
+    with PHP 5.1 again. (chregu)
+  - api_config: Improve replaceAllConsts() by not working on references but
+    instead returning a modified array. This may break compatibility for
+    projects that subclass api_config.
+  - api_routing_route: New routing implementation supporting regular
+    expressions for path matching. (marc)
+  - api_config: Fix writing of cache files with environment keys.
+    (lukas.smith)
+  - api_testing_case_functional: Use PATH_SEPARATOR instead of hard-coded
+    colon for include path. This fixes compatibility with MS Windows. (pneff)
+  - api_config: Fixed bug in config cache dir generation that would lead to a
+    double / in the file path. (lukas.smith)
+  - api_routing: Enable subdomain matching for routing. (pneff)
+  - api_pam_auth_zend: getUserId() returns the real user ID instead of the
+    full user identity. (fabian.vogler)
+
+2008-10-27 :: Version 1.1.4
+  - api_model_backend_get: Protocol can be specified in configuration. (ebi)
+  - api_config: Added ability to define command level configuration files
+    that overload the standard config. (lukas.smith)
+  - api_request: Match anything after the last dot for determining the node
+    extension. (lukas.smith)
+  - api_view: Simplified code. (lukas.smith)
+  - api_testing_case_functional: Ensuring properly that responseDOM is a
+    DOMDocument. (ebi)
+  - api_exceptionhandler_default: Handle the case when ReflectionMethod
+    throws an exception in the constructor. (lukas.smith)
+  - api_db: Ability to overwrite the adapter. (marc)
+  - api_log: New common code for logging. (chregu)
+  - api_model_factory: Added namespace support. (marc)
+  - api_db: Ability to overwrite the DB instance. (marc)
+  - api_controller, api_exceptionhandler_base, api_response: Don't die in
+    exception handler, instead die in api_response::send(). (pneff)
+  - api_exceptionhandler_default: Fix massaging of stackrace to avoid
+    overwriting by-reference variables. (pneff)
+  - api_exception_XsltParseError: Added XSL parse error to the exception
+    message. (marc)
+  - api_controller: Mad loadCommand public for testing purposes. (marc)
+  - api_response: Only die() in api_response::send() if the content length
+    has been output. (lukas.smith)
+
+2008-08-29 :: Version 1.1.3
+  - api_cache: Fix get() method. Major fuckup by me. (pneff)
+  - api_model_queryinfo: Make sure ? is only included in the URL if there are
+    parameters. (pneff)
+
+2008-08-29 :: Version 1.1.2
+  - api_cache: Fix del() method. A timeout of 0 (the default value) caused
+    problems (ebi, pneff)
+  - api_cache: Fixes to add() for prefix key handling. (pneff)
+  - api_cache: Unify key handling by moving the logic into a method. (pneff)
+  - api_model_http: Move headers to set on the CURL object into an object
+    variable. This allows for easy overwriting of the headers to set in
+    subclasses. (lejoe)
+  - api_helpers_string: escapeJSValue also escapes \r. (pneff)
+  - api_model_queryinfo: Modified to nicely handle "Array" parameters and use
+    the PHP function http_build_query to create the reqestURI parameters.
+    (ebi)
+  - api_helpers_xpath: Trim the return value of getText() method. (pierre)
+  - api_routing: Allow 0 as a URL parameter. This was ignored so far because
+    we used empty() to test the value and empty() returns true for '0'.
+    (pneff)
+
+2008-08-08 :: Version 1.1.1
+  - api_response has support for outputting a content length header. (pneff)
+  - api_request: New method getClientIp. This returns the real client IP,
+    using any request headers that proxies and load balancers set to pass
+    through to communicate the original client IP address. (pneff)
+  - Disable DOM dumping (XML=1 hack) by default and provide the config option
+    allowDomDump to enable it. (pneff)
+  - Switch to a patched copy of Symfony YAML. This is only a temporary
+    solution until Symfony has a stable branch with their YAML parser. (pneff)
+
+2008-07-08 :: Version 1.1.0
+  - IMPORTANT: This release breaks API compatibility to 1.0.* due to the
+    YAML parser switch and the change in the isAllowed() behaviour.
+  - Added Zend_Auth_Adapter_DbTable as authentication-adapter. (alain)
+  - Added the functionality to define an extension node in the config
+    for the allowed extensions. Syntax is documented and is like:
+    "extensions: [xml, rss, html]" only these extensions are then parsed
+    as extensions. (marc)
+  - Added the possibility to overwrite the "entry" values of
+    api_helpers_xml::array2dom. (marc)
+  - Use sfYaml class for parsing YAML instead of Spyc. (lukas.smith)
+  - Unit and functional testing framework. (ebi, pneff)
+  - Handle return from isAllowed() call. Now throws CommandNotAllowed
+    exception if false is returned. (lukas.smith)
+
+2008-07-01 :: Version 1.0.5
+  - Fixed config cache handling (lukas.smith)
+  - Added support for "umask" config option to force a specific chmod
+    setting for the cache file (lukas.smith)
+
+2008-06-18 :: Version 1.0.4
+  - Correct SSL Checking (alain)
+  - api_model_dom extends api_model (pneff)
+  - proper exception for non existing views and xslts (chregu)
+  - Various Docblocks (chregu) + fixes for doxygen (pneff)
+  - Extract getOuputFromDom from default view (pneff)
+  - Treat + params also as wildcard (pneff)
+  - Correct slashes in urls (pneff)
+  - Add cookie handling to mock api_response (pneff)
+  - Improved config caching (pneff)
+  - Use orginal attribute if no value found (philipp)
+  - Allow view to be ignored (pneff)
+  - Splitting the exception handle function to use getTrace seperately (ebi)
+
+2008-04-02 :: Version 1.0.3
+  - Bugfix for setCookie so it also works with more than one cookie (lejoe)
+
+2008-04-02 :: Version 1.0.2
+  - Add setCookie method to the api_response class. This improves
+    testability (lejoe)
+
+2008-04-01 :: Version 1.0.1
+  - Add DB exception class (marc)
+  - Avoid empty include paths (chregu)
+  - Avoid double calls to getDOM (marc)
+  - Add api_db::clear() method to improve testability (pneff)
+  - Avoid calling getParams() on non-Okapi exceptions (pneff)
+
+2008-03-14 :: Version 1.0.0
+  - First public release.
