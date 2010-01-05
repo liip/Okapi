@@ -76,17 +76,22 @@ class api_response {
      *
      * @param $name string: Name of the cookie
      * @param $value string: Value of the cookie
-     * @param $maxage int: Maxage of the cookie
+     * @param $expire int: Expiration timestamp of the cookie
      * @param $path string: Path where the cookie can be used
      * @param $domain: string: Domain which can read the cookie
      * @param $secure bool: Secure mode?
      * @param $httponly bool: Only allow HTTP usage?
      */
-    public function setCookie($name, $value = '', $maxage = 0, $path = '', $domain = '',
-                              $secure = false, $httponly = false) {
+    public function setCookie($name, $value = '', $expire = 0, $path = '', $domain = '',
+                              $secure = false, $httponly = true) {
+        if (!empty($expire)) {
+            $time = new DateTime();
+            $time->setTimestamp($expire);
+            $expire = date('D, d-M-Y H:i:s \G\M\T', $expire - $time->getOffset());
+        }
         $this->cookies[rawurlencode($name)] = rawurlencode($value)
                                               . (empty($domain) ? '' : '; Domain='.$domain)
-                                              . (empty($maxage) ? '' : '; Max-Age='.$maxage)
+                                              . (empty($expire) ? '' : '; expires='.$expire)
                                               . (empty($path) ? '' : '; Path='.$path)
                                               . (!$secure ? '' : '; Secure')
                                               . (!$httponly ? '' : '; HttpOnly');
