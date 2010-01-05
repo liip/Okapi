@@ -1,0 +1,19 @@
+UPGRADE GUIDE TO OKAPI2
+=======================
+
+Backwards Compatibility Breaks
+------------------------------
+
+* api_response::setCookie() :
+  - $maxage is now $expires which should be a unix timestamp and not
+    a duration in seconds, max-age isn't supported in all browsers.
+  - $httpOnly now defaults to true since it's a more secure default,
+    set it to false if you really need to read cookies from javascript.
+    This does not affect XHR though, so it is seldomly needed.
+
+
+TO BE DOCUMENTED:
+- routes
+- exceptions
+- core stuff (?)
+- Iauth
