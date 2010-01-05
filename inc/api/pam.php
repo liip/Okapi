@@ -115,6 +115,22 @@ class api_pam {
     }
 
     /**
+     * Force the login to the given user id without requiring to know
+     * the password or anything
+     *
+     * @param int $id  User id
+     * @param bool $persistent Whether to set a cookie for persistent login or not (aka "Remember me")
+     * @return bool Return value of the authentication forceLogin method
+     * @see api_pam_Iauth::forceLogin()
+     */
+    public function forceLogin($id, $persistent=false) {
+        if (($ao = $this->getAuthObj()) !== false) {
+            return $ao->forceLogin($id, $persistent);
+        }
+        return false;
+    }
+
+    /**
      * Log out the current user. Calls the logout method of the
      * authentication object.
      * @return bool: Return value of the authentication logout method
@@ -184,7 +200,7 @@ class api_pam {
      * Gets the additional meta information about the currently logged in
      * user. Calls the getAuthData() method of the authentication object.
      * @param string $attribute an optional attribute value
-     * @return array|mixed Information key/value pair or only one value if 
+     * @return array|mixed Information key/value pair or only one value if
      * $attribute is given
      * @see api_pam_Iauth::getAuthData()
      */

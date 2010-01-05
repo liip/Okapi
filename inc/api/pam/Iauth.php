@@ -19,6 +19,17 @@ interface api_pam_Iauth {
     public function login($user, $pass, $persistent);
 
     /**
+     * Force the login to the given user id without requiring to know
+     * the password or anything
+     *
+     * @param int $id  User id
+     * @param bool $persistent Whether to set a cookie for persistent login or not (aka "Remember me")
+     * @return bool Return value of the authentication forceLogin method
+     * @see api_pam_Iauth::forceLogin()
+     */
+    public function forceLogin($id, $persistent);
+
+    /**
      * Log out the currently logged in user. The authentication object
      * is responsible for handling the session state.
      */
@@ -49,7 +60,7 @@ interface api_pam_Iauth {
      * user. Or just one value of the data if $attribute is passed
      *
      * @param string $attribute an optional attribute value
-     * @return array|mixed Information key/value pair or only one value if 
+     * @return array|mixed Information key/value pair or only one value if
      * $attribute is given
      */
     public function getAuthData($attribute = null);
