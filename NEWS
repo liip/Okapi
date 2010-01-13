@@ -1,5 +1,9 @@
 Release history of Okapi.
 
+2009-12-16 :: Version 1.2.1
+  - Fix bug found in new memcached wrapper api_cache2
+    (harry fuecks)
+
 2009-12-16 :: Version 1.2.0
   - Made an config option to use ext/memcached instead of memache
   - Updated cache.php to use MEMCACHE_COMPRESSED constant instead

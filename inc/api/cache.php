@@ -45,7 +45,7 @@ class api_cache {
     /**
      * Memcache: Memcache object which the object is proxying.
      */
-    private $cache;
+    protected $cache;
 
     /**
      * int: Controls how often a failed server will be retried. Value is
@@ -57,7 +57,7 @@ class api_cache {
      * Constructor. Reads configuration values and connects to the
      * memcached daemons.
      */
-    private function __construct() {
+    protected function __construct() {
         $this->setupCache();
 
         $this->prefix = api_config::getInstance()->revision;
@@ -91,7 +91,6 @@ class api_cache {
                 self::$instance = new api_cache;
             }
         }
-        
         return self::$instance;
     }
     
