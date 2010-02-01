@@ -70,7 +70,14 @@ class api_routing extends sfPatternRouting {
             return str_replace('http://', 'https://', API_HOST).'/'.$this->request->getLang().$url;
         }
 
+        if (!$this->routes[$name]['ssl'] && substr(API_HOST, 0, 5) === 'https') {
+            return str_replace('https://', 'http://', API_HOST).'/'.$this->request->getLang().$url;
+        }
+
         // TODO make this optional and handle the left|right positioning by reading api_request settings
+        if ($absolute && $url[0] !== 'h') {
+            return API_HOST.'/'.$this->request->getLang().$url;
+        }
         return '/'.$this->request->getLang().$url;
     }
 
