@@ -219,9 +219,9 @@ class api_init {
                 try {
                     $loader->load($file);
                 } catch (InvalidArgumentException $e) {
-                    throw new api_exception('The service container configuration file "'.$file.'" does not exist, you either need a _my'.
+                    throw new api_exception('The service container configuration file "'.$file.'" does not exist (or cannot be parsed), you either need a _my'.
                     $cfg['serviceContainer']['extension'].' in '.$confDir.' or set your OKAPI_ENV environment variable to "local"'.
-                    ' or any name of a '.$cfg['serviceContainer']['extension'].' file to be used');
+                    ' or any name of a '.$cfg['serviceContainer']['extension'].' file to be used (error message: '.$e->getMessage().')');
                 }
 
                 if ($api_container_file) {
