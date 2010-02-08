@@ -57,11 +57,12 @@ abstract class api_command {
      * @param    $route array: The attributes as returned by
      *                         api_routing::getRoute().
      */
-    public function __construct(api_routing $routing, api_request $request, api_response $response) {
+    public function __construct(api_routing $routing, api_request $request, api_response $response, array $params) {
         $this->routing = $routing;
         $this->route = $routing->getRoute();
         $this->request = $request;
         $this->response = $response;
+        $this->params = $params;
         $this->response->command = $this;
         $this->response->getDataCallback = array($this,'getData');
         $this->command = api_helpers_class::getBaseName($this);
