@@ -198,19 +198,31 @@ class api_init {
 
         // Create ServiceContainer
         if (isset($cfg['serviceContainer'])) {
+            $confFileName = isset($cfg['serviceContainer']['file']) ? $cfg['serviceContainer']['file'] : $_SERVER['OKAPI_ENV'];
             $api_container_file = empty($cfg['configCache'])
                 ? false
-                : self::getCacheFilename('servicecontainer', $_SERVER['OKAPI_ENV']);
+                : self::getCacheFilename('servicecontainer', $confFileName);
 
             // TODO: reenable config caching once we have a fix for http://trac.symfony-project.org/ticket/7677
             if (true || !$api_container_file || !file_exists($api_container_file)) {
                 $sc = new sfServiceContainerBuilder();
                 $loader = $cfg['serviceContainer']['loader'];
                 $loader = new $loader($sc);
-                $file = isset($cfg['serviceContainer']['file'])
-                    ? $cfg['serviceContainer']['file'] : $_SERVER['OKAPI_ENV'];
-                $file.= $cfg['serviceContainer']['extension'];
-                $loader->load(API_PROJECT_DIR.'conf/servicecontainer/'.$file);
+
+                $confDir = API_PROJECT_DIR.'conf/servicecontainer/';
+                $file = $confDir . $confFileName . $cfg['serviceContainer']['extension'];
+                $localFile = $confDir . '_my' . $cfg['serviceContainer']['extension'];
+                if (file_exists($localFile)) {
+                    $file = $localFile;
+                }
+
+                try {
+                    $loader->load($file);
+                } catch (InvalidArgumentException $e) {
+                    throw new api_exception('The service container configuration file "'.$file.'" does not exist, you either need a _my'.
+                    $cfg['serviceContainer']['extension'].' in '.$confDir.' or set your OKAPI_ENV environment variable to "local"'.
+                    ' or any name of a '.$cfg['serviceContainer']['extension'].' file to be used');
+                }
 
                 if ($api_container_file) {
                     $dumper = new sfServiceContainerDumperPhp($sc);

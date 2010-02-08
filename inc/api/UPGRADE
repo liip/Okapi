@@ -11,9 +11,14 @@ Backwards Compatibility Breaks
     set it to false if you really need to read cookies from javascript.
     This does not affect XHR though, so it is seldomly needed.
 
+New Features
+------------
+
+* You can have a local _my.yml file that will take over the default 
+  okapi conf, for dev setups that shouldn't be committed
 
 TO BE DOCUMENTED:
 - routes
 - exceptions
-- core stuff (?)
+- core stuff (yaml conf etc)
 - Iauth
