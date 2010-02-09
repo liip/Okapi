@@ -133,7 +133,8 @@ class api_pam {
     /**
      * Log out the current user. Calls the logout method of the
      * authentication object.
-     * @return bool: Return value of the authentication logout method
+     *
+     * @return bool Return value of the authentication logout method
      * @see api_pam_Iauth::logout()
      */
     public function logout() {
@@ -144,9 +145,23 @@ class api_pam {
     }
 
     /**
+     * Forces the session user object to be reloaded from the database
+     * in case it changed
+     *
+     * @return bool success
+     */
+    public function reload() {
+        if (($ao = $this->getAuthObj()) !== false) {
+            return $ao->reload();
+        }
+        return false;
+    }
+
+    /**
      * Check if the user is currently logged in. Calls the checkAuth
      * method of the authentication object.
-     * @return bool: True if the user is logged in.
+     *
+     * @return bool true if the user is logged in.
      * @see api_pam_Iauth::checkAuth()
      */
     public function checkAuth() {
@@ -159,8 +174,8 @@ class api_pam {
     /**
      * Gets the ID of the currently logged in user. Calls the getUserId()
      * method of the authentication object.
-     * @return mixed: User ID. Variable type depends on authentication
-     *         class.
+     *
+     * @return mixed User ID. Variable type depends on authentication class.
      * @see api_pam_Iauth::getUserId()
      */
     public function getUserId() {
@@ -172,6 +187,7 @@ class api_pam {
 
     /**
      * Sets a new password on an arbitrary user
+     *
      * @param int $id user id to alter
      * @param string $password new user password
      * @return bool success
@@ -186,7 +202,8 @@ class api_pam {
     /**
      * Gets the user name of the currently logged in user. Calls the
      * getUserName() method of the authentication object.
-     * @return string: User name
+     *
+     * @return string User name
      * @see api_pam_Iauth::getUserName()
      */
     public function getUserName() {
@@ -199,6 +216,7 @@ class api_pam {
     /**
      * Gets the additional meta information about the currently logged in
      * user. Calls the getAuthData() method of the authentication object.
+     *
      * @param string $attribute an optional attribute value
      * @return array|mixed Information key/value pair or only one value if
      * $attribute is given
@@ -214,12 +232,13 @@ class api_pam {
     /**
      * Checks if the logged in user has access to the given object.
      * Calls isAllowed() of the permission object.
-     * @param $acObject string: Access control object. An arbitrary value
+     *
+     * @param string $acObject Access control object. An arbitrary value
      *        can be passed in, which the permission class uses to determine
      *        if the user has access or not.
-     * @param $acValue string: Access control value. Used in the same way as
+     * @param string $acValueAccess control value. Used in the same way as
      *        the $acObject param.
-     * @return bool: True if the user is allowed to access the object or no
+     * @return bool True if the user is allowed to access the object or no
      *        perm container has been defined in the configuration
      * @see api_pam_Iperm::isAllowed()
      */
@@ -260,8 +279,8 @@ class api_pam {
      * $pam->setAuthScheme('other');
      * \endcode
      *
-     * @param $schemeName string: Name of the scheme to use.
-     * @return bool: True if the given scheme exists.
+     * @param string $schemeName Name of the scheme to use.
+     * @return bool True if the given scheme exists.
      */
     public function setAuthScheme($schemeName) {
         if (isset($this->authConf[$schemeName]) || $schemeName == $this->confDefaultName) {
@@ -276,7 +295,8 @@ class api_pam {
      * Returns the name of the currently active authentication
      * scheme. See api_pam::setAuthScheme() for details about
      * schemes.
-     * @return string: Current authentication scheme.
+     *
+     * @return string Current authentication scheme.
      */
     public function getAuthScheme() {
         return (empty($this->authScheme)) ? $this->confDefaultName : $this->authScheme;
@@ -285,8 +305,9 @@ class api_pam {
     /**
      * Set a permission scheme to use. This works exactly the same way
      * as authentication schemes, documented under api_pam::setAuthScheme().
-     * @param $schemeName string: Name of the scheme to use.
-     * @return bool: True if the given scheme exists.
+     *
+     * @param string $schemeName Name of the scheme to use.
+     * @return bool true if the given scheme exists.
      */
     public function setPermScheme($schemeName) {
         if (isset($this->permConf[$schemeName]) || $schemeName == $this->permConfDefault) {
@@ -301,7 +322,8 @@ class api_pam {
      * Returns the name of the currently active permission
      * scheme. See api_pam::setAuthScheme() for details about
      * schemes.
-     * @return string: Current permission scheme.
+     *
+     * @return string Current permission scheme.
      */
     public function getPermScheme() {
         return (empty($this->permScheme)) ? $this->confDefaultName : $this->permScheme;
@@ -309,6 +331,7 @@ class api_pam {
 
     /**
      * Returns the current permission object.
+     *
      * @return api_pam_Iperm Permission object.
      */
     private function getPermObj() {
@@ -317,6 +340,7 @@ class api_pam {
 
     /**
      * Returns the current authentication object.
+     *
      * @return api_pam_Iauth Authentication object.
      */
     private function getAuthObj() {
@@ -326,9 +350,10 @@ class api_pam {
     /**
      * Returns a authentication or permission object. Re-uses existing
      * objects if possible.
-     * @param $prefix string: Object type to return - "auth" or "perm"
-     * @param $scheme string: Configuration scheme to use
-     * @return object: Authentication or permission object.
+     *
+     * @param string $prefix Object type to return - "auth" or "perm"
+     * @param string $scheme Configuration scheme to use
+     * @return object Authentication or permission object.
      */
     private function pamGetObject($prefix, $scheme) {
         $objArr = $prefix."Obj";
@@ -346,8 +371,9 @@ class api_pam {
 
     /**
      * Creates a new authentication or permission object.
-     * @param $prefix string: Object type to return - "auth" or "perm"
-     * @param $cfg hash: Configuration values. The 'class' value is used
+     *
+     * @param string $prefix Object type to return - "auth" or "perm"
+     * @param array $cfg Configuration values. The 'class' value is used
      *        to determine the actual class to use for creating the object.
      */
     private function pamLoadObject($prefix, $cfg) {

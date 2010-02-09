@@ -24,6 +24,7 @@ interface api_pam_Iauth {
      *
      * @param int $id  User id
      * @param bool $persistent Whether to set a cookie for persistent login or not (aka "Remember me")
+     *
      * @return bool Return value of the authentication forceLogin method
      * @see api_pam_Iauth::forceLogin()
      */
@@ -32,20 +33,31 @@ interface api_pam_Iauth {
     /**
      * Log out the currently logged in user. The authentication object
      * is responsible for handling the session state.
+     *
+     * @return bool success
      */
     public function logout();
 
     /**
+     * Forces the session user object to be reloaded from the database
+     * in case it changed
+     *
+     * @return bool success
+     */
+    public function reload();
+
+    /**
      * Check if the user is currently logged in.
-     * @return bool: True if the user is logged in.
+     *
+     * @return bool true if the user is logged in.
      */
     public function checkAuth();
 
     /**
      * Return the user ID of the currently logged in user. This ID
      * is used for the permission checking.
-     * @return mixed: User ID. Variable type depends on authentication
-     *         class.
+     *
+     * @return mixed User ID. Variable type depends on authentication class.
      */
     public function getUserId();
 
