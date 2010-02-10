@@ -1,18 +1,14 @@
 <?php
-/* Licensed under the Apache License, Version 2.0
- * See the LICENSE and NOTICE file for further information
- */
-
 /**
- * View which sets text/plain content type headers.
- * @author   Silvan Zurbruegg
- */
-class api_views_plain extends api_views_default {
-    /**
-     * Sends text/plain Content-type
-     */
-    protected function setHeaders() {
-        parent::setHeaders();
+*/
+class api_views_plain extends api_views_common {
+    public function setHeader() {
         $this->response->setContentType('text/plain');
+        $this->response->setCharset('utf-8');
+    }
+
+    public function dispatch($data, $exceptions = null) {
+        $this->setHeader();
+        $this->response->addContent($data);
     }
 }
