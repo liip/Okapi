@@ -59,10 +59,8 @@ class api_i18n {
      *
      * @param $lang string: Language into which this object will translate.
      */
-    public function __construct($lang, $config) {
-        $this->lang = $lang;
+    public function __construct($config) {
         $this->config = $config;
-        $this->loadRetriever($lang, $config);
     }
 
     /**
@@ -71,7 +69,10 @@ class api_i18n {
      *
      * @param $xmldoc DOMDocument: XML document to translate.
      */
-    public function i18n($xmldoc) {
+    public function i18n($lang, $xmldoc) {
+        $this->lang = $lang;
+        $this->loadRetriever($lang, $this->config);
+
         $xp = new DOMXPath($xmldoc);
         if (!$xp instanceof DOMXPath) {
             return false;
