@@ -33,21 +33,21 @@ class api_views_default extends api_views_common {
     /** string: XSLT file used for transforming the output. */
     protected $xslfile = '';
 
-    public function __construct($routing, $request, $response, $allowDump = false, $i18n = null) {
-        parent::__construct($routing, $request, $response, $i18n);
+    public function __construct($routing, $request, $response, $i18n = null, $i18ntransform = true, $allowDump = false) {
+        parent::__construct($routing, $request, $response, $i18n, $i18ntransform);
         $this->dumpDom = $this->parseDumpDomConfig($allowDump);
     }
 
     protected function parseDumpDomConfig($allow) {
-        if ($cfg === false || $this->request->getParam('XML') != '1') {
+        if ($allow === false || $this->request->getParam('XML') != '1') {
             return false;
         }
 
-        if ($cfg === true) {
+        if ($allow === true) {
             return true;
         } else if (is_array($cfg)) {
             $ip = $this->request->getClientIp();
-            foreach ($cfg as $pattern) {
+            foreach ($allow as $pattern) {
                 if (api_helpers_string::matchWildcard($pattern, $ip)) {
                     return true;
                 }

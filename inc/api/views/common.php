@@ -22,7 +22,7 @@ abstract class api_views_common {
      * Constructor.
      * @param $routing api_routing routing instance
      */
-    public function __construct($routing, $request, $response,  $i18n = null, $i18ntransform = true) {
+    public function __construct($routing, $request, $response, $i18n = null, $i18ntransform = true) {
         $this->route = $routing->getRoute();
         $this->routing = $routing;
         $this->request = $request;
@@ -76,8 +76,8 @@ abstract class api_views_common {
         if ($this->i18ntransform === false) {
             return;
         }
-        $i = $this->i18n->getInstance($lang);
-        $i->i18n($xmlDoc);
+
+        $this->i18n->i18n($lang, $xmlDoc);
     }
 
     /**
