@@ -60,25 +60,30 @@ class api_routing extends sfPatternRouting {
         return $this->routeName;
     }
 
+    /**
+     * generates an url from a route name
+     *
+     * if null is passed to the route name, the current page url is returned
+     *
+     * @param string $name route name
+     * @param array $params route parameters to build the url
+     * @param bool $absolute true to get a full url with the domain name etc
+     */
     public function gen($name, $params = array(), $absolute = false) {
         if ($name === null) {
-            return '/'.$this->request->getLang().$this->request->getPath();
+            return API_MOUNTPATH.$this->request->getLang().$this->request->getPath();
         }
-        $url = $this->generate($name, $params, $absolute);
+        $url = $this->generate($name, $params);
 
+        // force https links for ssl routes
         if ($this->routes[$name]['ssl'] && substr(API_HOST, 0, 5) !== 'https') {
-            return str_replace('http://', 'https://', API_HOST).'/'.$this->request->getLang().$url;
+            return str_replace('http://', 'https://', API_HOST).API_MOUNTPATH.$this->request->getLang().$url;
         }
 
-        if (!$this->routes[$name]['ssl'] && substr(API_HOST, 0, 5) === 'https') {
-            return str_replace('https://', 'http://', API_HOST).'/'.$this->request->getLang().$url;
+        if ($absolute) {
+            return API_HOST.API_MOUNTPATH.$this->request->getLang().$url;
         }
-
-        // TODO make this optional and handle the left|right positioning by reading api_request settings
-        if ($absolute && $url[0] !== 'h') {
-            return API_HOST.'/'.$this->request->getLang().$url;
-        }
-        return '/'.$this->request->getLang().$url;
+        return API_MOUNTPATH.$this->request->getLang().$url;
     }
 
     /**
