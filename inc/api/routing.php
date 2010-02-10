@@ -100,7 +100,7 @@ class api_routing extends sfPatternRouting {
      * @return api_routing_route the created route object
      */
     public function route($name, $pattern, $options = array(), $defaults = array(), $requirements = array()) {
-        $route = new api_routing_route($pattern, $defaults, $requirements, $options);
+        $route = new api_routing_route($pattern, (array)$defaults, (array)$requirements, $options);
         $this->appendRoute($name, $route);
         return $route;
     }
@@ -129,6 +129,9 @@ class api_routing extends sfPatternRouting {
                 $match = $match['_sf_route'];
                 $match->mergeProperties();
             }
+        }
+        if (empty($match)) {
+            throw new api_exception('Could not match a route');
         }
         $this->route = $match;
         $this->routeName = null;
