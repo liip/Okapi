@@ -1,5 +1,5 @@
 <?php
-
+// TODO: delete class?
 class api_i18n_dispatcher {
 
     /** array: Instances as returned by the getInstance() method.
