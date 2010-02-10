@@ -28,8 +28,6 @@ class api_model_queryinfo extends api_model {
         $this->lang = $request->getLang();
         $this->command = $route['command'];
         $this->method = $route['method'];
-        $this->sld = $request->getSld();
-        $this->tld = $request->getTld();
         $this->host = $request->getHost();
     }
 
@@ -42,8 +40,6 @@ class api_model_queryinfo extends api_model {
      *       - \b lang:       api_request::getLang()
      *       - \b command:    $route['command']
      *       - \b method:     $route['method']
-     *       - \b sld:        api_request::getSld()
-     *       - \b tld:        api_request::getTld()
      *       - \b host:       api_request::getHost()
      *       - \b languages:  api_request::getLanguages()
      *       - \b route:      $route
@@ -86,7 +82,7 @@ class api_model_queryinfo extends api_model {
         $queryP->nodeValue = str_replace("&","&amp;", substr($requestUri, 1));
         $root->appendChild($queryP);
 
-        foreach(array('lang', 'command', 'method', 'sld', 'tld', 'host') as $key) {
+        foreach(array('lang', 'command', 'method', 'host') as $key) {
             $node = $dom->createElement($key);
             $node->nodeValue = $this->$key;
             $root->appendChild($node);

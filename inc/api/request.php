@@ -13,10 +13,6 @@ class api_request {
     /** Hostname of the current request. */
     protected $host = '';
     /** Subdomain of the current request's hostname. */
-    protected $sld = '';
-    /** Top domain of the current request's hostname. */
-    protected $tld = '';
-    /** Path of the current request. */
     protected $path = '';
     /** Full URL of the current request. */
     protected $url = '';
