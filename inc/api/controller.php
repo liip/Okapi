@@ -63,6 +63,9 @@ class api_controller {
     }
 
     public function run() {
+        // load the routes
+        $sc->routingcontainer;
+
         $this->dispatcher = $this->sc->dispatcher;
 
         if (isset($this->events['application.request'])) {
