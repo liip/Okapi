@@ -75,11 +75,11 @@ class api_model_queryinfo extends api_model {
 
         $queryP = $dom->createElement('requestURI');
         $requestUri = $this->path;
-        $queryString = http_build_query($this->params);
+        $queryString = http_build_query($this->params->get(), '', '&amp;');
         if ($queryString !== '') {
             $requestUri .= '?' . $queryString;
         }
-        $queryP->nodeValue = str_replace("&","&amp;", substr($requestUri, 1));
+        $queryP->nodeValue = $requestUri;
         $root->appendChild($queryP);
 
         foreach(array('lang', 'command', 'method', 'host') as $key) {
