@@ -99,14 +99,13 @@ abstract class api_command {
         $method = isset($route['method'])
             ? $method = 'execute'.ucfirst($route['method']) : null;
 
-        if (isset($method)) {
-            if (method_exists($this, $method) || is_callable(array($this, $method))) {
-                $this->$method();
-                return $this->response;
-            }
+        if (empty($method) || !is_callable(array($this, $method))) {
+            throw new api_exception_noMethodFound('Incorrect method name '.get_class($this).'::'.$method.
+                ', you may want to implement __call or check the return value of isAllowed if you returned a custom method name');
         }
-        throw new api_exception_noMethodFound('Incorrect method name '.get_class($this).'::'.$method.
-            ', you may want to implement __call or check the return value of isAllowed if you returned a custom method name');
+
+        $this->$method();
+        return $this->response;
     }
 
     /**
