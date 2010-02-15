@@ -64,7 +64,7 @@ class api_controller {
 
     public function run() {
         // load the routes
-        $sc->routingcontainer;
+        $this->sc->routingcontainer;
 
         $this->dispatcher = $this->sc->dispatcher;
 
