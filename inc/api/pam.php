@@ -44,6 +44,9 @@
  *         the permission object.
  *
  * @author   Silvan Zurbruegg
+ *
+ * @dispatches pam.logged_in successful user login
+ * @dispatches pam.logged_out successful user logout
  */
 class api_pam {
     /**
@@ -63,6 +66,12 @@ class api_pam {
      * @var api_pam_Iperm
      */
     private $perm;
+
+    /**
+     * event dispatcher instance
+     * @var sfEventDispatcher
+     */
+    protected $dispatcher;
 
     /** string constant: Prefix for all class names in this package. */
     private $clsNameBase = 'api_pam';
@@ -91,9 +100,10 @@ class api_pam {
     /**
      * Constructor. Loads the PAM configuration.
      */
-    public function __construct($auth, $perm) {
+    public function __construct($dispatcher, $auth, $perm) {
         $this->auth = $auth;
         $this->perm = $perm;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -109,7 +119,13 @@ class api_pam {
      */
     public function login($user, $pass, $persistent=false) {
         if (($ao = $this->getAuthObj()) !== false) {
-            return $ao->login($user, $pass, $persistent);
+            $res = $ao->login($user, $pass, $persistent);
+            if ($res) {
+                $params = array('user' => $ao->getAuthData(), 'forcedLogin' => false, 'persistent' => $persistent);
+                $event = new sfEvent($this, 'pam.logged_in', $params);
+                $this->dispatcher->notifyUntil($event);
+            }
+            return $res;
         }
         return false;
     }
@@ -125,7 +141,13 @@ class api_pam {
      */
     public function forceLogin($id, $persistent=false) {
         if (($ao = $this->getAuthObj()) !== false) {
-            return $ao->forceLogin($id, $persistent);
+            $res = $ao->forceLogin($id, $persistent);
+            if ($res) {
+                $params = array('user' => $ao->getAuthData(), 'forcedLogin' => true, 'persistent' => $persistent);
+                $event = new sfEvent($this, 'pam.logged_in', $params);
+                $this->dispatcher->notifyUntil($event);
+            }
+            return $res;
         }
         return false;
     }
@@ -139,7 +161,12 @@ class api_pam {
      */
     public function logout() {
         if (($ao = $this->getAuthObj()) !== false) {
-            return $ao->logout();
+            $res = $ao->logout();
+            if ($res) {
+                $event = new sfEvent($this, 'pam.logged_out', array());
+                $this->dispatcher->notifyUntil($event);
+            }
+            return $res;
         }
         return false;
     }
