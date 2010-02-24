@@ -1,5 +1,9 @@
 Release history of Okapi.
 
+2010-02-24 :: Version 1.2.2
+  - api_helpers_xpath: Changeable namespaces added.
+    (marco.bohler)
+
 2009-12-16 :: Version 1.2.1
   - Fix bug found in new memcached wrapper api_cache2
     (harry fuecks)
