@@ -1,12 +1,12 @@
 <phpunit backupGlobals="true"
-             backupStaticAttributes="true"
+             backupStaticAttributes="false"
              bootstrap="./tests/bootstrap.php"
              colors="true"
              convertErrorsToExceptions="true"
              convertNoticesToExceptions="true"
              convertWarningsToExceptions="true"
              processIsolation="false"
-             stopOnFailure="fakse"
+             stopOnFailure="false"
              syntaxCheck="false"
              >
              <testsuites>
