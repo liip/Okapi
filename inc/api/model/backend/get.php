@@ -115,6 +115,9 @@ class api_model_backend_get extends api_model_http {
      */
     public function getDOM() {
         $dom = parent::getDOM();
+		if(null === $dom->documentElement){
+			throw new Exception('Received invalid data from ' .$this->url);
+		}
 
         // Add some attributes on the root node
         $doc = $dom->documentElement;
