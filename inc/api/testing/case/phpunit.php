@@ -10,7 +10,7 @@ abstract class api_testing_case_phpunit extends PHPUnit_Framework_Testcase {
     }
     
     function assertIsA($object, $type, $msg = ''){
-        $this->assertInstanceOf($type, $object, $msg);
+        $this->assertType($type, $object, $msg);
     }
     
     function assertIdentical($obj1, $obj2, $msg = ''){
