@@ -128,17 +128,16 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
             unset($rgOpts['driver']);
             
             foreach($rgOpts as $name => $opts) {
-
                 $check = $this->setZendAdapter($opts, $user, $pass);
+
                 if($check === true) {
                     return $check;
                 }
                 self::$zaAuth->clearIdentity();
             }
-
             return false;
         }
-        
+
         return $this->setZendAdapter($rgOpts, $user, $pass);
     }
 
@@ -155,6 +154,9 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
                 break;
             case "imap":
                 $this->setZendDbImapAdapter($rgOpts, $user, $pass);
+                break;
+            case "googleclient":
+                $this->setZendGoogleClientAdapter($rgOpts, $user, $pass);
                 break;
             default:
                 error_log("OKAPI: Zend_Auth_Adapter_".$strAdapter." not yet usable in Okapi");
@@ -217,6 +219,11 @@ class api_pam_auth_zend extends api_pam_common  implements api_pam_Iauth {
     private function setZendDbImapAdapter($rgOpts, $user, $pass) {
         unset($rgOpts['driver']);
         self::$zaAdapter = new Zend_Auth_Adapter_Imap($rgOpts, $user, $pass);
+    }
+    
+    private function setZendGoogleClientAdapter($rgOpts, $user, $pass) {
+        unset($rgOpts['driver']);
+        self::$zaAdapter = new Zend_Auth_Adapter_GoogleClient($rgOpts, $user, $pass);
     }
 
     /**
