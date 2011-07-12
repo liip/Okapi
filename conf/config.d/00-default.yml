@@ -2,10 +2,10 @@
 default: &default
     configCache: false
     tmpdir: "{API_PROJECT_DIR}tmp/"
-    
+
     exceptionhandler:
         "*": default
-    
+
     openid:
         client:
             identityUrl: <URL of the identity provider>
