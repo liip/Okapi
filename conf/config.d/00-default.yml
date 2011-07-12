@@ -10,5 +10,5 @@ default: &default
         client:
             identityUrl: <URL of the identity provider>
             foreignServices:
-                mconnect:
-                    returnUrl: https://dev.m-connect.ch/services
+                someForeignService:
+                    returnUrl: <url used instead of the referrer>
