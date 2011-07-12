@@ -8,39 +8,15 @@
  */
 class api_helpers_xpath {
     /**
-     * Default available namespaces
-     */
-    protected static $namespaces = array(
-        'x' => 'http://www.w3.org/1999/xhtml',
-        'xhtml' => 'http://www.w3.org/1999/xhtml',
-        'i18n' => 'http://apache.org/cocoon/i18n/2.1'
-    );
-    
-    /**
-     * Gets all used namespaces
-     */
-    public static function getNamespaces() {
-        return self::$namespaces;
-    }
-    
-    /**
-     * Set namespaces
-     * @param $nameSpaces Array: namespaces to be set
-     */
-    public static function setNamespaces(array $namespaces) {
-        self::$namespaces = $namespaces;
-    }
-    
-    /**
      * Gets the first DOM node matching the given XPath expression.
      * @param $dom DOMDocument: DOM to search in
      * @param $xpath string: XPath expression to search in DOM
      */
     public static function getNode(DOMDocument $dom, $xpath) {
         $xp = new DOMXPath($dom);
-        foreach (self::$namespaces as $ns => $uri) {
-            $xp->registerNamespace($ns, $uri);
-        }
+        $xp->registerNamespace('x', 'http://www.w3.org/1999/xhtml');
+        $xp->registerNamespace('xhtml', 'http://www.w3.org/1999/xhtml');
+        $xp->registerNamespace('i18n', 'http://apache.org/cocoon/i18n/2.1');
 
         $res = $xp->query($xpath);
         if (!$res || $res->length == 0) {
@@ -113,9 +89,9 @@ class api_helpers_xpath {
      */
     public static function getNodes($dom, $xpath) {
         $xp = new DOMXPath($dom);
-        foreach (self::$namespaces as $ns => $uri) {
-            $xp->registerNamespace($ns, $uri);
-        }
+        $xp->registerNamespace('x', 'http://www.w3.org/1999/xhtml');
+        $xp->registerNamespace('xhtml', 'http://www.w3.org/1999/xhtml');
+        $xp->registerNamespace('i18n', 'http://apache.org/cocoon/i18n/2.1');
 
         $ret = array();
         $nodes = $xp->query($xpath);

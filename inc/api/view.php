@@ -77,7 +77,7 @@ class api_view {
      * @return api_view|false
      */
     private static function getViewWithNamespace($ns, $ext, $name, $route, $response) {
-        $omitExt = (isset($route['view']['omitextension'])) ? $route['view']['omitextension'] : true;
+        $omitExt = (!empty($route['view']['omitextension']) && $route['view']['omitextension']) ? true : false;
         $className = $ns.api_view::$classNameBase.strtolower($name);
 
         if ($ext != null && $omitExt === false) {

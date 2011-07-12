@@ -27,8 +27,7 @@ class api_model_file extends api_model {
             return false;
         }
 
-        $this->dom = new DOMDocument();
-        $this->dom->load($file);
+        $this->dom = DOMDocument::load($file);
         if ($this->dom === false) {
             throw new api_exception_XmlParseError(api_exception::THROW_FATAL, $file);
         }
