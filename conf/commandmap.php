@@ -2,8 +2,8 @@
 
 $m = new api_routing();
 
-$m->route('*')
+$m->route('/openid/response/:cmd')
     ->config(array(
-        'command' => 'default',
-        'view' => array ('xsl' => 'default.xsl')
+        'command' => 'openid_response_{cmd}',
+        'method'  => 'index',
     ));

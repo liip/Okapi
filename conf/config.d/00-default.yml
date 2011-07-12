@@ -3,19 +3,12 @@ default: &default
     configCache: false
     tmpdir: "{API_PROJECT_DIR}tmp/"
     
-    hosts:
-        example.org:
-    
     exceptionhandler:
         "*": default
     
-    lang:
-        dir: "{API_PROJECT_DIR}lang"
-        fileprefix: lang
-        default: en
-        languages: [en]
-    
-    db:
-        default:
-            driver: mdb2
-            dsn: mysql://dbuser@localhost/example
+    openid:
+        client:
+            identityUrl: <URL of the identity provider>
+            foreignServices:
+                mconnect:
+                    returnUrl: https://dev.m-connect.ch/services
