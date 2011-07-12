@@ -87,9 +87,12 @@ class api_helpers_xml {
                             $nodeObj = $domdoc->createTextNode("");
                         }
 
-                    }  else if ($node instanceof DOMDocument){
-                        $nodeObj = $domdoc->importNode($node->documentElement, true);
-
+                    } else if ($node instanceof DOMDocument) {
+                        if ($node->documentElement) {
+                            $nodeObj = $domdoc->importNode($node->documentElement, true);
+                        } else {
+                            $nodeObj = '';
+                        }
                     } else if (is_bool($node)) {
                         $node = $node ? 'true' : 'false';
                         $nodeObj = $domdoc->createTextNode($node);
