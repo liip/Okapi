@@ -8,9 +8,6 @@ default: &default
     
     exceptionhandler:
         "*": default
-        
-    permission_handler:
-        classname: api_model_permission_handler
     
     lang:
         dir: "{API_PROJECT_DIR}lang"
@@ -22,19 +19,3 @@ default: &default
         default:
             driver: mdb2
             dsn: mysql://dbuser@localhost/example
-        read:
-            driver: zend
-            adapter: Pdo_Mysql
-            dsn:
-                host: 127.0.0.1
-                dbname: openid
-                username: openid_read
-                password: password
-        write:
-            driver: zend
-            adapter: Pdo_Mysql
-            dsn:
-                host: 127.0.0.1
-                dbname: openid
-                username: openid_write
-                password: password
