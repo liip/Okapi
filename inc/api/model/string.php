@@ -29,6 +29,7 @@ class api_model_string extends api_model {
     }
 
     public function getDOM() {
+        $string = $this->string;
         if (!empty($root)) {
             $string = sprintf('<%1$s>%2$s</%1$s>', $root, $string);
         }
