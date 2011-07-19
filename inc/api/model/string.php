@@ -9,7 +9,7 @@
  *
  * @author   Patrice Neff
  */
-class api_model_array extends api_model {
+class api_model_string extends api_model {
     /** string: Name of the root node to be set. */
     protected $root = '';
 
