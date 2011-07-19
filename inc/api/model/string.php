@@ -4,10 +4,10 @@
  */
 
 /**
- * Array model object. Represents an array and returns an XML DOM
+ * String model object. Represents a string and returns an XML DOM
  * for that array in getDOM().
  *
- * @author   Patrice Neff
+ * @author   Bastian Feder <bastian.feder@liip.ch>
  */
 class api_model_string extends api_model {
     /** string: Name of the root node to be set. */
