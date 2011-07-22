@@ -2,7 +2,7 @@
 /**
  * Tests the api_db class which returns database instances.
  */
-class DbTest extends api_testing_case_unit {
+class DbTest extends api_testing_case_phpunit {
     public function testGet() {
         $db = api_db::factory('testdb');
         $this->assertIsA($db, "api_db_dummy");
