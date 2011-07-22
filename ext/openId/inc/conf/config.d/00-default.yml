@@ -1,0 +1,40 @@
+#Preserve "white" spaces on empty lines.
+default: &default
+    configCache: false
+    tmpdir: "{API_PROJECT_DIR}tmp/"
+
+    exceptionhandler:
+        "*": default
+
+    openid:
+        client:
+# example:
+#           someForeignService:
+#               identityUrl: <URL of the identity provider>
+#               returnUrl: <url used instead of the referrer>
+            mconnect:
+                returnUrl: https://dev.m-connect.ch/services
+                identityUrl: https://dev.m-connect.ch/member/
+                
+        provider:
+            permission_handler:
+                classname: api_model_permission_handler
+            member_handler:
+                classname: api_model_member_handler
+    db:
+        read:
+            driver: zend
+            adapter: Pdo_Mysql
+            dsn:
+                host: 127.0.0.1
+                dbname: openid
+                username: openid_read
+                password: password
+        write:
+            driver: zend
+            adapter: Pdo_Mysql
+            dsn:
+                host: 127.0.0.1
+                dbname: openid
+                username: openid_write
+                password: password
