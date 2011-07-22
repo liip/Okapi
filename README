@@ -1,0 +1,4 @@
+api_db_zend
+
+Requires Zend Framework >= 1.8.0 for charset option support for other adapters than Zend_Db_Adapter_Pdo_Mysql
+http://framework.zend.com/issues/browse/ZF-1541
