@@ -2,7 +2,7 @@
 /**
  * Tests api_cache - just test we get the right instance
  */
-class ViewTest extends UnitTestCase {
+class ViewTest extends api_testing_case_phpunit {
     
     function setUp() {
         // Remove all existing routes
