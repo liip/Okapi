@@ -1,7 +1,7 @@
 <?php
 $m = new api_routing();
 /** default hallo world example */
-$m->route('/default')
+$m->route('/')
    ->config(array(
        'command' => 'nocommand',
        'view' => array ('xsl' => 'default.xsl')));
