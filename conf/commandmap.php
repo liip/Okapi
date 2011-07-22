@@ -1,5 +1,10 @@
 <?php
 $m = new api_routing();
+/** default hallo world example */
+$m->route('/default')
+   ->config(array(
+       'command' => 'nocommand',
+       'view' => array ('xsl' => 'default.xsl')));
 
 /** routes used by testing */
 $m->route('/command/:method')
@@ -25,13 +30,5 @@ $m->route('/noviewtest/')
 
 $m->route('/noxslttest/')
     ->config(array(
-        'command' => 'nocommand'
-      ));
-
-/** default hallo world example */
-$m->route('/helloworld')
-    ->config(array(
-        'command' => 'default',
-        'view' => array ('xsl' => 'default.xsl')
-    ));
+        'command' => 'nocommand'));
 
