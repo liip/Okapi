@@ -1,5 +1,14 @@
 <?php
 $m = new api_routing();
+
+/** default hallo world example */
+$m->route('*')
+    ->config(array(
+        'command' => 'default',
+        'view' => array ('xsl' => 'default.xsl')
+    ));
+
+/** routes used by testing */
 $m->route('/command/:method')
   ->config(array(
       'command' => 'nocommand',
