@@ -1,0 +1,218 @@
+*************************
+OKAPI - OpenId Extension
+*************************
+
+=======
+Purpose
+=======
+The openId extension for OKAPI is an openId wrapper/driver to enable OKAPI to handle OpenId authentication (id provider) 
+requests and to send authentication requests to an identity provider.
+
+============
+Requirements
+============
+
+Access to the identity provider
+===============================
+Most of the time it is not necessary to get be granted access to an idendity provider (authentication server). 
+But there are many nonpublic identity providers (e.g. M-connect) who will only grant you access after a registration. 
+Before trying to get data from these servers, pls check if there is such a restriction.
+
+PHP version
+===========
+>= 5.2
+
+3rd party
+=========
+
+-----------
+PHP modules
+-----------
+* Curl || https stream wrapper
+
+------------------------
+OpenId library
+------------------------
+Since this extension does not implement the open id procedure by itself, an external library is necessary.
+I decided on using LightOpenId[1], since it is very light weight and provided every functionallity I needed at the time.
+
+[1] http://code.google.com/p/lightopenid/
+
+============
+Installation
+============
+This extension is part of the OKAPI extension repository. To add this to your application, you need to add the extesnion
+to svn:externals definition of your application repository.
+
+$> svn propedit svn:externals ext/
+
+Your default editor will open. Just add 
+
+https://svn.liip.ch/repos/public/okapi/ext/openId/trunk/       openId
+
+to the file and store it.
+
+$> svn up 
+
+will then download the sources.
+
+=============
+OpenId Client
+=============
+
+Configuration
+=============
+There are three settings to be made for the openId authentication request.
+First you have to decide what name your foreign service (the openid identity provider you are calling)
+shall have (here: someForeignService). 
+Next is to set the 'identityUrl'. Your identity provider shall be able to name it to you. 
+Add this to the field named 'identityUrl' as a subsection of your identity provider field definition.
+Third and optional you may define a 'redirectUrl'. Be aware this is _not_ the 'returnPath' mandatory for the
+openId authentication request. This is just for internal processing if you want to send the user to a specific page
+after the authentication process was finished or if the process was cancelled. 
+
+-------
+Example
+-------
+
+openid:
+    client:
+       someForeignService:
+           identityUrl: <URL of the identity provider>
+           redirectUrl: <url to a drop page>
+
+Synopsis
+========
+----------------------
+Send an openId request
+----------------------
+The first step of an authentication request is to start a discovery process in order to get the url to 
+authenticate against. This could be done using the 'authUrl()' method from the api_openId_client_request class.
+To send an authentication request to the identity provider the following example shall enlighten you.
+
+Example
+-------
+
+    $configuration = api_config::getInstance();
+    $openidRequest = api_openId_client_request(configuration->openid['client']['someForeignService']);
+    
+    $openidRequest->setReturnPath('/openid/response/someForeignService/auth');
+    $url = $openidRequest->authUrl();
+    header("Location: $url");
+    exit();
+    
+Most of the identity providers support the request for AX-Attributes, but which attributes are provided, 
+are in the hands of the provider. If you want to receive AX-Attributes pls refer to the service documentation of your
+provider. The follwoing example shows how to prepare the request to ask for attributes. 
+    
+Example with AX-Attibutes
+-------------------------
+
+    $configuration = api_config::getInstance();
+    $openidRequest = api_openId_client_request(configuration->openid['client']['someForeignService']);
+    
+    $openidRequest->setReturnPath('/openid/response/someForeignService/auth');
+    $url = $openidRequest->authUrl();
+    
+    $openidRequest->addRequiredAttribute('email');
+    $openidRequest->addRequiredAttribute('language');
+    $openidRequest->addOptionalAttribute('firstname');
+    $openidRequest->addOptionalAttribute('lastname');
+    $openidRequest->addOptionalAttribute('gender');
+    
+    /*
+     * or use the setAttributes() method. Both keys (required, optional) are optional.
+     *
+     * $openidRequest->setAttributes(array(
+     *    'required' => array('email', 'language'),
+     *    'optional' => array('firstname', 'lastname', 'gender'),
+     * ));
+     */
+
+    header("Location: $url");
+    exit();
+    
+
+--------------------------
+Receive an openId response
+--------------------------
+After you sent the request the identity provider will return to you (remember the set 'returnPath').
+To be able to catch the request from the identity provider you have to define a route 
+(the shown one is already predefined in commandmap.php):
+
+Example
+-------
+
+    $m->route('/openid/response/:service/:cmd')
+        ->config(array(
+            'command' => 'openid_response_{service}',
+            'method'  => '{cmd}',
+    ));
+
+According how OKAPI functions this route will fetch the request to our 'someForeignService' since the returnPath was set
+to '/openid/response/someForeignService'. The routing handler will now invoke 
+api__command_openid_response_someForeignService::auth().
+The method auth() shall now e.g. handle the authentication of the user in your side and redirect the user to a 
+reasonable page or the page from where the authentication was triggered.
+
+Example
+-------
+
+    $configuration = api_config::getInstance();
+    $openidResponse = api_openId_client_response(configuration->openid['client']['someForeignService']);
+    
+    // determine if the authentication request was cancelled
+    if ('cancel' == $openidResponse->getMode()) {
+        // user cancelled request
+        $openidResponse->cancelled($this->getReferrer(), $this->response);
+    } else {
+        try {
+            $openIdResponse->Validate();
+            // process response
+
+        } catch (OpenIdErrorException $e) {
+            // invalid response, send home
+            $this->response->redirect($this->getReferrer(), 400);
+        }
+    }
+
+In getReferrer() it is determined where to send the user to, either the defined 'redirectUrl' or 
+the '$_SERVER['HTTP_REFERRER']'.
+
+If you requested AX-Attributes to be returned, use the following methods in your auth() method where the response
+is processed:
+
+Example
+-------
+
+    $attributes = $openidResponce->getAttributes();
+
+It might be that the returned attribute names do not fit your internal list of attribute names. To make them fit 
+the method 'normalizeAttributeNames()' is provided:
+
+Example
+-------
+
+    $axAttributesMap = array(
+        '.net/namePerson/first' => 'firstName',
+        '.net/namePerson/last'  => 'lastName',
+        '.net/contact/email'    => 'email',
+        '.net/person/gender'    => 'gender',
+        '.net/perf/language'    => 'language',
+    );
+    $attributes = $this->normalizeAttributeNames($openidResponce->getAttributes(), $axAttributesMap);
+
+========================
+OpenId identity provider
+========================
+
+
+
+
+===============
+Further Reading
+===============
+* http://openid.net/developers/specs/
+* http://openid.net/specs/openid-authentication-2_0.htm
+* http://openid.net/specs/openid-attribute-exchange-1_0.html
+* http://www.axschema.org/
