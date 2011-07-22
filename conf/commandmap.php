@@ -1,9 +1,30 @@
 <?php
-
 $m = new api_routing();
+$m->route('/command/:method')
+  ->config(array(
+      'command' => 'nocommand',
+      'view' => array('xsl' => 'command.xsl')));
 
-$m->route('*')
+$m->route('/helloworld/:method')
     ->config(array(
-        'command' => 'default',
-        'view' => array ('xsl' => 'default.xsl')
-    ));
+        'command' => 'helloworld',
+        'view' => array('xsl' => 'helloworld.xsl')));
+
+$m->route('/namespacetest/:namespace/:command/:method')
+    ->config(array(
+        'command' => 'nocommand',
+        'view' => array('xsl' => 'command.xsl')));
+
+$m->route('/noviewtest/')
+    ->config(array(
+        'command' => 'nocommand',
+        'view' => array('class' => 'notexisting',
+        'xsl' => 'command.xsl')));
+
+$m->route('/noxslttest/')
+    ->config(array(
+        'command' => 'nocommand'
+      ));
+
+    
+?>

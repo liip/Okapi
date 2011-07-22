@@ -1,0 +1,91 @@
+# =======================
+# = Live configuration =
+# =======================
+default: &demo-shared
+    configCache: false
+    tmpdir: "{API_PROJECT_DIR}tmp/"
+    
+    lang:
+        dir: "{API_PROJECT_DIR}lang/"
+        fileprefix: lang
+        i18ntransform: true
+        default: en
+        languages: [en, de]
+        retriever: lowercase
+    
+    hosts:
+        demo.okapi.org:
+            sld: demo
+            tld: okapi.org
+        pathdemo.okapi.org:
+            path: /xyz
+            sld: pathdemo
+            tld: okapi.org
+            host: pathdemo.okapi
+        notld.okapi.org:
+            # Used for the tests. tld should automatically be "okapi.org"
+            sld: notld
+        "ssoa*":
+            path: /ssoa/
+    
+    exceptionhandler:
+        "*": rethrow
+    
+    config_test: main
+    
+    backend:
+        extapi: &extapi
+            host: extapi.local.ch
+            path: /0
+            cities:
+                path: /cities.xml
+            testparams:
+                path: "/{myparam}/index.xml"
+        secure: &secure
+            host: secure.local.ch
+            protocol: https://
+            secreturl:
+                path: /test
+
+    
+    db:
+        testdb:
+            driver: dummy
+            dsn: dummydsn
+        testdb_nodsn:
+            driver: dummy
+        othertestdb:
+            driver: dummy
+            dsn: dododsn
+
+# =======================
+# = Debug configuration =
+# =======================
+debug: 
+    <<: *demo-shared
+    config_test: debug
+    backend:
+        extapi: 
+            <<: *extapi
+            host: extapi.local.ch
+        secure: *secure
+
+# =======================
+# = Logging configuration =
+# =======================
+loggingAll: 
+    <<: *demo-shared
+    log:
+        -
+            class: Writer_Mock
+            priority: DEBUG       
+            
+# =======================
+# = Logging configuration =
+# =======================
+loggingAlert: 
+    <<: *demo-shared
+    log:
+        -
+            class: Writer_Mock
+            priority: ALERT      
