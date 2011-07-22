@@ -14,7 +14,7 @@ class testResponse extends api_response {
     }
 }
 
-class ControllerTest extends UnitTestCase {
+class ControllerTest extends api_testing_case_phpunit {
     function setUp() {
         $_SERVER['HTTP_HOST'] = 'demo.okapi.org';
         $_SERVER["REQUEST_URI"] = '/command/the';

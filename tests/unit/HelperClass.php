@@ -2,7 +2,7 @@
 /**
  * Tests the api_helpers_class class.
  */
-class HelperClassTest extends UnitTestCase {
+class HelperClassTest extends api_testing_case_phpunit {
     /**
      * Test that api_helpers_class::getBasename() works for strings.
      */

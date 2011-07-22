@@ -1,5 +1,5 @@
 <?php
-class ResponseTest extends UnitTestCase {
+class ResponseTest extends api_testing_case_phpunit {
     function tearDown() {
         @ob_end_clean();
     }

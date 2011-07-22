@@ -3,7 +3,7 @@
  * Tests the api_init class which handles initialisation of the
  * API. Sets constants, variables, etc.
  */
-class InitTest extends UnitTestCase {
+class InitTest extends api_testing_case_phpunit {
     function setUp() {
         $_SERVER['HTTP_HOST'] = 'demo.okapi.org';
         $_SERVER["REQUEST_URI"] = '/the/command';
