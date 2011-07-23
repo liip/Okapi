@@ -1,5 +1,5 @@
 <?php
-abstract class api_testing_case_phpunit extends PHPUnit_Framework_Testcase {
+abstract class api_testing_case_phpunit extends PHPUnit_Framework_TestCase {
     
     function assertEqual($exp, $given, $msg = ''){
         $this->assertEquals($exp, $given, $msg);
