@@ -5,7 +5,13 @@
 class CacheTest extends api_testing_case_phpunit {
     
     function testGetInstance() {
-        $this->assertIsA(api_cache::getInstance(), 'api_cache');
+        if (extension_loaded('memcached') || extension_loaded('memcache')) {
+            $this->assertIsA(api_cache::getInstance(), 'api_cache');
+        } else {
+            $this->markTestIncomplete(
+                "Can't test api_cache without memcache or memcached extension loaded"
+            );
+        }
     }
     
 }
