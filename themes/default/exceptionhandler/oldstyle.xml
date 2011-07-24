@@ -15,7 +15,7 @@
     <xsl:variable name="exception" select="/response/command[@name='exception']"/>
     
     <xsl:template name="addtohead">
-        <link rel="stylesheet" type="text/css" href="{$webrootStatic}css/exceptionhandler.css"/>
+        <link rel="stylesheet" type="text/css" href="{$webrootStatic}stylesheets/exceptionhandler.css"/>
     </xsl:template>
 
     <xsl:template name="content">

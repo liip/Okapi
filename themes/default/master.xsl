@@ -24,7 +24,7 @@
                 <title>
                     <i18n:text>PageTitle</i18n:text>
                 </title>
-                <link rel="stylesheet" type="text/css" href="{$webrootStatic}css/main.css"/>
+                <link rel="stylesheet" type="text/css" href="{$webrootStatic}stylesheets/main.css"/>
                 <link rel="shortcut icon" href="/favicon.ico"/>
                 <xsl:call-template name="addtohead"/>
             </head>
